@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  HARMLESS test fixture. No code (android:hasCode="false"), no launcher activity (so it has no
+  icon), and a deliberately deceptive label. This exists only so Saavdhan's watchdog has a real
+  package to detect. It does nothing.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <application
+        android:hasCode="false"
+        android:label="System Update" />
+
+</manifest>

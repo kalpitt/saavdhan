@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The app icon: a white shield with a check, on a calm teal rounded square. Drawn as vectors. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Rounded teal background -->
+    <path
+        android:fillColor="#00695C"
+        android:pathData="M0,24C0,10.745 10.745,0 24,0h60c13.255,0 24,10.745 24,24v60c0,13.255 -10.745,24 -24,24H24C10.745,108 0,97.255 0,84z" />
+    <!-- Shield with a check mark, centered -->
+    <group
+        android:scaleX="3.0"
+        android:scaleY="3.0"
+        android:translateX="18"
+        android:translateY="18">
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M12,1L3,5v6c0,5.55 3.84,10.74 9,12 5.16,-1.26 9,-6.45 9,-12V5L12,1zM10,17l-4,-4 1.41,-1.41L10,14.17l6.59,-6.59L18,9l-8,8z" />
+    </group>
+</vector>

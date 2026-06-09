@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Saavdhan</string>
+
+    <!-- Language onboarding -->
+    <string name="choose_language">Choose your language</string>
+    <string name="choose_language_sub">You can change this later in Settings.</string>
+    <string name="lang_english">English</string>
+    <string name="lang_hindi">हिन्दी</string>
+
+    <!-- Scan home -->
+    <string name="home_subtitle">Check your phone for dangerous apps</string>
+    <string name="scan_button">Scan my phone</string>
+    <string name="scanning">Scanning…</string>
+    <string name="scan_again">Scan again</string>
+
+    <!-- Results -->
+    <string name="result_safe_title">No dangerous apps found</string>
+    <string name="result_safe_body">We did not find apps with the warning signs of scam spyware. Stay alert, and scan again any time.</string>
+    <string name="result_found_title">%1$d app needs your attention</string>
+    <string name="result_found_title_plural">%1$d apps need your attention</string>
+    <string name="partial_scan_note">This phone limits what we can see, so the scan may be incomplete.</string>
+
+    <!-- Risk levels -->
+    <string name="risk_critical">Very dangerous</string>
+    <string name="risk_high">Dangerous</string>
+    <string name="risk_suspicious">Worth checking</string>
+    <string name="risk_low">Looks okay</string>
+
+    <!-- Danger signals (plain language) -->
+    <string name="signal_accessibility">Can read your screen and tap for you (Accessibility)</string>
+    <string name="signal_device_admin">Has admin power that blocks removal (Device Admin)</string>
+    <string name="signal_sms">Can read your text messages, including bank OTPs</string>
+    <string name="signal_sideloaded">Installed from outside the Play Store</string>
+    <string name="signal_hidden_icon">Hides its icon from your app list</string>
+    <string name="signal_impersonation">Pretends to be a trusted system app</string>
+
+    <!-- App detail -->
+    <string name="detail_why_title">Why this looks risky</string>
+    <string name="detail_what_title">What this app could do</string>
+    <string name="detail_what_critical">This app has the exact powers that banking-scam spyware uses: it can watch your screen, read your OTPs, and stop you from removing it. If you did not install it on purpose, treat it as dangerous and remove it.</string>
+    <string name="detail_what_high">This app holds powerful permissions that scam apps often misuse. If you do not clearly recognise and trust it, you should remove it.</string>
+    <string name="detail_what_suspicious">This app shows one warning sign. It may be perfectly fine if it is something you installed on purpose — like a password manager or a screen reader. Check that you recognise it.</string>
+    <string name="detail_what_low">We did not find strong warning signs for this app.</string>
+    <string name="detail_allowlisted_note">This is a built-in or well-known app. We show it only so you can see the full picture.</string>
+
+    <!-- Honesty banner about what the app can and cannot do -->
+    <string name="honesty_note">For your safety, Android only lets YOU turn these settings off — no app can do it for you. Saavdhan takes you straight to the right screen; you make the final tap.</string>
+
+    <!-- Actions (deep links) -->
+    <string name="action_app_info">Open this app\'s settings page</string>
+    <string name="action_uninstall">Uninstall this app</string>
+    <string name="action_accessibility">Turn off its Accessibility</string>
+    <string name="action_device_admin">Remove its admin power</string>
+    <string name="action_app_info_hint">From here you can Force Stop, change permissions, or uninstall.</string>
+    <string name="action_accessibility_hint">In the list that opens, find this app and switch it OFF.</string>
+    <string name="action_device_admin_hint">Find this app in the list and tap Deactivate, then come back.</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_language">Language</string>
+    <string name="settings_about">About Saavdhan</string>
+    <string name="settings_offline_note">Saavdhan works fully offline. It never connects to the internet and never sends your data anywhere.</string>
+
+    <!-- Background watchdog (new-app alerts) -->
+    <string name="watchdog_channel_name">Threat alerts</string>
+    <string name="watchdog_channel_desc">Warns you when a newly installed app looks dangerous.</string>
+    <string name="watchdog_title">A new app looks dangerous</string>
+    <string name="watchdog_text">%1$s may be a scam app. Tap to check it in Saavdhan.</string>
+
+    <!-- On-screen overlay coach -->
+    <string name="coach_accessibility">Find \"%1$s\" in this list and turn it OFF.</string>
+    <string name="coach_device_admin">Find \"%1$s\", tap it, then choose Deactivate.</string>
+    <string name="coach_done">Got it</string>
+    <string name="enable_helper">Enable the on-screen helper</string>
+    <string name="enable_helper_hint">Shows step-by-step help on top of the Settings screen. Asks for the \"draw over other apps\" permission once.</string>
+
+    <!-- Generic -->
+    <string name="back">Back</string>
+</resources>
