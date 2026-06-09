@@ -4,6 +4,7 @@
 
 **A free, fully-offline Android app that helps non-technical people find and safely remove scam/spyware apps from their phone — in Hindi or English.**
 
+[![CI](https://github.com/kalpitt/Saavdhan---Anti-Scam-App/actions/workflows/ci.yml/badge.svg)](https://github.com/kalpitt/Saavdhan---Anti-Scam-App/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Android%207%2B-green.svg)](#)
 [![Built with](https://img.shields.io/badge/built%20with-Kotlin%20%2B%20Compose-7F52FF.svg)](#)
