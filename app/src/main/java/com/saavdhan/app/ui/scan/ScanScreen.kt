@@ -114,8 +114,9 @@ private fun ResultsContent(
     onAppClick: (String) -> Unit,
     onScanAgain: () -> Unit,
 ) {
-    // Only surface apps that are worth attention (not the calm LOW/allowlisted ones).
-    val flagged = apps.filter { it.assessment.level != RiskLevel.LOW }
+    val allFlagged = apps.filter { it.assessment.level != RiskLevel.LOW }
+    val serious = allFlagged.filter { it.assessment.level == RiskLevel.CRITICAL || it.assessment.level == RiskLevel.HIGH }
+    val mild = allFlagged.filter { it.assessment.level == RiskLevel.SUSPICIOUS }
 
     LazyColumn(
         modifier = Modifier
@@ -128,7 +129,7 @@ private fun ResultsContent(
             item { InfoCard(text = stringResource(R.string.partial_scan_note)) }
         }
 
-        if (flagged.isEmpty()) {
+        if (serious.isEmpty() && mild.isEmpty()) {
             item {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Spacer(Modifier.height(24.dp))
@@ -146,16 +147,28 @@ private fun ResultsContent(
                 }
             }
         } else {
-            item {
-                val title = if (flagged.size == 1) {
-                    stringResource(R.string.result_found_title, flagged.size)
-                } else {
-                    stringResource(R.string.result_found_title_plural, flagged.size)
+            if (serious.isNotEmpty()) {
+                item {
+                    val title = if (serious.size == 1) {
+                        stringResource(R.string.result_found_title, serious.size)
+                    } else {
+                        stringResource(R.string.result_found_title_plural, serious.size)
+                    }
+                    Text(title, style = MaterialTheme.typography.titleLarge)
                 }
-                Text(title, style = MaterialTheme.typography.titleLarge)
+                items(serious, key = { it.app.packageName }) { item ->
+                    AppRiskCard(item, onClick = { onAppClick(item.app.packageName) })
+                }
             }
-            items(flagged, key = { it.app.packageName }) { item ->
-                AppRiskCard(item, onClick = { onAppClick(item.app.packageName) })
+
+            if (mild.isNotEmpty()) {
+                item {
+                    Spacer(Modifier.height(8.dp))
+                    Text(stringResource(R.string.result_mild_section), style = MaterialTheme.typography.titleLarge)
+                }
+                items(mild, key = { it.app.packageName }) { item ->
+                    AppRiskCard(item, onClick = { onAppClick(item.app.packageName) })
+                }
             }
         }
 
@@ -180,7 +193,7 @@ private fun AppRiskCard(item: AssessedApp, onClick: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            Column(Modifier.padding(end = 12.dp)) {
+            Column(Modifier.padding(end = 12.dp).weight(1f)) {
                 Text(item.app.label, style = MaterialTheme.typography.titleLarge)
                 Spacer(Modifier.height(4.dp))
                 Text(
