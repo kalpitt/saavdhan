@@ -88,6 +88,11 @@ testing across phone makes. Please read **[CONTRIBUTING.md](CONTRIBUTING.md)** f
 five non-negotiable principles above and how to build/test. Be kind: we follow a
 [Code of Conduct](CODE_OF_CONDUCT.md). To report a security concern, see [SECURITY.md](SECURITY.md).
 
+**Using an AI coding assistant?** Point it at **[AGENTS.md](AGENTS.md)** — it's the single,
+tool-agnostic brief that orients any agent (rules, build commands, project map). The living
+project state and session history live in **[context/](context/README.md)** so work can continue
+across chats and tools without losing the thread.
+
 ## Tech
 
 Native Android · Kotlin · Jetpack Compose · Material 3 · WorkManager · minSdk 24 / targetSdk 35 ·
