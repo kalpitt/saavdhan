@@ -36,10 +36,31 @@ object KnownApps {
      * (e.g. screen readers that genuinely need Accessibility). Prevents needless alarm.
      */
     val TRUSTED_PACKAGES: Set<String> = setOf(
-        "com.google.android.marvin.talkback", // TalkBack screen reader
-        "com.android.vending",                // Google Play Store
-        "com.google.android.gms",             // Google Play Services
+        "com.google.android.marvin.talkback",             // TalkBack screen reader
+        "com.android.vending",                            // Google Play Store
+        "com.google.android.gms",                         // Google Play Services
+        "com.huawei.health",                              // Huawei Health
+        "com.microsoft.windowsintune.companyportal",      // Company Portal
     )
+
+    /**
+     * Package name prefixes we trust, for store-installed apps that start with these.
+     * Prevents flagging icon-less Google/Samsung helper modules.
+     */
+    val TRUSTED_PREFIXES: Set<String> = setOf(
+        "com.google.android.",
+        "com.samsung.android.",
+        "com.samsung.accessory.",
+    )
+
+    /**
+     * Returns true if [packageName] is trusted either by exact match or by prefix (e.g. Play-installed
+     * Google/Samsung helpers). Only applies to store-installed apps (not sideloaded).
+     */
+    fun isTrustedPackage(packageName: String, installSource: com.saavdhan.app.domain.model.InstallSource): Boolean {
+        if (installSource == com.saavdhan.app.domain.model.InstallSource.SIDELOADED) return false
+        return packageName in TRUSTED_PACKAGES || TRUSTED_PREFIXES.any { packageName.startsWith(it) }
+    }
 
     /**
      * Returns true if [label] matches a commonly-impersonated name but [packageName] is NOT the
