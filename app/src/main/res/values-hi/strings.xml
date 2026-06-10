@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">सावधान</string>
+
+    <!-- Language onboarding -->
+    <string name="choose_language">अपनी भाषा चुनें</string>
+    <string name="choose_language_sub">आप इसे बाद में सेटिंग में बदल सकते हैं।</string>
+    <string name="lang_english">English</string>
+    <string name="lang_hindi">हिन्दी</string>
+
+    <!-- Scan home -->
+    <string name="home_subtitle">खतरनाक ऐप्स के लिए अपना फ़ोन जाँचें</string>
+    <string name="scan_button">मेरा फ़ोन स्कैन करें</string>
+    <string name="scanning">स्कैन हो रहा है…</string>
+    <string name="scan_again">फिर से स्कैन करें</string>
+
+    <!-- Results -->
+    <string name="result_safe_title">कोई खतरनाक ऐप नहीं मिला</string>
+    <string name="result_safe_body">हमें स्कैम स्पाईवेयर के चेतावनी संकेत वाले ऐप्स नहीं मिले। सतर्क रहें, और कभी भी दोबारा स्कैन करें।</string>
+    <string name="result_found_title">%1$d ऐप पर ध्यान देने की ज़रूरत है</string>
+    <string name="result_found_title_plural">%1$d ऐप्स पर ध्यान देने की ज़रूरत है</string>
+    <string name="partial_scan_note">यह फ़ोन हमें सीमित जानकारी देखने देता है, इसलिए स्कैन अधूरा हो सकता है।</string>
+
+    <!-- Risk levels -->
+    <string name="risk_critical">बहुत खतरनाक</string>
+    <string name="risk_high">खतरनाक</string>
+    <string name="risk_suspicious">जाँचने लायक</string>
+    <string name="risk_low">ठीक लगता है</string>
+
+    <!-- Danger signals (plain language) -->
+    <string name="signal_accessibility">आपकी स्क्रीन देख सकता है और आपकी जगह टैप कर सकता है (Accessibility)</string>
+    <string name="signal_device_admin">हटाने से रोकने वाली एडमिन शक्ति रखता है (Device Admin)</string>
+    <string name="signal_sms">आपके मैसेज पढ़ सकता है, बैंक OTP सहित</string>
+    <string name="signal_sideloaded">Play Store के बाहर से इंस्टॉल किया गया</string>
+    <string name="signal_hidden_icon">आपकी ऐप सूची से अपना आइकन छुपाता है</string>
+    <string name="signal_impersonation">किसी भरोसेमंद सिस्टम ऐप का रूप धरता है</string>
+
+    <!-- App detail -->
+    <string name="detail_why_title">यह जोखिम भरा क्यों लगता है</string>
+    <string name="detail_what_title">यह ऐप क्या कर सकता है</string>
+    <string name="detail_what_critical">इस ऐप के पास ठीक वही शक्तियाँ हैं जो बैंक-स्कैम स्पाईवेयर इस्तेमाल करता है: यह आपकी स्क्रीन देख सकता है, आपके OTP पढ़ सकता है, और आपको इसे हटाने से रोक सकता है। अगर आपने इसे जानबूझकर इंस्टॉल नहीं किया है, तो इसे खतरनाक मानें और हटा दें।</string>
+    <string name="detail_what_high">इस ऐप के पास ताकतवर अनुमतियाँ हैं जिनका स्कैम ऐप्स अक्सर दुरुपयोग करते हैं। अगर आप इसे साफ़ तौर पर नहीं पहचानते और इस पर भरोसा नहीं करते, तो इसे हटा दें।</string>
+    <string name="detail_what_suspicious">इस ऐप में एक चेतावनी संकेत है। अगर यह कुछ ऐसा है जो आपने जानबूझकर इंस्टॉल किया है — जैसे पासवर्ड मैनेजर या स्क्रीन रीडर — तो यह बिलकुल ठीक हो सकता है। पक्का करें कि आप इसे पहचानते हैं।</string>
+    <string name="detail_what_low">इस ऐप के लिए हमें कोई मजबूत चेतावनी संकेत नहीं मिला।</string>
+    <string name="detail_allowlisted_note">यह एक बिल्ट-इन या जाना-पहचाना ऐप है। हम इसे सिर्फ़ इसलिए दिखाते हैं ताकि आपको पूरी तस्वीर दिखे।</string>
+
+    <!-- Honesty banner -->
+    <string name="honesty_note">आपकी सुरक्षा के लिए, Android सिर्फ़ आपको ये सेटिंग बंद करने देता है — कोई ऐप आपके लिए यह नहीं कर सकता। सावधान आपको सीधे सही स्क्रीन पर ले जाता है; आखिरी टैप आप करते हैं।</string>
+
+    <!-- Actions (deep links) -->
+    <string name="action_app_info">इस ऐप की सेटिंग खोलें</string>
+    <string name="action_uninstall">इस ऐप को हटाएँ</string>
+    <string name="action_accessibility">इसकी Accessibility बंद करें</string>
+    <string name="action_device_admin">इसकी एडमिन शक्ति हटाएँ</string>
+    <string name="action_app_info_hint">यहाँ से आप Force Stop कर सकते हैं, अनुमतियाँ बदल सकते हैं, या हटा सकते हैं।</string>
+    <string name="action_accessibility_hint">खुलने वाली सूची में, इस ऐप को ढूँढें और इसे बंद (OFF) करें।</string>
+    <string name="action_device_admin_hint">सूची में इस ऐप को ढूँढें और Deactivate पर टैप करें, फिर वापस आएँ।</string>
+
+    <!-- Settings -->
+    <string name="settings_title">सेटिंग</string>
+    <string name="settings_language">भाषा</string>
+    <string name="settings_about">सावधान के बारे में</string>
+    <string name="settings_offline_note">सावधान पूरी तरह ऑफ़लाइन काम करता है। यह कभी इंटरनेट से नहीं जुड़ता और आपका डेटा कहीं नहीं भेजता।</string>
+
+    <!-- Background watchdog (new-app alerts) -->
+    <string name="watchdog_channel_name">खतरे की चेतावनी</string>
+    <string name="watchdog_channel_desc">जब कोई नया इंस्टॉल किया गया ऐप खतरनाक लगता है तो आपको चेतावनी देता है।</string>
+    <string name="watchdog_title">एक नया ऐप खतरनाक लगता है</string>
+    <string name="watchdog_text">%1$s एक स्कैम ऐप हो सकता है। सावधान में जाँचने के लिए टैप करें।</string>
+
+    <!-- On-screen overlay coach -->
+    <string name="coach_accessibility">इस सूची में \"%1$s\" को ढूँढें और इसे बंद (OFF) करें।</string>
+    <string name="coach_device_admin">\"%1$s\" को ढूँढें, उस पर टैप करें, फिर Deactivate चुनें।</string>
+    <string name="coach_done">समझ गया</string>
+    <string name="enable_helper">ऑन-स्क्रीन सहायक चालू करें</string>
+    <string name="enable_helper_hint">सेटिंग स्क्रीन के ऊपर कदम-दर-कदम मदद दिखाता है। एक बार \"अन्य ऐप्स के ऊपर दिखाने\" की अनुमति माँगता है।</string>
+
+    <!-- Guided cleanup (Phase 2) -->
+    <string name="start_cleanup">निर्देशित सफ़ाई शुरू करें</string>
+    <string name="cleanup_title">निर्देशित सफ़ाई</string>
+    <string name="cleanup_recheck">फिर से जाँचें</string>
+    <string name="status_done">हो गया</string>
+    <string name="status_current">अभी यह करें</string>
+
+    <string name="step_isolate_title">फ़ोन को अलग करें</string>
+    <string name="step_isolate_desc">Airplane मोड चालू करें ताकि सफ़ाई के दौरान यह ऐप आपकी जानकारी न भेज सके।</string>
+    <string name="step_isolate_action">Airplane सेटिंग खोलें</string>
+    <string name="step_isolate_hint">या ऊपर से नीचे स्वाइप करें और Airplane मोड बटन पर टैप करें।</string>
+
+    <string name="step_accessibility_title">इसकी Accessibility बंद करें</string>
+    <string name="step_accessibility_desc">यह ऐप आपकी स्क्रीन देख सकता है। पहले इसकी Accessibility बंद (OFF) करें।</string>
+
+    <string name="step_admin_title">इसकी एडमिन शक्ति हटाएँ</string>
+    <string name="step_admin_desc">इस ऐप के पास हटाने से रोकने वाली एडमिन शक्ति है। इसे Deactivate करें ताकि आप इसे हटा सकें।</string>
+
+    <string name="step_uninstall_title">ऐप को हटाएँ</string>
+    <string name="step_uninstall_desc">अब इस ऐप को अपने फ़ोन से हटा दें।</string>
+
+    <string name="step_secure_title">अपने खातों को सुरक्षित करें</string>
+    <string name="step_secure_desc">किसी दूसरे डिवाइस से, अपने बैंक और UPI के पासवर्ड बदलें। ऐसे किसी भी भुगतान अनुरोध या ऑटो-पे मैंडेट पर नज़र रखें जो आपने नहीं बनाया, और उन्हें रद्द करें।</string>
+
+    <string name="cleanup_done_title">खतरनाक ऐप हट गया है</string>
+    <string name="cleanup_done_desc">बहुत बढ़िया। आख़िरी काम: किसी दूसरे डिवाइस से अपने खातों को सुरक्षित करें।</string>
+
+    <string name="safe_mode_title">अब भी नहीं हट रहा?</string>
+    <string name="safe_mode_desc">कुछ स्कैम ऐप्स इन स्क्रीनों को रोक देते हैं। अपने फ़ोन को Safe Mode में रीस्टार्ट करें — इससे सभी डाउनलोड किए गए ऐप्स बंद हो जाते हैं ताकि आप इसे हटा सकें। पावर बटन दबाकर रखें, फिर \"Power off\" को तब तक दबाकर रखें जब तक \"Reboot to safe mode\" न दिखे, और OK पर टैप करें।</string>
+
+    <string name="factory_reset_title">आख़िरी उपाय: फ़ैक्टरी रीसेट</string>
+    <string name="factory_reset_desc">अगर और कुछ काम न करे, तो फ़ैक्टरी रीसेट फ़ोन को मिटा देता है और ऐप को हटा देता है। पहले अपनी तस्वीरें किसी कंप्यूटर पर बैकअप करें। फिर सेटिंग खोलें और \"Reset\" खोजें।</string>
+    <string name="factory_reset_action">सेटिंग खोलें</string>
+
+    <!-- Generic -->
+    <string name="back">वापस</string>
+</resources>
