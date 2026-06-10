@@ -37,6 +37,16 @@ object SettingsDeepLinks {
         Intent(Settings.ACTION_SECURITY_SETTINGS)
             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
 
+    /** Opens the Airplane-mode / wireless settings. We cannot toggle it — the user taps it. */
+    fun airplaneSettings(): Intent =
+        Intent(Settings.ACTION_AIRPLANE_MODE_SETTINGS)
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+
+    /** Opens the main system Settings. There is no reliable factory-reset deep link, so we guide. */
+    fun mainSettings(): Intent =
+        Intent(Settings.ACTION_SETTINGS)
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+
     /**
      * Launches [intent], or shows a gentle message if this particular phone has no screen for it
      * (some manufacturers move these around). Never crashes.

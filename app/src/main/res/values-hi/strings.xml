@@ -75,6 +75,40 @@
     <string name="enable_helper">ऑन-स्क्रीन सहायक चालू करें</string>
     <string name="enable_helper_hint">सेटिंग स्क्रीन के ऊपर कदम-दर-कदम मदद दिखाता है। एक बार \"अन्य ऐप्स के ऊपर दिखाने\" की अनुमति माँगता है।</string>
 
+    <!-- Guided cleanup (Phase 2) -->
+    <string name="start_cleanup">निर्देशित सफ़ाई शुरू करें</string>
+    <string name="cleanup_title">निर्देशित सफ़ाई</string>
+    <string name="cleanup_recheck">फिर से जाँचें</string>
+    <string name="status_done">हो गया</string>
+    <string name="status_current">अभी यह करें</string>
+
+    <string name="step_isolate_title">फ़ोन को अलग करें</string>
+    <string name="step_isolate_desc">Airplane मोड चालू करें ताकि सफ़ाई के दौरान यह ऐप आपकी जानकारी न भेज सके।</string>
+    <string name="step_isolate_action">Airplane सेटिंग खोलें</string>
+    <string name="step_isolate_hint">या ऊपर से नीचे स्वाइप करें और Airplane मोड बटन पर टैप करें।</string>
+
+    <string name="step_accessibility_title">इसकी Accessibility बंद करें</string>
+    <string name="step_accessibility_desc">यह ऐप आपकी स्क्रीन देख सकता है। पहले इसकी Accessibility बंद (OFF) करें।</string>
+
+    <string name="step_admin_title">इसकी एडमिन शक्ति हटाएँ</string>
+    <string name="step_admin_desc">इस ऐप के पास हटाने से रोकने वाली एडमिन शक्ति है। इसे Deactivate करें ताकि आप इसे हटा सकें।</string>
+
+    <string name="step_uninstall_title">ऐप को हटाएँ</string>
+    <string name="step_uninstall_desc">अब इस ऐप को अपने फ़ोन से हटा दें।</string>
+
+    <string name="step_secure_title">अपने खातों को सुरक्षित करें</string>
+    <string name="step_secure_desc">किसी दूसरे डिवाइस से, अपने बैंक और UPI के पासवर्ड बदलें। ऐसे किसी भी भुगतान अनुरोध या ऑटो-पे मैंडेट पर नज़र रखें जो आपने नहीं बनाया, और उन्हें रद्द करें।</string>
+
+    <string name="cleanup_done_title">खतरनाक ऐप हट गया है</string>
+    <string name="cleanup_done_desc">बहुत बढ़िया। आख़िरी काम: किसी दूसरे डिवाइस से अपने खातों को सुरक्षित करें।</string>
+
+    <string name="safe_mode_title">अब भी नहीं हट रहा?</string>
+    <string name="safe_mode_desc">कुछ स्कैम ऐप्स इन स्क्रीनों को रोक देते हैं। अपने फ़ोन को Safe Mode में रीस्टार्ट करें — इससे सभी डाउनलोड किए गए ऐप्स बंद हो जाते हैं ताकि आप इसे हटा सकें। पावर बटन दबाकर रखें, फिर \"Power off\" को तब तक दबाकर रखें जब तक \"Reboot to safe mode\" न दिखे, और OK पर टैप करें।</string>
+
+    <string name="factory_reset_title">आख़िरी उपाय: फ़ैक्टरी रीसेट</string>
+    <string name="factory_reset_desc">अगर और कुछ काम न करे, तो फ़ैक्टरी रीसेट फ़ोन को मिटा देता है और ऐप को हटा देता है। पहले अपनी तस्वीरें किसी कंप्यूटर पर बैकअप करें। फिर सेटिंग खोलें और \"Reset\" खोजें।</string>
+    <string name="factory_reset_action">सेटिंग खोलें</string>
+
     <!-- Generic -->
     <string name="back">वापस</string>
 </resources>

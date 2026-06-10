@@ -75,6 +75,40 @@
     <string name="enable_helper">Enable the on-screen helper</string>
     <string name="enable_helper_hint">Shows step-by-step help on top of the Settings screen. Asks for the \"draw over other apps\" permission once.</string>
 
+    <!-- Guided cleanup (Phase 2) -->
+    <string name="start_cleanup">Start guided cleanup</string>
+    <string name="cleanup_title">Guided cleanup</string>
+    <string name="cleanup_recheck">Re-check</string>
+    <string name="status_done">Done</string>
+    <string name="status_current">Do this now</string>
+
+    <string name="step_isolate_title">Isolate the phone</string>
+    <string name="step_isolate_desc">Turn on Airplane mode so the app can\'t send your information while you clean up.</string>
+    <string name="step_isolate_action">Open Airplane settings</string>
+    <string name="step_isolate_hint">Or swipe down from the top and tap the Airplane mode button.</string>
+
+    <string name="step_accessibility_title">Turn off its Accessibility</string>
+    <string name="step_accessibility_desc">This app can watch your screen. Switch its Accessibility OFF first.</string>
+
+    <string name="step_admin_title">Remove its admin power</string>
+    <string name="step_admin_desc">This app has admin power that blocks removal. Deactivate it so you can uninstall.</string>
+
+    <string name="step_uninstall_title">Uninstall the app</string>
+    <string name="step_uninstall_desc">Now remove the app from your phone.</string>
+
+    <string name="step_secure_title">Secure your accounts</string>
+    <string name="step_secure_desc">From a DIFFERENT device, change your bank and UPI passwords. Watch for any payment requests or auto-pay mandates you did not set up, and cancel them.</string>
+
+    <string name="cleanup_done_title">The dangerous app is gone</string>
+    <string name="cleanup_done_desc">Well done. One last thing: secure your accounts from another device.</string>
+
+    <string name="safe_mode_title">Still won\'t go away?</string>
+    <string name="safe_mode_desc">Some scam apps block these screens. Restart your phone in Safe Mode — it turns off all downloaded apps so you can remove this one. Press and hold the power button, then press and hold \"Power off\" until \"Reboot to safe mode\" appears, and tap OK.</string>
+
+    <string name="factory_reset_title">Last resort: factory reset</string>
+    <string name="factory_reset_desc">If nothing else works, a factory reset erases the phone and removes the app. Back up your photos to a computer first. Then open Settings and search for \"Reset\".</string>
+    <string name="factory_reset_action">Open Settings</string>
+
     <!-- Generic -->
     <string name="back">Back</string>
 </resources>
