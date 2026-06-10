@@ -162,7 +162,7 @@ fun AppDetailScreen(
                     text = stringResource(R.string.action_accessibility),
                     onClick = {
                         OverlayCoach.show(context, coachAccessibility) // shows only if permission granted
-                        SettingsDeepLinks.launch(context, SettingsDeepLinks.accessibilitySettings())
+                        SettingsDeepLinks.launch(context, SettingsDeepLinks.accessibilitySettings(), SettingsDeepLinks.mainSettings())
                     },
                 )
                 Text(
@@ -178,7 +178,7 @@ fun AppDetailScreen(
                     text = stringResource(R.string.action_device_admin),
                     onClick = {
                         OverlayCoach.show(context, coachDeviceAdmin) // shows only if permission granted
-                        SettingsDeepLinks.launch(context, SettingsDeepLinks.deviceAdminSettings())
+                        SettingsDeepLinks.launch(context, SettingsDeepLinks.deviceAdminSettings(), SettingsDeepLinks.mainSettings())
                     },
                 )
                 Text(

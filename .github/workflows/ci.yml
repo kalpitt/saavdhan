@@ -37,10 +37,13 @@ jobs:
       - name: Assemble debug APK
         run: ./gradlew assembleDebug
 
-      - name: Verify the offline guarantee (no INTERNET permission)
+      - name: Assemble release APK (unsigned)
+        run: ./gradlew assembleRelease
+
+      - name: Verify the offline guarantee (no INTERNET permission in debug or release)
         run: |
           if grep -rq "android.permission.INTERNET" app/build/intermediates/merged_manifest*/; then
             echo "::error::INTERNET permission found in the merged manifest — the offline rule is broken."
             exit 1
           fi
-          echo "OK: no INTERNET permission in the merged manifest."
+          echo "OK: no INTERNET permission in debug or release merged manifests."

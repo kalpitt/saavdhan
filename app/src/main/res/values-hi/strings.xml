@@ -111,4 +111,5 @@
 
     <!-- Generic -->
     <string name="back">वापस</string>
+    <string name="error_screen_not_found">यह स्क्रीन इस फ़ोन पर नहीं खुल पाई। कृपया सेटिंग्स खोलकर खुद ढूँढें।</string>
 </resources>

@@ -111,4 +111,5 @@
 
     <!-- Generic -->
     <string name="back">Back</string>
+    <string name="error_screen_not_found">Could not open that screen on this phone. Please open Settings and find it yourself.</string>
 </resources>
