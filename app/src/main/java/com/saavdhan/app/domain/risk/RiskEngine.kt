@@ -47,9 +47,12 @@ object RiskEngine {
             return true
         }
 
-        // Prefix-trusted packages (e.g. com.google.android.*) also get power-checked if sideloaded
+        // Prefix-trusted packages (e.g. com.google.android.*). isTrustedPackage already excludes
+        // sideloaded apps, so the real spoofing risk here is a NON-Play install (other store /
+        // unknown source) claiming a trusted prefix while holding dangerous powers. Only a
+        // Play-verified install of such a package is trusted unconditionally.
         if (KnownApps.isTrustedPackage(app.packageName, app.installSource)) {
-            if (app.installSource == com.saavdhan.app.domain.model.InstallSource.SIDELOADED &&
+            if (app.installSource != com.saavdhan.app.domain.model.InstallSource.PLAY_STORE &&
                 (app.hasAccessibilityEnabled || app.isDeviceAdmin || app.smsGranted)
             ) {
                 return false

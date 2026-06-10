@@ -18,7 +18,7 @@ sealed interface ScanState {
     data object Idle : ScanState
     data object Scanning : ScanState
     data class Done(val result: ScanResult) : ScanState
-    data class Error(val message: String) : ScanState
+    data object Error : ScanState
 }
 
 /**
@@ -39,7 +39,9 @@ class ScanViewModel(application: Application) : AndroidViewModel(application) {
                 }
                 state = ScanState.Done(result)
             } catch (e: Exception) {
-                state = ScanState.Error(e.localizedMessage ?: "Couldn't finish scanning. Try again.")
+                // Offline app, no crash reporting by design — log for local diagnostics only.
+                android.util.Log.w("Saavdhan", "Scan failed", e)
+                state = ScanState.Error
             }
         }
     }

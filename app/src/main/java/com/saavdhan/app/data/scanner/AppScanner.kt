@@ -126,6 +126,10 @@ class AppScanner(private val context: Context) {
 
     /** Check if we can see all installed packages (QUERY_ALL_PACKAGES is granted and not restricted by OEM/Play). */
     private fun canQueryAllPackages(): Boolean {
+        // Package-visibility filtering arrived in Android 11 (API 30). Before that, apps could
+        // always see every installed package, and QUERY_ALL_PACKAGES isn't even a known permission
+        // (checkSelfPermission would wrongly report DENIED on API < 30). So below R, never partial.
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) return true
         val permission = ContextCompat.checkSelfPermission(context, Manifest.permission.QUERY_ALL_PACKAGES)
         return permission == PackageManager.PERMISSION_GRANTED
     }

@@ -4,12 +4,13 @@ import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.saavdhan.app.data.scanner.AppScanner
-import com.saavdhan.app.domain.model.RiskLevel
+import com.saavdhan.app.data.scanner.AssessedApp
 
 /**
  * The real background watchdog. Runs periodically (and once when the app opens). It diffs the
  * current installed-app list against the saved [InstalledAppsSnapshot]; for each *newly* installed
- * package it runs the same risk check as a full scan and notifies if the app is dangerous.
+ * package it runs the same risk check as a full scan and notifies if the app is dangerous. The
+ * "which new packages should alert" decision lives in the pure, tested [WatchdogPolicy].
  *
  * Why a worker and not a manifest `PACKAGE_ADDED` receiver: since Android 8, the system blocks a
  * background manifest receiver from getting `PACKAGE_ADDED` ("Background execution not allowed"),
@@ -26,21 +27,20 @@ class NewAppScanWorker(
         val current = scanner.installedPackageNames()
         val known = InstalledAppsSnapshot.get(applicationContext)
 
-        if (known == null) {
-            // First ever run: establish the baseline. We don't alarm about apps that were already
-            // installed — the on-demand scan covers those. Only future installs are "new".
-            InstalledAppsSnapshot.save(applicationContext, current)
-            InstalledAppsSnapshot.setLastRunMillis(applicationContext, System.currentTimeMillis())
-            return Result.success()
-        }
+        // Assess only the newly-installed packages once, then let WatchdogPolicy decide which
+        // ones warrant an alert. On the first run (known == null) the policy returns nothing.
+        val newlyInstalled = if (known == null) emptySet() else current - known
+        val assessedByPackage: Map<String, AssessedApp> = newlyInstalled
+            .mapNotNull { pkg -> scanner.assessSingle(pkg)?.let { pkg to it } }
+            .toMap()
 
-        val newlyInstalled = current - known
-        for (packageName in newlyInstalled) {
-            val assessed = scanner.assessSingle(packageName) ?: continue
-            val level = assessed.assessment.level
-            if (level == RiskLevel.HIGH || level == RiskLevel.CRITICAL) {
-                ThreatNotifier.notifyThreat(applicationContext, assessed)
-            }
+        val toAlert = WatchdogPolicy.newlyInstalledThreats(
+            knownPackages = known,
+            currentPackages = current,
+            getRiskLevel = { assessedByPackage[it]?.assessment?.level },
+        )
+        toAlert.forEach { pkg ->
+            assessedByPackage[pkg]?.let { ThreatNotifier.notifyThreat(applicationContext, it) }
         }
 
         InstalledAppsSnapshot.save(applicationContext, current)
