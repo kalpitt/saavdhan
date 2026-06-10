@@ -67,6 +67,7 @@ fun ScanScreen(
                 onAppClick = onAppClick,
                 onScanAgain = viewModel::scan,
             )
+            is ScanState.Error -> ErrorContent(padding, errorMessage = state.message, onRetry = viewModel::scan)
         }
     }
 }
@@ -103,6 +104,32 @@ private fun ScanningContent(padding: PaddingValues) {
         CircularProgressIndicator()
         Spacer(Modifier.height(16.dp))
         Text(stringResource(R.string.scanning), style = MaterialTheme.typography.bodyLarge)
+    }
+}
+
+@Composable
+private fun ErrorContent(padding: PaddingValues, errorMessage: String, onRetry: () -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(padding)
+            .padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+    ) {
+        Text(
+            text = stringResource(R.string.scan_error_title),
+            style = MaterialTheme.typography.titleLarge,
+            textAlign = TextAlign.Center,
+        )
+        Spacer(Modifier.height(16.dp))
+        Text(
+            text = stringResource(R.string.scan_error_body),
+            style = MaterialTheme.typography.bodyLarge,
+            textAlign = TextAlign.Center,
+        )
+        Spacer(Modifier.height(32.dp))
+        PrimaryButton(text = stringResource(R.string.scan_again), onClick = onRetry)
     }
 }
 

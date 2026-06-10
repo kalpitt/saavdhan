@@ -241,4 +241,44 @@ class RiskEngineTest {
         assertEquals(RiskLevel.LOW, result.level)
         assertTrue(result.allowlisted)
     }
+
+    @Test
+    fun `sideloaded app with a trusted prefix but Accessibility is flagged HIGH (not allowlisted)`() {
+        // e.g. a fake com.google.android.something claiming it's just a helper
+        val result = RiskEngine.assess(
+            app(
+                packageName = "com.google.android.evil",
+                installSource = InstallSource.SIDELOADED,
+                accessibility = true,
+            ),
+        )
+        assertEquals(RiskLevel.HIGH, result.level)
+        assertFalse(result.allowlisted)
+    }
+
+    @Test
+    fun `sideloaded app with a trusted prefix but Device Admin is flagged HIGH (not allowlisted)`() {
+        val result = RiskEngine.assess(
+            app(
+                packageName = "com.samsung.android.fake",
+                installSource = InstallSource.SIDELOADED,
+                deviceAdmin = true,
+            ),
+        )
+        assertEquals(RiskLevel.HIGH, result.level)
+        assertFalse(result.allowlisted)
+    }
+
+    @Test
+    fun `Play-installed app with a trusted prefix and Accessibility is still allowed (not sideloaded)`() {
+        val result = RiskEngine.assess(
+            app(
+                packageName = "com.google.android.something",
+                installSource = InstallSource.PLAY_STORE,
+                accessibility = true,
+            ),
+        )
+        assertEquals(RiskLevel.LOW, result.level)
+        assertTrue(result.allowlisted)
+    }
 }
