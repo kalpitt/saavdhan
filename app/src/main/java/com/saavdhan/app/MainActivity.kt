@@ -20,6 +20,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.saavdhan.app.i18n.LocaleManager
+import com.saavdhan.app.ui.cleanup.CleanupScreen
+import com.saavdhan.app.ui.cleanup.CleanupViewModel
 import com.saavdhan.app.ui.detail.AppDetailScreen
 import com.saavdhan.app.ui.onboarding.LanguageScreen
 import com.saavdhan.app.ui.scan.ScanScreen
@@ -80,6 +82,8 @@ private object Routes {
     const val SETTINGS = "settings"
     const val DETAIL = "detail/{pkg}"
     fun detail(packageName: String) = "detail/$packageName"
+    const val CLEANUP = "cleanup/{pkg}"
+    fun cleanup(packageName: String) = "cleanup/$packageName"
 }
 
 @Composable
@@ -113,6 +117,20 @@ fun SaavdhanApp(
             val pkg = backStackEntry.arguments?.getString("pkg").orEmpty()
             AppDetailScreen(
                 viewModel = scanViewModel,
+                packageName = pkg,
+                onBack = { navController.popBackStack() },
+                onStartCleanup = { navController.navigate(Routes.cleanup(pkg)) },
+            )
+        }
+        composable(
+            route = Routes.CLEANUP,
+            arguments = listOf(navArgument("pkg") { type = NavType.StringType }),
+        ) { backStackEntry ->
+            val pkg = backStackEntry.arguments?.getString("pkg").orEmpty()
+            // A fresh CleanupViewModel per cleanup, scoped to this nav entry.
+            val cleanupViewModel: CleanupViewModel = viewModel()
+            CleanupScreen(
+                viewModel = cleanupViewModel,
                 packageName = pkg,
                 onBack = { navController.popBackStack() },
             )

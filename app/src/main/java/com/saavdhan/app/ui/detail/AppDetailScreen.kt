@@ -23,6 +23,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.saavdhan.app.R
+import com.saavdhan.app.domain.model.RiskLevel
 import com.saavdhan.app.domain.model.RiskSignal
 import com.saavdhan.app.system.deeplink.SettingsDeepLinks
 import com.saavdhan.app.system.overlay.OverlayCoach
@@ -43,6 +44,7 @@ fun AppDetailScreen(
     viewModel: ScanViewModel,
     packageName: String,
     onBack: () -> Unit,
+    onStartCleanup: () -> Unit,
 ) {
     val item = viewModel.find(packageName)
     val context = LocalContext.current
@@ -132,9 +134,19 @@ fun AppDetailScreen(
                 )
             }
 
+            // Guided cleanup — the headline action for a flagged app: a reactive, step-by-step
+            // walk-through (isolate → strip powers → uninstall → secure accounts).
+            if (assessment.level != RiskLevel.LOW) {
+                Spacer(Modifier.height(12.dp))
+                PrimaryButton(
+                    text = stringResource(R.string.start_cleanup),
+                    onClick = onStartCleanup,
+                )
+            }
+
             // Actions — the one-tap deep links
             Spacer(Modifier.height(12.dp))
-            PrimaryButton(
+            SecondaryButton(
                 text = stringResource(R.string.action_app_info),
                 onClick = { SettingsDeepLinks.launch(context, SettingsDeepLinks.appInfo(packageName)) },
             )
