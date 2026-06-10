@@ -163,18 +163,7 @@ class AppScanner(private val context: Context) {
         } catch (e: Exception) {
             null
         }
-        return when (installer) {
-            "com.android.vending" -> InstallSource.PLAY_STORE
-            null -> InstallSource.SIDELOADED
-            "com.android.packageinstaller",
-            "com.google.android.packageinstaller",
-            "com.miui.packageinstaller",  // Xiaomi file manager / sideload installer
-            "com.samsung.android.packageinstaller",  // Samsung package manager
-            "com.coloros.filemanager",  // Oppo/Realme file manager
-            "com.transsion.packageinstaller",  // Tecno/Infinix file manager
-            -> InstallSource.SIDELOADED
-            else -> InstallSource.OTHER_STORE
-        }
+        return InstallerClassifier.classify(installer)
     }
 
     private val smsPermissions = setOf(
