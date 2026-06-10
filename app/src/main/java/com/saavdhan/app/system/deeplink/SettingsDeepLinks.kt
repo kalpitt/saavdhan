@@ -48,18 +48,22 @@ object SettingsDeepLinks {
             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
 
     /**
-     * Launches [intent], or shows a gentle message if this particular phone has no screen for it
-     * (some manufacturers move these around). Never crashes.
+     * Launches [intent], or tries each [fallbacks] in order if it fails. Shows a gentle message
+     * if no screen can be opened (some manufacturers move these around). Never crashes.
      */
-    fun launch(context: Context, intent: Intent) {
-        try {
-            context.startActivity(intent)
-        } catch (e: ActivityNotFoundException) {
-            Toast.makeText(
-                context,
-                "Could not open that screen on this phone. Please open Settings manually.",
-                Toast.LENGTH_LONG,
-            ).show()
+    fun launch(context: Context, intent: Intent, vararg fallbacks: Intent) {
+        for (candidate in listOf(intent, *fallbacks)) {
+            try {
+                context.startActivity(candidate)
+                return
+            } catch (e: Exception) {
+                // ActivityNotFoundException or SecurityException — try the next fallback
+            }
         }
+        Toast.makeText(
+            context,
+            context.getString(com.saavdhan.app.R.string.error_screen_not_found),
+            Toast.LENGTH_LONG,
+        ).show()
     }
 }

@@ -337,13 +337,13 @@ private fun actionFor(
     CleanupStepId.DISABLE_ACCESSIBILITY -> {
         {
             OverlayCoach.show(context, coachAccessibility) // shows only if permission granted
-            SettingsDeepLinks.launch(context, SettingsDeepLinks.accessibilitySettings())
+            SettingsDeepLinks.launch(context, SettingsDeepLinks.accessibilitySettings(), SettingsDeepLinks.mainSettings())
         }
     }
     CleanupStepId.REMOVE_ADMIN -> {
         {
             OverlayCoach.show(context, coachDeviceAdmin)
-            SettingsDeepLinks.launch(context, SettingsDeepLinks.deviceAdminSettings())
+            SettingsDeepLinks.launch(context, SettingsDeepLinks.deviceAdminSettings(), SettingsDeepLinks.mainSettings())
         }
     }
     CleanupStepId.UNINSTALL -> {

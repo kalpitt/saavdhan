@@ -41,6 +41,7 @@ fun RiskSignal.labelRes(): Int = when (this) {
     RiskSignal.ACCESSIBILITY -> R.string.signal_accessibility
     RiskSignal.DEVICE_ADMIN -> R.string.signal_device_admin
     RiskSignal.SMS_ACCESS -> R.string.signal_sms
+    RiskSignal.NOTIFICATION_LISTENER -> R.string.signal_notification_listener
     RiskSignal.SIDELOADED -> R.string.signal_sideloaded
     RiskSignal.HIDDEN_ICON -> R.string.signal_hidden_icon
     RiskSignal.IMPERSONATION -> R.string.signal_impersonation
