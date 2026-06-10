@@ -31,6 +31,7 @@
     <string name="signal_accessibility">आपकी स्क्रीन देख सकता है और आपकी जगह टैप कर सकता है (Accessibility)</string>
     <string name="signal_device_admin">हटाने से रोकने वाली एडमिन शक्ति रखता है (Device Admin)</string>
     <string name="signal_sms">आपके मैसेज पढ़ सकता है, बैंक OTP सहित</string>
+    <string name="signal_notification_listener">आपकी सभी सूचनाएँ पढ़ सकता है (बैंक OTP संदेश भी)</string>
     <string name="signal_sideloaded">Play Store के बाहर से इंस्टॉल किया गया</string>
     <string name="signal_hidden_icon">आपकी ऐप सूची से अपना आइकन छुपाता है</string>
     <string name="signal_impersonation">किसी भरोसेमंद सिस्टम ऐप का रूप धरता है</string>

@@ -31,6 +31,7 @@
     <string name="signal_accessibility">Can read your screen and tap for you (Accessibility)</string>
     <string name="signal_device_admin">Has admin power that blocks removal (Device Admin)</string>
     <string name="signal_sms">Can read your text messages, including bank OTPs</string>
+    <string name="signal_notification_listener">Can read all your notifications (including bank OTP messages)</string>
     <string name="signal_sideloaded">Installed from outside the Play Store</string>
     <string name="signal_hidden_icon">Hides its icon from your app list</string>
     <string name="signal_impersonation">Pretends to be a trusted system app</string>

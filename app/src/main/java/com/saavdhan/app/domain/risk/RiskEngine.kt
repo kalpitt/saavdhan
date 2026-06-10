@@ -39,6 +39,7 @@ object RiskEngine {
         if (app.isDeviceAdmin) add(RiskSignal.DEVICE_ADMIN)
         // Granted SMS access is the dangerous state (that's where OTPs can be read).
         if (app.smsGranted) add(RiskSignal.SMS_ACCESS)
+        if (app.hasNotificationListener) add(RiskSignal.NOTIFICATION_LISTENER)
         if (app.installSource == com.saavdhan.app.domain.model.InstallSource.SIDELOADED) add(RiskSignal.SIDELOADED)
         if (app.hasHiddenIcon) add(RiskSignal.HIDDEN_ICON)
         if (app.impersonatesSystemApp) add(RiskSignal.IMPERSONATION)
@@ -49,26 +50,32 @@ object RiskEngine {
         val accessibility = RiskSignal.ACCESSIBILITY in signals
         val deviceAdmin = RiskSignal.DEVICE_ADMIN in signals
         val sms = RiskSignal.SMS_ACCESS in signals
+        val notif = RiskSignal.NOTIFICATION_LISTENER in signals
         val sideloaded = RiskSignal.SIDELOADED in signals
         val hiddenIcon = RiskSignal.HIDDEN_ICON in signals
         val impersonation = RiskSignal.IMPERSONATION in signals
 
         // 1. The spyware trinity — the classic banking-trojan fingerprint.
-        if (accessibility && deviceAdmin && sms) return RiskLevel.CRITICAL
+        // Also: accessibility + deviceAdmin + notification (trojans read notifications instead of SMS sometimes).
+        if (accessibility && deviceAdmin && (sms || notif)) return RiskLevel.CRITICAL
 
         // 2. Strong two-signal combinations, and the standalone "this is hiding / faking" flags.
         val highCombo =
             (sideloaded && accessibility) ||
                 (sideloaded && deviceAdmin) ||
+                (sideloaded && sms) ||
+                (sideloaded && notif) ||
                 (accessibility && deviceAdmin) ||
                 (accessibility && sms) ||
+                (accessibility && notif) ||
                 (deviceAdmin && sms) ||
+                (deviceAdmin && notif) ||
                 impersonation ||
-                (hiddenIcon && (accessibility || deviceAdmin || sms || sideloaded))
+                (hiddenIcon && (accessibility || deviceAdmin || sms || sideloaded || notif))
         if (highCombo) return RiskLevel.HIGH
 
         // 3. A single mild clue worth a glance.
-        val suspicious = sideloaded || accessibility || deviceAdmin || hiddenIcon
+        val suspicious = sideloaded || accessibility || deviceAdmin || hiddenIcon || notif
         if (suspicious) return RiskLevel.SUSPICIOUS
 
         // 4. Nothing notable (SMS access alone is too common to flag on its own).
