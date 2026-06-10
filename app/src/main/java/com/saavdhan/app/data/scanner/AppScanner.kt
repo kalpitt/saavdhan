@@ -1,5 +1,6 @@
 package com.saavdhan.app.data.scanner
 
+import android.Manifest
 import android.accessibilityservice.AccessibilityServiceInfo
 import android.app.admin.DevicePolicyManager
 import android.content.Context
@@ -8,6 +9,7 @@ import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.os.Build
 import android.view.accessibility.AccessibilityManager
+import androidx.core.content.ContextCompat
 import com.saavdhan.app.BuildConfig
 import com.saavdhan.app.domain.allowlist.KnownApps
 import com.saavdhan.app.domain.model.InstallSource
@@ -36,13 +38,32 @@ class AppScanner(private val context: Context) {
     private val pm: PackageManager = context.packageManager
 
     fun scan(): ScanResult {
-        val accessibilityPackages = enabledAccessibilityPackages()
-        val adminPackages = activeDeviceAdminPackages()
-        val notificationListenerPackages = enabledNotificationListenerPackages()
+        val accessibilityPackages = try {
+            enabledAccessibilityPackages()
+        } catch (e: Exception) {
+            emptySet()
+        }
+        val adminPackages = try {
+            activeDeviceAdminPackages()
+        } catch (e: Exception) {
+            emptySet()
+        }
+        val notificationListenerPackages = try {
+            enabledNotificationListenerPackages()
+        } catch (e: Exception) {
+            emptySet()
+        }
         val myPackage = context.packageName
 
         val assessed = installedPackages()
-            .mapNotNull { info -> assessInfo(info, accessibilityPackages, adminPackages, notificationListenerPackages, myPackage) }
+            .mapNotNull { info ->
+                try {
+                    assessInfo(info, accessibilityPackages, adminPackages, notificationListenerPackages, myPackage)
+                } catch (e: Exception) {
+                    // Skip packages that fail to assess; don't crash the whole scan
+                    null
+                }
+            }
             .toMutableList()
 
         // On an emulator there is no real malware, so add demo threats to exercise the UI.
@@ -53,7 +74,10 @@ class AppScanner(private val context: Context) {
         val sorted = assessed
             .sortedByDescending { it.assessment.level.ordinal }
             .distinctBy { it.app.packageName }
-        return ScanResult(apps = sorted, partial = false)
+
+        // Mark as partial if visibility is restricted (Play policy, OEM restrictions, etc.)
+        val isPartial = !canQueryAllPackages()
+        return ScanResult(apps = sorted, partial = isPartial)
     }
 
     /**
@@ -99,6 +123,16 @@ class AppScanner(private val context: Context) {
     }
 
     // --- Reading the phone -------------------------------------------------------------------
+
+    /** Check if we can see all installed packages (QUERY_ALL_PACKAGES is granted and not restricted by OEM/Play). */
+    private fun canQueryAllPackages(): Boolean {
+        // Package-visibility filtering arrived in Android 11 (API 30). Before that, apps could
+        // always see every installed package, and QUERY_ALL_PACKAGES isn't even a known permission
+        // (checkSelfPermission would wrongly report DENIED on API < 30). So below R, never partial.
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) return true
+        val permission = ContextCompat.checkSelfPermission(context, Manifest.permission.QUERY_ALL_PACKAGES)
+        return permission == PackageManager.PERMISSION_GRANTED
+    }
 
     @Suppress("DEPRECATION")
     private fun installedPackages(): List<PackageInfo> =
@@ -163,18 +197,7 @@ class AppScanner(private val context: Context) {
         } catch (e: Exception) {
             null
         }
-        return when (installer) {
-            "com.android.vending" -> InstallSource.PLAY_STORE
-            null -> InstallSource.SIDELOADED
-            "com.android.packageinstaller",
-            "com.google.android.packageinstaller",
-            "com.miui.packageinstaller",  // Xiaomi file manager / sideload installer
-            "com.samsung.android.packageinstaller",  // Samsung package manager
-            "com.coloros.filemanager",  // Oppo/Realme file manager
-            "com.transsion.packageinstaller",  // Tecno/Infinix file manager
-            -> InstallSource.SIDELOADED
-            else -> InstallSource.OTHER_STORE
-        }
+        return InstallerClassifier.classify(installer)
     }
 
     private val smsPermissions = setOf(

@@ -6,18 +6,28 @@ the **danger brain**.
 
 ## What we test today
 
-### Unit tests — the RiskEngine (the brain) ✅ *done*
-`app/src/test/java/com/saavdhan/app/domain/risk/RiskEngineTest.kt` — 9 tests, all passing.
+### Unit tests — domain core ✅ *done*
+**42 tests across 3 files**, all passing. Because the `domain` layer is pure Kotlin with **no Android dependencies**, these run on your computer in ~30 milliseconds, no emulator needed.
 
-Because the `domain` layer is pure Kotlin with **no Android dependencies**, these run on your
-computer in ~30 milliseconds, no emulator needed. They lock in the rules:
+- **[RiskEngineTest.kt](../app/src/test/java/com/saavdhan/app/domain/risk/RiskEngineTest.kt)** — 22 tests locking in detection rules:
+  - the spyware trinity (Accessibility + Device Admin + SMS) ⇒ `CRITICAL`
+  - sideloaded + accessibility ⇒ `HIGH`; trusted-package spoofing with powers ⇒ `HIGH`; impersonation ⇒ `HIGH`
+  - SMS_REQUESTED signal (sideloaded + asks for SMS) ⇒ `HIGH` when paired with accessibility/admin
+  - a Play-Store app with accessibility ⇒ only `SUSPICIOUS` (don't scare legit users)
+  - SMS access alone ⇒ `LOW` (too common to flag)
+  - system apps and trusted packages ⇒ `LOW` + allowlisted (with power re-check for spoofing)
+  - a clean app ⇒ `LOW`
+- **[CleanupEngineTest.kt](../app/src/test/java/com/saavdhan/app/domain/cleanup/CleanupEngineTest.kt)** — 8 tests for the reactive cleanup flow:
+  - step ordering (isolate → disable access → remove admin → uninstall → secure accounts)
+  - state transitions as the user completes steps
+  - Safe Mode escalation when Device Admin resists uninstall
+- **[KnownAppsTest.kt](../app/src/test/java/com/saavdhan/app/domain/allowlist/KnownAppsTest.kt)** — 12 tests for allowlist & impersonation:
+  - impersonation detection (label matching, case/space insensitivity, system-app bypass)
+  - trusted-package lookup (exact matches, prefixes like `com.google.android.*`)
+  - sideload-blocking for prefix-trusted packages
 
-- the spyware trinity (Accessibility + Device Admin + SMS) ⇒ `CRITICAL`
-- sideloaded + accessibility ⇒ `HIGH`; hidden-icon + sideloaded ⇒ `HIGH`; impersonation ⇒ `HIGH`
-- a Play-Store app with accessibility ⇒ only `SUSPICIOUS` (don't scare legit users)
-- SMS access alone ⇒ `LOW` (too common to flag)
-- system apps and trusted packages ⇒ `LOW` + allowlisted
-- a clean app ⇒ `LOW`
+**Rule:** you may not change a detection rule or allowlist behaviour without adding/updating a test.
+This is guardrail #1 in [Coding Standards](06-coding-standards.md).
 
 **Rule:** you may not change a detection rule without adding/updating a test that proves the new
 behaviour. This is guardrail #1 in [Coding Standards](06-coding-standards.md).

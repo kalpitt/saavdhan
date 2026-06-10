@@ -63,6 +63,13 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        // Hide any lingering overlay coaching banner when the user returns to the app — the coach
+        // is only meant to float over the system Settings screen, never over Saavdhan itself.
+        com.saavdhan.app.system.overlay.OverlayCoach.hide(this)
+    }
+
     /** On Android 13+, ask once for notification permission so the watchdog can alert the user. */
     private fun maybeRequestNotificationPermission() {
         // Don't interrupt first-launch onboarding: only ask once a language has been chosen, so the

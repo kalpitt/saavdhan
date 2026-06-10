@@ -28,6 +28,9 @@ jobs:
       - name: Cache Gradle
         uses: gradle/actions/setup-gradle@v4
 
+      - name: Drift check (docs consistency)
+        run: bash scripts/drift_check.sh
+
       - name: Unit tests (the detection engine)
         run: ./gradlew testDebugUnitTest
 
@@ -41,8 +44,18 @@ jobs:
         run: ./gradlew assembleRelease
 
       - name: Verify the offline guarantee (no INTERNET permission in debug or release)
+        shell: bash
         run: |
-          if grep -rq "android.permission.INTERNET" app/build/intermediates/merged_manifest*/; then
+          set -euo pipefail
+          shopt -s nullglob
+          # Collect the merged-manifest directories. If none exist, the build layout changed —
+          # fail loudly rather than silently passing because there was nothing to grep.
+          manifest_dirs=(app/build/intermediates/merged_manifest*/)
+          if [ ${#manifest_dirs[@]} -eq 0 ]; then
+            echo "::error::Merged manifest path not found — cannot verify the offline guarantee. Build output layout may have changed."
+            exit 1
+          fi
+          if grep -rq "android.permission.INTERNET" "${manifest_dirs[@]}"; then
             echo "::error::INTERNET permission found in the merged manifest — the offline rule is broken."
             exit 1
           fi

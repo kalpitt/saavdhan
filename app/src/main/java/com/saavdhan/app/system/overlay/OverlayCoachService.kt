@@ -4,7 +4,9 @@ import android.app.Service
 import android.content.Intent
 import android.graphics.PixelFormat
 import android.os.Build
+import android.os.Handler
 import android.os.IBinder
+import android.os.Looper
 import android.view.Gravity
 import android.view.View
 import android.view.WindowManager
@@ -16,12 +18,14 @@ import com.saavdhan.app.R
 /**
  * Draws a small banner on top of whatever is on screen (e.g. the system Settings list), showing the
  * user the next step. Needs the "draw over other apps" permission (`SYSTEM_ALERT_WINDOW`); the
- * caller checks that via [OverlayCoach]. The banner stays until the user taps "Got it". See ADR-0008.
+ * caller checks that via [OverlayCoach]. The banner auto-hides after ~2 minutes or when tapped "Got it". See ADR-0008.
  */
 class OverlayCoachService : Service() {
 
     private var windowManager: WindowManager? = null
     private var overlayView: View? = null
+    private val handler = Handler(Looper.getMainLooper())
+    private val timeoutRunnable = Runnable { stopSelf() }
 
     override fun onBind(intent: Intent?): IBinder? = null
 
@@ -37,6 +41,9 @@ class OverlayCoachService : Service() {
 
     private fun showOverlay(message: String) {
         removeOverlay()
+        // Cancel any pending timeout from a previous banner
+        handler.removeCallbacks(timeoutRunnable)
+
         val wm = getSystemService(WINDOW_SERVICE) as? WindowManager ?: return
         windowManager = wm
 
@@ -62,6 +69,8 @@ class OverlayCoachService : Service() {
 
         try {
             wm.addView(view, params)
+            // Auto-dismiss after timeout
+            handler.postDelayed(timeoutRunnable, OVERLAY_TIMEOUT_MS)
         } catch (e: Exception) {
             // If the OS refuses (e.g. permission revoked between check and now), fail quietly.
             stopSelf()
@@ -104,11 +113,13 @@ class OverlayCoachService : Service() {
     }
 
     override fun onDestroy() {
+        handler.removeCallbacks(timeoutRunnable)
         removeOverlay()
         super.onDestroy()
     }
 
     companion object {
         const val EXTRA_MESSAGE = "extra_message"
+        private const val OVERLAY_TIMEOUT_MS = 2 * 60 * 1000L // 2 minutes
     }
 }
