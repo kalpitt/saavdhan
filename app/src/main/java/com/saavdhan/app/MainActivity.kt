@@ -11,6 +11,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -95,6 +96,18 @@ fun SaavdhanApp(
     val navController = rememberNavController()
     // One shared scan view-model so Home and Detail see the same results.
     val scanViewModel: ScanViewModel = viewModel()
+
+    // Picking a language recreates the activity, and Navigation then restores the back stack it
+    // saved BEFORE the pick — which still points at onboarding, overriding startDestination. So
+    // once a language exists, steer any restored onboarding entry to Home (and drop onboarding
+    // from the stack so the back button exits the app rather than reopening it).
+    LaunchedEffect(hasChosenLanguage) {
+        if (hasChosenLanguage && navController.currentDestination?.route == Routes.ONBOARDING) {
+            navController.navigate(Routes.HOME) {
+                popUpTo(Routes.ONBOARDING) { inclusive = true }
+            }
+        }
+    }
 
     NavHost(
         navController = navController,
