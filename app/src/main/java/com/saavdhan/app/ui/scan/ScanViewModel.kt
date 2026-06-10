@@ -13,11 +13,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-/** The three states the home screen can be in. */
+/** The scan states the home screen can be in. */
 sealed interface ScanState {
     data object Idle : ScanState
     data object Scanning : ScanState
     data class Done(val result: ScanResult) : ScanState
+    data class Error(val message: String) : ScanState
 }
 
 /**
@@ -32,10 +33,14 @@ class ScanViewModel(application: Application) : AndroidViewModel(application) {
     fun scan() {
         state = ScanState.Scanning
         viewModelScope.launch {
-            val result = withContext(Dispatchers.Default) {
-                AppScanner(getApplication()).scan()
+            try {
+                val result = withContext(Dispatchers.Default) {
+                    AppScanner(getApplication()).scan()
+                }
+                state = ScanState.Done(result)
+            } catch (e: Exception) {
+                state = ScanState.Error(e.localizedMessage ?: "Couldn't finish scanning. Try again.")
             }
-            state = ScanState.Done(result)
         }
     }
 
