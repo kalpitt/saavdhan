@@ -33,13 +33,16 @@ enum class RiskSignal {
     /** Can read/receive SMS — where bank OTPs arrive. */
     SMS_ACCESS,
 
+    /** Sideloaded app that requests SMS (but not yet granted). Often paired with other red flags. */
+    SMS_REQUESTED,
+
     /** Holds Notification Listener Service — can read every notification, including bank OTPs. */
     NOTIFICATION_LISTENER,
 
     /** Was sideloaded (installed from an APK, not a store). */
     SIDELOADED,
 
-    /** Hides its icon from the launcher. */
+    /** Hides its icon from the launcher (sideloaded apps only; store-installed helpers may lack icons legitimately). */
     HIDDEN_ICON,
 
     /** Pretends to be a trusted system app. */

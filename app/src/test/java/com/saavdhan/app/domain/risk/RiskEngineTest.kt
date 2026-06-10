@@ -5,6 +5,7 @@ import com.saavdhan.app.domain.model.RiskLevel
 import com.saavdhan.app.domain.model.RiskSignal
 import com.saavdhan.app.domain.model.ScannedApp
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -67,11 +68,27 @@ class RiskEngineTest {
     }
 
     @Test
-    fun `hidden icon on a sideloaded app is HIGH`() {
+    fun `hidden icon on a sideloaded app alone is SUSPICIOUS`() {
         val result = RiskEngine.assess(
             app(installSource = InstallSource.SIDELOADED, hiddenIcon = true),
         )
+        assertEquals(RiskLevel.SUSPICIOUS, result.level)
+    }
+
+    @Test
+    fun `sideloaded hidden icon plus SMS request is HIGH`() {
+        val result = RiskEngine.assess(
+            app(installSource = InstallSource.SIDELOADED, hiddenIcon = true, requestsSms = true),
+        )
         assertEquals(RiskLevel.HIGH, result.level)
+    }
+
+    @Test
+    fun `store-installed app with no icon is LOW (not flagged)`() {
+        val result = RiskEngine.assess(
+            app(installSource = InstallSource.PLAY_STORE, hiddenIcon = true),
+        )
+        assertEquals(RiskLevel.LOW, result.level)
     }
 
     @Test
@@ -184,5 +201,44 @@ class RiskEngineTest {
     @Test
     fun `a clean app is LOW`() {
         assertEquals(RiskLevel.LOW, RiskEngine.assess(app()).level)
+    }
+
+    @Test
+    fun `a Play-installed Google module (no icon) is LOW and allowlisted`() {
+        val result = RiskEngine.assess(
+            app(
+                packageName = "com.google.android.safetycore",
+                installSource = InstallSource.PLAY_STORE,
+                hiddenIcon = true,
+            ),
+        )
+        assertEquals(RiskLevel.LOW, result.level)
+        assertTrue(result.allowlisted)
+    }
+
+    @Test
+    fun `sideloaded app faking a trusted package name with Accessibility is flagged`() {
+        val result = RiskEngine.assess(
+            app(
+                packageName = "com.google.android.gms",
+                installSource = InstallSource.SIDELOADED,
+                accessibility = true,
+            ),
+        )
+        assertEquals(RiskLevel.HIGH, result.level)
+        assertFalse(result.allowlisted)
+    }
+
+    @Test
+    fun `sideloaded app faking a trusted package name but harmless is LOW and allowlisted`() {
+        val result = RiskEngine.assess(
+            app(
+                packageName = "com.google.android.gms",
+                installSource = InstallSource.SIDELOADED,
+                accessibility = false,
+            ),
+        )
+        assertEquals(RiskLevel.LOW, result.level)
+        assertTrue(result.allowlisted)
     }
 }

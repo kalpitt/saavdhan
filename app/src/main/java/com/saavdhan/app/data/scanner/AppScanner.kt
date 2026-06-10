@@ -46,7 +46,7 @@ class AppScanner(private val context: Context) {
             .toMutableList()
 
         // On an emulator there is no real malware, so add demo threats to exercise the UI.
-        if (BuildConfig.DEBUG) assessed += demoApps()
+        if (BuildConfig.DEBUG && isEmulator()) assessed += demoApps()
 
         // Scariest first, and de-duplicated by package: a package name must be unique in the list
         // (the UI uses it as a stable key, and a duplicate would otherwise crash the results list).
@@ -202,7 +202,16 @@ class AppScanner(private val context: Context) {
         return (info.flags and mask) != 0
     }
 
-    // --- Demo data (debug builds only) -------------------------------------------------------
+    // --- Emulator detection ------------------------------------------------------------------
+
+    private fun isEmulator(): Boolean {
+        return Build.HARDWARE.contains("ranchu") ||
+            Build.HARDWARE.contains("goldfish") ||
+            Build.FINGERPRINT.startsWith("generic") ||
+            Build.PRODUCT.contains("sdk_gphone")
+    }
+
+    // --- Demo data (debug builds on emulator only) -------------------------------------------
 
     private fun demoApps(): List<AssessedApp> {
         val now = System.currentTimeMillis()

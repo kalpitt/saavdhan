@@ -19,6 +19,7 @@
     <string name="result_safe_body">हमें स्कैम स्पाईवेयर के चेतावनी संकेत वाले ऐप्स नहीं मिले। सतर्क रहें, और कभी भी दोबारा स्कैन करें।</string>
     <string name="result_found_title">%1$d ऐप पर ध्यान देने की ज़रूरत है</string>
     <string name="result_found_title_plural">%1$d ऐप्स पर ध्यान देने की ज़रूरत है</string>
+    <string name="result_mild_section">शायद ठीक हैं — एक नज़र डाल लें</string>
     <string name="partial_scan_note">यह फ़ोन हमें सीमित जानकारी देखने देता है, इसलिए स्कैन अधूरा हो सकता है।</string>
 
     <!-- Risk levels -->
@@ -31,6 +32,7 @@
     <string name="signal_accessibility">आपकी स्क्रीन देख सकता है और आपकी जगह टैप कर सकता है (Accessibility)</string>
     <string name="signal_device_admin">हटाने से रोकने वाली एडमिन शक्ति रखता है (Device Admin)</string>
     <string name="signal_sms">आपके मैसेज पढ़ सकता है, बैंक OTP सहित</string>
+    <string name="signal_sms_requested">आपके मैसेज पढ़ने की अनुमति माँगता है</string>
     <string name="signal_notification_listener">आपकी सभी सूचनाएँ पढ़ सकता है (बैंक OTP संदेश भी)</string>
     <string name="signal_sideloaded">Play Store के बाहर से इंस्टॉल किया गया</string>
     <string name="signal_hidden_icon">आपकी ऐप सूची से अपना आइकन छुपाता है</string>

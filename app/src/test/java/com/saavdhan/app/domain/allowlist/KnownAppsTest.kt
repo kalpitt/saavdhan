@@ -1,15 +1,15 @@
 package com.saavdhan.app.domain.allowlist
 
+import com.saavdhan.app.domain.model.InstallSource
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-/** Tests for impersonation detection. Pure logic, runs on your computer. */
+/** Tests for allowlist and impersonation detection. Pure logic, runs on your computer. */
 class KnownAppsTest {
 
     @Test
     fun `a sideloaded app named System Update is impersonating`() {
-        // No real user-installed app should ever be called "System Update".
         assertTrue(KnownApps.isImpersonating("System Update", "com.evil.fake", isSystemApp = false))
     }
 
@@ -40,5 +40,37 @@ class KnownAppsTest {
     @Test
     fun `an ordinary app name is not flagged`() {
         assertFalse(KnownApps.isImpersonating("My Recipes", "com.example.recipes", isSystemApp = false))
+    }
+
+    @Test
+    fun `a Play-Store Google module is trusted by prefix`() {
+        assertTrue(KnownApps.isTrustedPackage("com.google.android.safetycore", InstallSource.PLAY_STORE))
+    }
+
+    @Test
+    fun `a Play-Store Samsung module is trusted by prefix`() {
+        assertTrue(KnownApps.isTrustedPackage("com.samsung.android.messaging", InstallSource.PLAY_STORE))
+    }
+
+    @Test
+    fun `a sideloaded app is never trusted by prefix`() {
+        assertFalse(KnownApps.isTrustedPackage("com.google.android.safetycore", InstallSource.SIDELOADED))
+    }
+
+    @Test
+    fun `Huawei Health in the trusted list is recognized`() {
+        assertTrue(KnownApps.isTrustedPackage("com.huawei.health", InstallSource.PLAY_STORE))
+    }
+
+    @Test
+    fun `Company Portal in the trusted list is recognized`() {
+        assertTrue(
+            KnownApps.isTrustedPackage("com.microsoft.windowsintune.companyportal", InstallSource.PLAY_STORE),
+        )
+    }
+
+    @Test
+    fun `an unknown Store app is not trusted`() {
+        assertFalse(KnownApps.isTrustedPackage("com.random.unknown", InstallSource.PLAY_STORE))
     }
 }
