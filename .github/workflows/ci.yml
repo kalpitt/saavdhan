@@ -29,7 +29,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Drift check (docs consistency)
-        run: bash context/scripts/drift_check.sh
+        run: bash scripts/drift_check.sh
 
       - name: Unit tests (the detection engine)
         run: ./gradlew testDebugUnitTest
@@ -44,16 +44,19 @@ jobs:
         run: ./gradlew assembleRelease
 
       - name: Verify the offline guarantee (no INTERNET permission in debug or release)
+        shell: bash
         run: |
-          set -e
-          # Fail loudly if the path structure changed (don't silently pass on missing path)
-          if [ ! -d "app/build/intermediates/merged_manifest"* 2>/dev/null ] && ! find app/build/intermediates -type d -name "merged_manifest*" -quit 2>/dev/null | grep -q .; then
-            echo "::error::Merged manifest path not found — cannot verify offline guarantee. Build output may have changed."
+          set -euo pipefail
+          shopt -s nullglob
+          # Collect the merged-manifest directories. If none exist, the build layout changed —
+          # fail loudly rather than silently passing because there was nothing to grep.
+          manifest_dirs=(app/build/intermediates/merged_manifest*/)
+          if [ ${#manifest_dirs[@]} -eq 0 ]; then
+            echo "::error::Merged manifest path not found — cannot verify the offline guarantee. Build output layout may have changed."
             exit 1
           fi
-          # Now check that INTERNET is not present anywhere in the manifests
-          if grep -rq "android.permission.INTERNET" app/build/intermediates/merged_manifest* 2>/dev/null; then
+          if grep -rq "android.permission.INTERNET" "${manifest_dirs[@]}"; then
             echo "::error::INTERNET permission found in the merged manifest — the offline rule is broken."
             exit 1
           fi
-          echo "✅ OK: no INTERNET permission in debug or release merged manifests."
+          echo "OK: no INTERNET permission in debug or release merged manifests."

@@ -67,7 +67,7 @@ fun ScanScreen(
                 onAppClick = onAppClick,
                 onScanAgain = viewModel::scan,
             )
-            is ScanState.Error -> ErrorContent(padding, errorMessage = state.message, onRetry = viewModel::scan)
+            is ScanState.Error -> ErrorContent(padding, onRetry = viewModel::scan)
         }
     }
 }
@@ -108,7 +108,7 @@ private fun ScanningContent(padding: PaddingValues) {
 }
 
 @Composable
-private fun ErrorContent(padding: PaddingValues, errorMessage: String, onRetry: () -> Unit) {
+private fun ErrorContent(padding: PaddingValues, onRetry: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()

@@ -113,6 +113,7 @@ class OverlayCoachService : Service() {
     }
 
     override fun onDestroy() {
+        handler.removeCallbacks(timeoutRunnable)
         removeOverlay()
         super.onDestroy()
     }

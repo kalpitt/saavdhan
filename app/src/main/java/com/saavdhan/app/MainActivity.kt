@@ -46,8 +46,6 @@ class MainActivity : ComponentActivity() {
         maybeRequestNotificationPermission()
         // Schedule the background watchdog + run an immediate new-app scan.
         com.saavdhan.app.system.watchdog.Watchdog.onAppOpen(this)
-        // Hide any lingering overlay coaching banner (in case the app was reopened)
-        com.saavdhan.app.system.overlay.OverlayCoach.hide(this)
         setContent {
             SaavdhanTheme {
                 Surface(modifier = Modifier.fillMaxSize()) {
@@ -63,6 +61,13 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Hide any lingering overlay coaching banner when the user returns to the app — the coach
+        // is only meant to float over the system Settings screen, never over Saavdhan itself.
+        com.saavdhan.app.system.overlay.OverlayCoach.hide(this)
     }
 
     /** On Android 13+, ask once for notification permission so the watchdog can alert the user. */

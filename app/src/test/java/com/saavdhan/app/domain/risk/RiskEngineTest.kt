@@ -244,7 +244,8 @@ class RiskEngineTest {
 
     @Test
     fun `sideloaded app with a trusted prefix but Accessibility is flagged HIGH (not allowlisted)`() {
-        // e.g. a fake com.google.android.something claiming it's just a helper
+        // A sideloaded fake claiming a com.google.android.* prefix: isTrustedPackage already
+        // rejects sideloaded, so it's flagged on the normal sideloaded+accessibility path.
         val result = RiskEngine.assess(
             app(
                 packageName = "com.google.android.evil",
@@ -257,11 +258,14 @@ class RiskEngineTest {
     }
 
     @Test
-    fun `sideloaded app with a trusted prefix but Device Admin is flagged HIGH (not allowlisted)`() {
+    fun `OTHER_STORE app with a trusted prefix and dangerous powers is flagged (not allowlisted)`() {
+        // The real prefix-spoofing gap: a non-Play install (other store / unknown) claiming a
+        // trusted prefix while holding Accessibility + Device Admin must NOT be allowlisted.
         val result = RiskEngine.assess(
             app(
-                packageName = "com.samsung.android.fake",
-                installSource = InstallSource.SIDELOADED,
+                packageName = "com.google.android.evil",
+                installSource = InstallSource.OTHER_STORE,
+                accessibility = true,
                 deviceAdmin = true,
             ),
         )
@@ -270,7 +274,22 @@ class RiskEngineTest {
     }
 
     @Test
-    fun `Play-installed app with a trusted prefix and Accessibility is still allowed (not sideloaded)`() {
+    fun `UNKNOWN-source app with a trusted prefix and Device Admin plus SMS is flagged HIGH (not allowlisted)`() {
+        val result = RiskEngine.assess(
+            app(
+                packageName = "com.samsung.android.fake",
+                installSource = InstallSource.UNKNOWN,
+                deviceAdmin = true,
+                smsGranted = true,
+            ),
+        )
+        assertEquals(RiskLevel.HIGH, result.level)
+        assertFalse(result.allowlisted)
+    }
+
+    @Test
+    fun `Play-installed app with a trusted prefix and Accessibility is still allowed`() {
+        // Play-verified installs of trusted-prefix packages stay trusted even with powers.
         val result = RiskEngine.assess(
             app(
                 packageName = "com.google.android.something",
