@@ -24,6 +24,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -37,6 +42,7 @@ import com.saavdhan.app.ui.components.InfoCard
 import com.saavdhan.app.ui.components.PrimaryButton
 import com.saavdhan.app.ui.components.RiskChip
 import com.saavdhan.app.ui.labelRes
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -94,16 +100,32 @@ private fun IdleContent(padding: PaddingValues, onScan: () -> Unit) {
 
 @Composable
 private fun ScanningContent(padding: PaddingValues) {
+    // After ~8s, add a calm "this can take a minute" line so a slow scan never feels broken.
+    var showSlowNote by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        delay(8_000)
+        showSlowNote = true
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(padding),
+            .padding(padding)
+            .padding(horizontal = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
         CircularProgressIndicator()
         Spacer(Modifier.height(16.dp))
         Text(stringResource(R.string.scanning), style = MaterialTheme.typography.bodyLarge)
+        if (showSlowNote) {
+            Spacer(Modifier.height(12.dp))
+            Text(
+                stringResource(R.string.scan_slow_note),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center,
+            )
+        }
     }
 }
 
