@@ -38,10 +38,11 @@ class AppScanner(private val context: Context) {
     fun scan(): ScanResult {
         val accessibilityPackages = enabledAccessibilityPackages()
         val adminPackages = activeDeviceAdminPackages()
+        val notificationListenerPackages = enabledNotificationListenerPackages()
         val myPackage = context.packageName
 
         val assessed = installedPackages()
-            .mapNotNull { info -> assessInfo(info, accessibilityPackages, adminPackages, myPackage) }
+            .mapNotNull { info -> assessInfo(info, accessibilityPackages, adminPackages, notificationListenerPackages, myPackage) }
             .toMutableList()
 
         // On an emulator there is no real malware, so add demo threats to exercise the UI.
@@ -62,7 +63,7 @@ class AppScanner(private val context: Context) {
     fun assessSingle(packageName: String): AssessedApp? {
         if (packageName == context.packageName) return null
         val info = packageInfo(packageName) ?: return null
-        return assessInfo(info, enabledAccessibilityPackages(), activeDeviceAdminPackages(), context.packageName)
+        return assessInfo(info, enabledAccessibilityPackages(), activeDeviceAdminPackages(), enabledNotificationListenerPackages(), context.packageName)
     }
 
     /** Build the facts for one package and run the brain over them. Shared by full and single scans. */
@@ -70,6 +71,7 @@ class AppScanner(private val context: Context) {
         info: PackageInfo,
         accessibilityPackages: Set<String>,
         adminPackages: Set<String>,
+        notificationListenerPackages: Set<String>,
         myPackage: String,
     ): AssessedApp? {
         val appInfo = info.applicationInfo ?: return null
@@ -88,6 +90,7 @@ class AppScanner(private val context: Context) {
             isDeviceAdmin = pkg in adminPackages,
             requestsSms = requestsSms(info),
             smsGranted = smsGranted(info),
+            hasNotificationListener = pkg in notificationListenerPackages,
             hasHiddenIcon = !isSystem && pm.getLaunchIntentForPackage(pkg) == null,
             impersonatesSystemApp = KnownApps.isImpersonating(label, pkg, isSystem),
             firstInstallTimeMillis = info.firstInstallTime,
@@ -139,6 +142,16 @@ class AppScanner(private val context: Context) {
         return dpm.activeAdmins?.map { it.packageName }?.toSet() ?: emptySet()
     }
 
+    private fun enabledNotificationListenerPackages(): Set<String> {
+        // Colon-separated flattened ComponentNames, e.g. "com.foo/com.foo.Listener:com.bar/..."
+        val flat = android.provider.Settings.Secure.getString(
+            context.contentResolver, "enabled_notification_listeners",
+        ) ?: return emptySet()
+        return flat.split(':').mapNotNull {
+            android.content.ComponentName.unflattenFromString(it)?.packageName
+        }.toSet()
+    }
+
     @Suppress("DEPRECATION")
     private fun installSource(packageName: String): InstallSource {
         val installer: String? = try {
@@ -155,6 +168,10 @@ class AppScanner(private val context: Context) {
             null -> InstallSource.SIDELOADED
             "com.android.packageinstaller",
             "com.google.android.packageinstaller",
+            "com.miui.packageinstaller",  // Xiaomi file manager / sideload installer
+            "com.samsung.android.packageinstaller",  // Samsung package manager
+            "com.coloros.filemanager",  // Oppo/Realme file manager
+            "com.transsion.packageinstaller",  // Tecno/Infinix file manager
             -> InstallSource.SIDELOADED
             else -> InstallSource.OTHER_STORE
         }
@@ -163,6 +180,7 @@ class AppScanner(private val context: Context) {
     private val smsPermissions = setOf(
         android.Manifest.permission.RECEIVE_SMS,
         android.Manifest.permission.READ_SMS,
+        android.Manifest.permission.SEND_SMS,  // trojans send fraud SMS/UPI requests from the victim's number
     )
 
     private fun requestsSms(info: PackageInfo): Boolean =
@@ -198,6 +216,7 @@ class AppScanner(private val context: Context) {
                 isDeviceAdmin = true,
                 requestsSms = true,
                 smsGranted = true,
+                hasNotificationListener = true,
                 hasHiddenIcon = true,
                 impersonatesSystemApp = true,
                 firstInstallTimeMillis = now,

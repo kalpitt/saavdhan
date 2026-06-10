@@ -14,6 +14,8 @@ plain English, so skim it if you're curious what your assistant is being told.
 
 1. Read **this file** (rules, commands, map — below).
 2. Read **[`context/STATE.md`](context/STATE.md)** — where the project is *right now* and the next steps.
+   - **Drift check**: Cross-check STATE.md's claims against `git log --oneline -10` on main. If they
+     disagree (e.g. a "pending" branch is already merged), fix STATE.md before starting work.
 3. Read the newest file in **[`context/handoffs/`](context/handoffs/)** — the story of the last session.
 4. Read **[`context/PROFILE.md`](context/PROFILE.md)** — who the human is and how to work with them.
 5. Now you are caught up. Start working.
@@ -150,3 +152,28 @@ The short version:
 - Co-author trailer on commits: `Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>`.
 - Updating `context/` files **is part of finishing a task**, not an afterthought — commit them
   together with the code so the next chat (in any tool) starts current.
+
+---
+
+## 7. Multi-step plans & active work
+
+If you produce a multi-step plan (e.g. a 3-PR refactor, a phased feature rollout), save it to
+**`context/plans/`** with a name like `YYYY-MM-DD-topic.md`. This makes it visible to any tool
+that resumes this work, and it survives a session boundary.
+
+When that work lands (final PR merged), **delete the plan file** — a stale plan misleads the
+next agent worse than no plan at all. A finished plan's job is done; move its essence (if needed)
+to the git history, then clean up.
+
+Example:
+```bash
+# Start of session 1:
+echo "# Phase 3 refactor (3 PRs): ..." > context/plans/2026-06-10-phase3-refactor.md
+
+# Session 1 PR 1 merges, session 2 resumes:
+# Agent reads the plan, continues work.
+
+# Session 2 PR 3 merges (all work done):
+rm context/plans/2026-06-10-phase3-refactor.md
+git add context/ && git commit "Session 2: Phase 3 refactor complete (all 3 PRs merged)"
+```

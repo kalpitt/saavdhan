@@ -33,6 +33,9 @@ data class ScannedApp(
     /** True if the SMS permission above is actually granted (not just requested). */
     val smsGranted: Boolean,
 
+    /** True if this app is registered as a Notification Listener (can read all notifications, including bank OTPs). */
+    val hasNotificationListener: Boolean = false,
+
     /** True if the app has NO icon in the launcher — i.e. it's hiding from the user. */
     val hasHiddenIcon: Boolean,
 
