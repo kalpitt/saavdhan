@@ -13,6 +13,8 @@
     <string name="scan_button">Scan my phone</string>
     <string name="scanning">Scanning…</string>
     <string name="scan_again">Scan again</string>
+    <string name="scan_error_title">Couldn\'t finish scanning</string>
+    <string name="scan_error_body">Something went wrong while checking your apps. Please try again.</string>
 
     <!-- Results -->
     <string name="result_safe_title">No dangerous apps found</string>

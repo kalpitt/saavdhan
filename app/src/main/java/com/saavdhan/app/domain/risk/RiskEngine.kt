@@ -36,8 +36,9 @@ object RiskEngine {
     /** Determine if an app should be trusted and hidden from results. */
     private fun isAllowlisted(app: ScannedApp, signals: List<RiskSignal>): Boolean {
         if (app.isSystemApp) return true
+
+        // Exact-match trusted packages must also pass a power check for sideloaded impostors
         if (app.packageName in KnownApps.TRUSTED_PACKAGES) {
-            // Sideloaded app with the same name as a trusted package is NOT trusted if it has dangerous powers.
             if (app.installSource == com.saavdhan.app.domain.model.InstallSource.SIDELOADED &&
                 (app.hasAccessibilityEnabled || app.isDeviceAdmin || app.smsGranted)
             ) {
@@ -45,7 +46,21 @@ object RiskEngine {
             }
             return true
         }
-        return KnownApps.isTrustedPackage(app.packageName, app.installSource)
+
+        // Prefix-trusted packages (e.g. com.google.android.*). isTrustedPackage already excludes
+        // sideloaded apps, so the real spoofing risk here is a NON-Play install (other store /
+        // unknown source) claiming a trusted prefix while holding dangerous powers. Only a
+        // Play-verified install of such a package is trusted unconditionally.
+        if (KnownApps.isTrustedPackage(app.packageName, app.installSource)) {
+            if (app.installSource != com.saavdhan.app.domain.model.InstallSource.PLAY_STORE &&
+                (app.hasAccessibilityEnabled || app.isDeviceAdmin || app.smsGranted)
+            ) {
+                return false
+            }
+            return true
+        }
+
+        return false
     }
 
     /** Turn the raw facts about an app into the list of named red flags. */

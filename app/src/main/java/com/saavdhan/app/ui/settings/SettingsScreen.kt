@@ -31,6 +31,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.saavdhan.app.R
 import com.saavdhan.app.i18n.LocaleManager
 import com.saavdhan.app.system.battery.BatteryStatus
@@ -50,14 +53,17 @@ fun SettingsScreen(
     val batteryExempt = remember { mutableStateOf(BatteryStatus.isExempt(context)) }
     val lastRunMillis = remember { mutableStateOf(InstalledAppsSnapshot.getLastRunMillis(context)) }
 
-    DisposableEffect(Unit) {
-        // Check battery status on every screen resume
-        val onResume = {
-            batteryExempt.value = BatteryStatus.isExempt(context)
-            lastRunMillis.value = InstalledAppsSnapshot.getLastRunMillis(context)
+    // Check battery status every time the screen resumes (user returns from system Settings)
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                batteryExempt.value = BatteryStatus.isExempt(context)
+                lastRunMillis.value = InstalledAppsSnapshot.getLastRunMillis(context)
+            }
         }
-        onResume()
-        onDispose { }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
     Scaffold(
