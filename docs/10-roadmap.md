@@ -42,26 +42,30 @@ A living plan. Checked = done; unchecked = planned. Order within a phase is roug
 
 **Goal:** signed APK → GitHub Releases → landing page; failure-path hardening; watchdog v2.
 
-### Milestone 0 — Safety net & docs
-- [ ] CI hardening: offline-guarantee check fails if manifests missing (not silent-pass on missing path)
-- [ ] Context sync: STATE, roadmap, testing-strategy to reality; no machine-local paths in repo
-- [ ] Drift detection: CI step that fails on path-based dead links + string-key mismatches
-- [ ] Seam extraction: watchdog diff/alert and cleanup state-capture as testable pure functions
+### Milestone 0 — Safety net & docs ✅ (merged in PR #5)
+- [x] CI hardening: offline-guarantee check fails if manifests missing (not silent-pass on missing path)
+- [x] Context sync: STATE, roadmap, testing-strategy to reality; no machine-local paths in published files
+- [x] Drift detection: `scripts/drift_check.sh` in CI — machine-local paths, string-key mirroring
+- [x] Seam extraction: `WatchdogPolicy` + `InstallerClassifier` as tested pure functions
 
-### Milestone 1 — Failure-path hardening
-- [ ] Scan error handling: `ScanState.Error` + try/catch + calm bilingual retry
-- [ ] Partial visibility: implement `partial=true` flag when visibility is truncated
-- [ ] Cleanup survives process death: `SavedStateHandle` for progress
-- [ ] Prefix-trust power-gating: sideloaded + Accessibility/Device-Admin overrides allowlist
-- [ ] Overlay timeout + dismissal: banner auto-hides after ~2 min or on app resume
-- [ ] Settings resume: battery card updates when user returns from exemption screen
-- [ ] Slow-scan reassurance: "lots of apps to check" message after ~8 seconds
+### Milestone 1 — Failure-path hardening ✅ (merged in PR #5)
+- [x] Scan error handling: `ScanState.Error` + try/catch + calm bilingual retry
+- [x] Partial visibility: `partial=true` when `QUERY_ALL_PACKAGES` is restricted (API 30+)
+- [x] Cleanup survives process death: `SavedStateHandle` for progress
+- [x] Prefix-trust power-gating: non-Play installs with dangerous powers override the allowlist
+- [x] Overlay timeout + dismissal: banner auto-hides after ~2 min and on app resume
+- [x] Settings resume: battery card updates when user returns from exemption screen
+- [x] Slow-scan reassurance: "lots of apps to check" message after ~8 seconds
 
-### Milestone 2 — Release & watchdog v2
-- [ ] Release signing: keystore generation, Gradle wiring, first signed v0.2.0
-- [ ] GitHub Releases: publish signed APK as release asset (family download link)
-- [ ] GitHub Pages: landing page (bilingual, vision + download link) at `kalpitt.github.io/saavdhan`
-- [ ] Watchdog v2: alert when already-installed app *gains* HIGH/CRITICAL powers (the real SpyNote sequence)
+### Milestone 2 — Release & watchdog v2 (in progress)
+- [x] Watchdog v2: alerts when an already-installed app *gains* HIGH/CRITICAL powers (the real
+      SpyNote sequence); level-aware snapshot with silent migration from v1 (no alert spam on upgrade)
+- [x] Release signing wiring: Gradle reads optional `keystore.properties` (see the `.example`
+      template); unsigned builds keep working without it
+- [x] Landing page built: `docs/index.html` (bilingual, promises, install guide, download button)
+- [ ] **Human:** generate + back up the keystore (`keystore.properties.example` has the command)
+- [ ] **Human:** enable GitHub Pages on the public repo (Settings → Pages → main, /docs)
+- [ ] First signed v0.2.0 on GitHub Releases (after keystore exists)
 - [ ] ktlint in CI: enforce code style on all commits
 
 ### Milestone 3 — Polish & reach

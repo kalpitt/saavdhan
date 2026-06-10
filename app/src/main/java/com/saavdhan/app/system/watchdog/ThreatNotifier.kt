@@ -50,7 +50,7 @@ object ThreatNotifier {
      * helper method, so the MissingPermission warning is suppressed here with that justification.
      */
     @SuppressLint("MissingPermission")
-    fun notifyThreat(context: Context, assessed: AssessedApp) {
+    fun notifyThreat(context: Context, assessed: AssessedApp, escalation: Boolean = false) {
         if (!canPost(context)) return
         ensureChannel(context)
 
@@ -64,10 +64,12 @@ object ThreatNotifier {
             android.app.PendingIntent.FLAG_IMMUTABLE or android.app.PendingIntent.FLAG_UPDATE_CURRENT,
         )
 
+        val titleRes = if (escalation) R.string.watchdog_escalation_title else R.string.watchdog_title
+        val textRes = if (escalation) R.string.watchdog_escalation_text else R.string.watchdog_text
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notification)
-            .setContentTitle(context.getString(R.string.watchdog_title))
-            .setContentText(context.getString(R.string.watchdog_text, assessed.app.label))
+            .setContentTitle(context.getString(titleRes))
+            .setContentText(context.getString(textRes, assessed.app.label))
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setCategory(NotificationCompat.CATEGORY_ALARM)
             .setAutoCancel(true)
