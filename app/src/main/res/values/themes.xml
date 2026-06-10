@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- The host window theme. Compose draws the actual UI; this just sets up the window with
+         no old-style action bar and a transparent status bar. -->
+    <style name="Theme.Saavdhan" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowBackground">@android:color/white</item>
+    </style>
+</resources>

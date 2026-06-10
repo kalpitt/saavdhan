@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!--
+      HARD OFFLINE RULE (see docs/decisions/0001): Saavdhan must never hold the INTERNET
+      permission, so the OS makes any network call physically impossible. We don't declare it —
+      and we also explicitly REMOVE it below, in case a third-party library (e.g. Compose's debug
+      tooling) tries to merge it in. This keeps the guarantee bulletproof in debug AND release.
+    -->
+    <uses-permission android:name="android.permission.INTERNET" tools:node="remove" />
+
+    <!--
+      Needed to SEE the other apps installed on the phone so we can check them for danger.
+      This is a sensitive permission; it is justified here because Saavdhan is a security
+      scanner. If the Play Store ever denies it, the app still runs on a reduced set of apps.
+    -->
+    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"
+        tools:ignore="QueryAllPackagesPermission" />
+
+    <!-- Show a notification when a dangerous app is newly installed (Android 13+ runtime prompt). -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <!-- Float the step-by-step "overlay coach" on top of the system Settings screen. -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Saavdhan">
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:theme="@style/Theme.Saavdhan">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- The new-app watchdog runs via WorkManager (see system/watchdog/), not a manifest
+             receiver: Android 8+ blocks background manifest receivers from getting PACKAGE_ADDED. -->
+
+        <!-- The floating "overlay coach" that guides the user on the Settings screen. -->
+        <service
+            android:name=".system.overlay.OverlayCoachService"
+            android:exported="false" />
+
+    </application>
+
+</manifest>
