@@ -60,8 +60,14 @@
     <!-- Settings -->
     <string name="settings_title">सेटिंग</string>
     <string name="settings_language">भाषा</string>
+    <string name="settings_protection_title">बैकग्राउंड सुरक्षा</string>
     <string name="settings_about">सावधान के बारे में</string>
     <string name="settings_offline_note">सावधान पूरी तरह ऑफ़लाइन काम करता है। यह कभी इंटरनेट से नहीं जुड़ता और आपका डेटा कहीं नहीं भेजता।</string>
+    <string name="battery_ok">सावधान को बैकग्राउंड में चलने की अनुमति है। कोई ख़तरनाक नया ऐप आते ही यह आपको आगाह कर सकता है।</string>
+    <string name="battery_blocked">आपके फ़ोन का बैटरी सेवर सावधान की बैकग्राउंड निगरानी रोक सकता है। नीचे टैप करें, सूची में सावधान ढूँढें, और अनुमति दें।</string>
+    <string name="battery_fix_button">बैटरी सेटिंग्स खोलें</string>
+    <string name="watchdog_last_run">पिछली बैकग्राउंड जाँच: %1$s</string>
+    <string name="watchdog_never_run">बैकग्राउंड जाँच अभी तक नहीं चली है।</string>
 
     <!-- Background watchdog (new-app alerts) -->
     <string name="watchdog_channel_name">खतरे की चेतावनी</string>

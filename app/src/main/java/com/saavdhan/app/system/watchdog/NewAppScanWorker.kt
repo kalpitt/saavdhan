@@ -30,6 +30,7 @@ class NewAppScanWorker(
             // First ever run: establish the baseline. We don't alarm about apps that were already
             // installed — the on-demand scan covers those. Only future installs are "new".
             InstalledAppsSnapshot.save(applicationContext, current)
+            InstalledAppsSnapshot.setLastRunMillis(applicationContext, System.currentTimeMillis())
             return Result.success()
         }
 
@@ -43,6 +44,7 @@ class NewAppScanWorker(
         }
 
         InstalledAppsSnapshot.save(applicationContext, current)
+        InstalledAppsSnapshot.setLastRunMillis(applicationContext, System.currentTimeMillis())
         return Result.success()
     }
 }
