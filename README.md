@@ -77,9 +77,15 @@ beginner-friendly [build guide](docs/08-build-and-run.md) explains every term.
 
 ## Project status
 
-**Phase 1 (scanner core): complete and tested** — bilingual detect → explain → one-tap deep links,
-plus a WorkManager background watchdog for newly-installed threats. **Phase 2 (guided cleanup):
-in progress.** See the [roadmap](docs/10-roadmap.md).
+**Early release (v0.1.0).** Phase 1 (scanner core) and Phase 2 (guided cleanup) are complete and
+tested — the full loop works: bilingual detect → explain → reactive guided cleanup, plus a
+WorkManager background watchdog for newly-installed threats. See the [roadmap](docs/10-roadmap.md)
+and the [changelog](CHANGELOG.md).
+
+> Tested on the Android emulator. **Help wanted:** real-device testing across phone makers.
+> Android's deep-links to system screens differ between makers (Samsung, Xiaomi, Oppo, Vivo…), so
+> if a "fix" button lands on the wrong screen on your phone, please [open an issue](../../issues) —
+> that feedback is gold.
 
 ## Contributing
 
