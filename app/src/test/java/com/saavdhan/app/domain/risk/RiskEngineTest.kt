@@ -24,6 +24,7 @@ class RiskEngineTest {
         deviceAdmin: Boolean = false,
         requestsSms: Boolean = false,
         smsGranted: Boolean = false,
+        notificationListener: Boolean = false,
         hiddenIcon: Boolean = false,
         impersonates: Boolean = false,
     ) = ScannedApp(
@@ -35,6 +36,7 @@ class RiskEngineTest {
         isDeviceAdmin = deviceAdmin,
         requestsSms = requestsSms,
         smsGranted = smsGranted,
+        hasNotificationListener = notificationListener,
         hasHiddenIcon = hiddenIcon,
         impersonatesSystemApp = impersonates,
         firstInstallTimeMillis = 0L,
@@ -114,6 +116,69 @@ class RiskEngineTest {
         )
         assertEquals(RiskLevel.LOW, result.level)
         assertTrue(result.allowlisted)
+    }
+
+    @Test
+    fun `sideloaded plus SMS is HIGH`() {
+        val result = RiskEngine.assess(
+            app(installSource = InstallSource.SIDELOADED, smsGranted = true),
+        )
+        assertEquals(RiskLevel.HIGH, result.level)
+    }
+
+    @Test
+    fun `sideloaded plus notification listener is HIGH`() {
+        val result = RiskEngine.assess(
+            app(installSource = InstallSource.SIDELOADED, notificationListener = true),
+        )
+        assertEquals(RiskLevel.HIGH, result.level)
+    }
+
+    @Test
+    fun `accessibility plus SMS is HIGH`() {
+        val result = RiskEngine.assess(
+            app(accessibility = true, smsGranted = true),
+        )
+        assertEquals(RiskLevel.HIGH, result.level)
+    }
+
+    @Test
+    fun `accessibility plus notification listener is HIGH`() {
+        val result = RiskEngine.assess(
+            app(accessibility = true, notificationListener = true),
+        )
+        assertEquals(RiskLevel.HIGH, result.level)
+    }
+
+    @Test
+    fun `device admin plus SMS is HIGH`() {
+        val result = RiskEngine.assess(
+            app(deviceAdmin = true, smsGranted = true),
+        )
+        assertEquals(RiskLevel.HIGH, result.level)
+    }
+
+    @Test
+    fun `device admin plus notification listener is HIGH`() {
+        val result = RiskEngine.assess(
+            app(deviceAdmin = true, notificationListener = true),
+        )
+        assertEquals(RiskLevel.HIGH, result.level)
+    }
+
+    @Test
+    fun `accessibility plus device admin plus notification listener (no SMS) is CRITICAL`() {
+        val result = RiskEngine.assess(
+            app(accessibility = true, deviceAdmin = true, notificationListener = true),
+        )
+        assertEquals(RiskLevel.CRITICAL, result.level)
+        assertTrue(RiskSignal.NOTIFICATION_LISTENER in result.signals)
+    }
+
+    @Test
+    fun `notification listener alone is SUSPICIOUS`() {
+        val result = RiskEngine.assess(app(notificationListener = true))
+        assertEquals(RiskLevel.SUSPICIOUS, result.level)
     }
 
     @Test

@@ -33,6 +33,9 @@ enum class RiskSignal {
     /** Can read/receive SMS — where bank OTPs arrive. */
     SMS_ACCESS,
 
+    /** Holds Notification Listener Service — can read every notification, including bank OTPs. */
+    NOTIFICATION_LISTENER,
+
     /** Was sideloaded (installed from an APK, not a store). */
     SIDELOADED,
 
