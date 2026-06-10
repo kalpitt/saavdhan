@@ -19,6 +19,7 @@
     <string name="result_safe_body">We did not find apps with the warning signs of scam spyware. Stay alert, and scan again any time.</string>
     <string name="result_found_title">%1$d app needs your attention</string>
     <string name="result_found_title_plural">%1$d apps need your attention</string>
+    <string name="result_mild_section">Probably fine — worth a quick look</string>
     <string name="partial_scan_note">This phone limits what we can see, so the scan may be incomplete.</string>
 
     <!-- Risk levels -->
@@ -31,6 +32,7 @@
     <string name="signal_accessibility">Can read your screen and tap for you (Accessibility)</string>
     <string name="signal_device_admin">Has admin power that blocks removal (Device Admin)</string>
     <string name="signal_sms">Can read your text messages, including bank OTPs</string>
+    <string name="signal_sms_requested">Requests permission to read your text messages</string>
     <string name="signal_notification_listener">Can read all your notifications (including bank OTP messages)</string>
     <string name="signal_sideloaded">Installed from outside the Play Store</string>
     <string name="signal_hidden_icon">Hides its icon from your app list</string>

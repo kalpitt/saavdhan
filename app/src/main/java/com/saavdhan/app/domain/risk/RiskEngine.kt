@@ -22,15 +22,30 @@ object RiskEngine {
 
     fun assess(app: ScannedApp): RiskAssessment {
         val signals = collectSignals(app)
-        val allowlisted = app.isSystemApp || app.packageName in KnownApps.TRUSTED_PACKAGES
+        val allowlisted = isAllowlisted(app, signals)
 
         // Apps we trust are reported calmly regardless of the powers they hold.
         if (allowlisted) {
             return RiskAssessment(RiskLevel.LOW, signals, allowlisted = true)
         }
 
-        val level = levelFor(signals)
+        val level = levelFor(signals, app)
         return RiskAssessment(level, signals, allowlisted = false)
+    }
+
+    /** Determine if an app should be trusted and hidden from results. */
+    private fun isAllowlisted(app: ScannedApp, signals: List<RiskSignal>): Boolean {
+        if (app.isSystemApp) return true
+        if (app.packageName in KnownApps.TRUSTED_PACKAGES) {
+            // Sideloaded app with the same name as a trusted package is NOT trusted if it has dangerous powers.
+            if (app.installSource == com.saavdhan.app.domain.model.InstallSource.SIDELOADED &&
+                (app.hasAccessibilityEnabled || app.isDeviceAdmin || app.smsGranted)
+            ) {
+                return false
+            }
+            return true
+        }
+        return KnownApps.isTrustedPackage(app.packageName, app.installSource)
     }
 
     /** Turn the raw facts about an app into the list of named red flags. */
@@ -39,17 +54,27 @@ object RiskEngine {
         if (app.isDeviceAdmin) add(RiskSignal.DEVICE_ADMIN)
         // Granted SMS access is the dangerous state (that's where OTPs can be read).
         if (app.smsGranted) add(RiskSignal.SMS_ACCESS)
+        // Sideloaded app that requests SMS is a warning sign (even if not granted yet).
+        if (app.installSource == com.saavdhan.app.domain.model.InstallSource.SIDELOADED &&
+            app.requestsSms && !app.smsGranted
+        ) {
+            add(RiskSignal.SMS_REQUESTED)
+        }
         if (app.hasNotificationListener) add(RiskSignal.NOTIFICATION_LISTENER)
         if (app.installSource == com.saavdhan.app.domain.model.InstallSource.SIDELOADED) add(RiskSignal.SIDELOADED)
-        if (app.hasHiddenIcon) add(RiskSignal.HIDDEN_ICON)
+        // Hidden icon is only a flag for sideloaded apps (store apps may legitimately lack icons).
+        if (app.installSource == com.saavdhan.app.domain.model.InstallSource.SIDELOADED && app.hasHiddenIcon) {
+            add(RiskSignal.HIDDEN_ICON)
+        }
         if (app.impersonatesSystemApp) add(RiskSignal.IMPERSONATION)
     }
 
     /** Combine the red flags into one overall level. Order matters: we check scariest first. */
-    private fun levelFor(signals: List<RiskSignal>): RiskLevel {
+    private fun levelFor(signals: List<RiskSignal>, app: ScannedApp): RiskLevel {
         val accessibility = RiskSignal.ACCESSIBILITY in signals
         val deviceAdmin = RiskSignal.DEVICE_ADMIN in signals
         val sms = RiskSignal.SMS_ACCESS in signals
+        val smsRequested = RiskSignal.SMS_REQUESTED in signals
         val notif = RiskSignal.NOTIFICATION_LISTENER in signals
         val sideloaded = RiskSignal.SIDELOADED in signals
         val hiddenIcon = RiskSignal.HIDDEN_ICON in signals
@@ -70,12 +95,13 @@ object RiskEngine {
                 (accessibility && notif) ||
                 (deviceAdmin && sms) ||
                 (deviceAdmin && notif) ||
-                impersonation ||
-                (hiddenIcon && (accessibility || deviceAdmin || sms || sideloaded || notif))
+                (hiddenIcon && (accessibility || deviceAdmin || sms || smsRequested || notif)) ||
+                (sideloaded && smsRequested && (accessibility || deviceAdmin)) ||
+                impersonation
         if (highCombo) return RiskLevel.HIGH
 
         // 3. A single mild clue worth a glance.
-        val suspicious = sideloaded || accessibility || deviceAdmin || hiddenIcon || notif
+        val suspicious = sideloaded || accessibility || deviceAdmin || hiddenIcon || smsRequested || notif
         if (suspicious) return RiskLevel.SUSPICIOUS
 
         // 4. Nothing notable (SMS access alone is too common to flag on its own).
