@@ -60,8 +60,14 @@
     <!-- Settings -->
     <string name="settings_title">Settings</string>
     <string name="settings_language">Language</string>
+    <string name="settings_protection_title">Background protection</string>
     <string name="settings_about">About Saavdhan</string>
     <string name="settings_offline_note">Saavdhan works fully offline. It never connects to the internet and never sends your data anywhere.</string>
+    <string name="battery_ok">Saavdhan is allowed to run in the background. It can alert you as soon as a dangerous new app appears.</string>
+    <string name="battery_blocked">Your phone\'s battery saver may stop Saavdhan from watching in the background. Tap below, find Saavdhan in the list, and allow it.</string>
+    <string name="battery_fix_button">Open battery settings</string>
+    <string name="watchdog_last_run">Last background check: %1$s</string>
+    <string name="watchdog_never_run">The background check hasn\'t run yet.</string>
 
     <!-- Background watchdog (new-app alerts) -->
     <string name="watchdog_channel_name">Threat alerts</string>
