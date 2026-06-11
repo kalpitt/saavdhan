@@ -6,6 +6,26 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); the pro
 
 ## [Unreleased]
 
+### Added
+- **Watchdog v2.** The background watchdog now also warns when an *already-installed* app gains
+  dangerous powers (Accessibility / Device Admin / OTP access) — the real-world scam sequence where
+  an app installs quietly and is "armed" later. Alerts fire once per upward crossing; no repeat spam.
+- **Slow-scan reassurance.** If a scan takes more than ~8 seconds, a calm "this can take a minute"
+  note appears so the wait never feels broken.
+- **Scan error screen.** If a scan fails mid-way, the app shows a calm bilingual "couldn't finish
+  scanning — try again" screen instead of crashing.
+- **Honest partial-scan banner.** If the phone restricts which apps Saavdhan can see, the results
+  now say the scan may be incomplete instead of declaring a false "all clear".
+- Landing page (`docs/index.html`) for GitHub Pages, and release-signing wiring
+  (`keystore.properties`, gitignored) in preparation for the first signed APK release.
+
+### Fixed
+- Closed an allowlist gap: a non-Play app faking a trusted package prefix (e.g.
+  `com.google.android.*`) while holding dangerous powers is no longer trusted.
+- Cleanup progress now survives Android killing the app mid-cleanup (common on low-RAM phones).
+- The battery-optimization card in Settings updates immediately on return from system Settings.
+- The floating coach banner now auto-hides after ~2 minutes and whenever you return to the app.
+
 ## [0.1.0] — 2026-06-10
 First public early release. **Fully offline** — the app does not hold the `INTERNET` permission, so
 it cannot make a network call. Detection runs on-device with a deterministic, unit-tested rule

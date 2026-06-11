@@ -13,6 +13,7 @@
     <string name="scan_button">मेरा फ़ोन स्कैन करें</string>
     <string name="scanning">स्कैन हो रहा है…</string>
     <string name="scan_again">फिर से स्कैन करें</string>
+    <string name="scan_slow_note">कई ऐप्स की जाँच हो रही है — इसमें थोड़ा समय लग सकता है। सब ठीक है।</string>
     <string name="scan_error_title">स्कैन पूरा नहीं हो सका</string>
     <string name="scan_error_body">आपके ऐप्स की जाँच करते समय कुछ गलत हुआ। कृपया दोबारा कोशिश करें।</string>
 
@@ -78,6 +79,8 @@
     <string name="watchdog_channel_desc">जब कोई नया इंस्टॉल किया गया ऐप खतरनाक लगता है तो आपको चेतावनी देता है।</string>
     <string name="watchdog_title">एक नया ऐप खतरनाक लगता है</string>
     <string name="watchdog_text">%1$s एक स्कैम ऐप हो सकता है। सावधान में जाँचने के लिए टैप करें।</string>
+    <string name="watchdog_escalation_title">एक इंस्टॉल किया हुआ ऐप खतरनाक हो गया है</string>
+    <string name="watchdog_escalation_text">%1$s ने ऐसी शक्तियाँ ले ली हैं जिनका स्कैम ऐप्स गलत इस्तेमाल करते हैं। सावधान में जाँचने के लिए टैप करें।</string>
 
     <!-- On-screen overlay coach -->
     <string name="coach_accessibility">इस सूची में \"%1$s\" को ढूँढें और इसे बंद (OFF) करें।</string>

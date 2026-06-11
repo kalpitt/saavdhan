@@ -13,6 +13,7 @@
     <string name="scan_button">Scan my phone</string>
     <string name="scanning">Scanning…</string>
     <string name="scan_again">Scan again</string>
+    <string name="scan_slow_note">Lots of apps to check — this can take a minute. Everything is fine.</string>
     <string name="scan_error_title">Couldn\'t finish scanning</string>
     <string name="scan_error_body">Something went wrong while checking your apps. Please try again.</string>
 
@@ -78,6 +79,8 @@
     <string name="watchdog_channel_desc">Warns you when a newly installed app looks dangerous.</string>
     <string name="watchdog_title">A new app looks dangerous</string>
     <string name="watchdog_text">%1$s may be a scam app. Tap to check it in Saavdhan.</string>
+    <string name="watchdog_escalation_title">An installed app turned dangerous</string>
+    <string name="watchdog_escalation_text">%1$s has gained powers that scam apps misuse. Tap to check it in Saavdhan.</string>
 
     <!-- On-screen overlay coach -->
     <string name="coach_accessibility">Find \"%1$s\" in this list and turn it OFF.</string>
