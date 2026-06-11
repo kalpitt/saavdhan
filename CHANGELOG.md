@@ -6,6 +6,20 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); the pro
 
 ## [Unreleased]
 
+### Added
+- Home screen now states the offline promise up front ("Works fully offline — nothing ever
+  leaves your phone", EN+HI) — trust-building for first-time users.
+- ktlint code-style enforcement in CI (`./gradlew ktlintCheck`; auto-fix with `ktlintFormat`).
+
+### Fixed
+- **Watchdog test-fixture regression (caught in emulator testing):** the v2 watchdog's baseline
+  included the emulator demo fixtures, which share a package name with the `decoyapp` test app —
+  so the documented decoyapp flow could never alert. The watchdog now scans real packages only.
+  Verified live on the emulator: clean baseline → install decoyapp → threat notification posts.
+- Opening a flagged app's detail page after the scan results are gone (e.g. after Android killed
+  the app) now shows an honest "scan again" note instead of a misleading "no dangerous apps" line.
+- Cleanup screen's app name now survives process death too.
+
 ## [0.2.0] — 2026-06-11
 Failure-path hardening + watchdog v2. First release distributed as a signed APK on GitHub Releases.
 

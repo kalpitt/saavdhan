@@ -1,0 +1,17 @@
+# Code style for ktlint (enforced in CI via ./gradlew ktlintCheck; auto-fix with ktlintFormat).
+root = true
+
+[*.{kt,kts}]
+ktlint_code_style = android_studio
+# Long descriptive lines are fine in this codebase; don't fight them.
+max_line_length = off
+# Composables are PascalCase by convention — don't flag them.
+ktlint_function_naming_ignore_when_annotated_with = Composable
+# This codebase deliberately uses inline teaching comments in argument lists (e.g. the
+# allowlist's "// TalkBack screen reader") — keep them.
+ktlint_standard_value-argument-comment = disabled
+ktlint_standard_value-parameter-comment = disabled
+# Older ktlint versions flag the same pattern under this rule id.
+ktlint_standard_discouraged-comment-location = disabled
+indent_size = 4
+insert_final_newline = true

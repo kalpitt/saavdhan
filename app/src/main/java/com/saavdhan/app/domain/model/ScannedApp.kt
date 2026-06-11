@@ -46,7 +46,7 @@ data class ScannedApp(
     val impersonatesSystemApp: Boolean,
 
     /** When the app was first installed, in epoch milliseconds. Used only for "this appeared recently" hints. */
-    val firstInstallTimeMillis: Long,
+    val firstInstallTimeMillis: Long
 )
 
 /** How an app arrived on the phone. */
@@ -65,5 +65,5 @@ enum class InstallSource {
     SYSTEM,
 
     /** We could not determine the source. */
-    UNKNOWN,
+    UNKNOWN
 }

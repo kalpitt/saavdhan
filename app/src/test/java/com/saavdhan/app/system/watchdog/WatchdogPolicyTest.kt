@@ -15,7 +15,7 @@ class WatchdogPolicyTest {
     fun `first run establishes baseline without alerting, even on dangerous apps`() {
         val alerts = WatchdogPolicy.assessChanges(
             known = null,
-            current = mapOf("com.evil" to RiskLevel.CRITICAL, "com.ok" to RiskLevel.LOW),
+            current = mapOf("com.evil" to RiskLevel.CRITICAL, "com.ok" to RiskLevel.LOW)
         )
         assertTrue(alerts.isEmpty())
     }
@@ -24,7 +24,7 @@ class WatchdogPolicyTest {
     fun `newly installed CRITICAL app alerts as NEW_INSTALL`() {
         val alerts = WatchdogPolicy.assessChanges(
             known = mapOf("com.ok" to RiskLevel.LOW),
-            current = mapOf("com.ok" to RiskLevel.LOW, "com.evil" to RiskLevel.CRITICAL),
+            current = mapOf("com.ok" to RiskLevel.LOW, "com.evil" to RiskLevel.CRITICAL)
         )
         assertEquals(listOf(Alert("com.evil", AlertKind.NEW_INSTALL)), alerts)
     }
@@ -33,7 +33,7 @@ class WatchdogPolicyTest {
     fun `newly installed SUSPICIOUS app does not alert`() {
         val alerts = WatchdogPolicy.assessChanges(
             known = mapOf("com.ok" to RiskLevel.LOW),
-            current = mapOf("com.ok" to RiskLevel.LOW, "com.meh" to RiskLevel.SUSPICIOUS),
+            current = mapOf("com.ok" to RiskLevel.LOW, "com.meh" to RiskLevel.SUSPICIOUS)
         )
         assertTrue(alerts.isEmpty())
     }
@@ -43,7 +43,7 @@ class WatchdogPolicyTest {
         // The real SpyNote sequence: installed quietly, armed later.
         val alerts = WatchdogPolicy.assessChanges(
             known = mapOf("com.sleeper" to RiskLevel.LOW),
-            current = mapOf("com.sleeper" to RiskLevel.HIGH),
+            current = mapOf("com.sleeper" to RiskLevel.HIGH)
         )
         assertEquals(listOf(Alert("com.sleeper", AlertKind.ESCALATION)), alerts)
     }
@@ -52,7 +52,7 @@ class WatchdogPolicyTest {
     fun `existing app escalating from SUSPICIOUS to CRITICAL alerts as ESCALATION`() {
         val alerts = WatchdogPolicy.assessChanges(
             known = mapOf("com.sleeper" to RiskLevel.SUSPICIOUS),
-            current = mapOf("com.sleeper" to RiskLevel.CRITICAL),
+            current = mapOf("com.sleeper" to RiskLevel.CRITICAL)
         )
         assertEquals(listOf(Alert("com.sleeper", AlertKind.ESCALATION)), alerts)
     }
@@ -61,7 +61,7 @@ class WatchdogPolicyTest {
     fun `app already dangerous last run does not re-alert (no spam)`() {
         val alerts = WatchdogPolicy.assessChanges(
             known = mapOf("com.evil" to RiskLevel.HIGH),
-            current = mapOf("com.evil" to RiskLevel.CRITICAL), // worse, but already alerted
+            current = mapOf("com.evil" to RiskLevel.CRITICAL) // worse, but already alerted
         )
         assertTrue(alerts.isEmpty())
     }
@@ -70,7 +70,7 @@ class WatchdogPolicyTest {
     fun `migrated v1 entry (unknown old level) is baselined silently even if dangerous now`() {
         val alerts = WatchdogPolicy.assessChanges(
             known = mapOf("com.evil" to null), // v1 snapshot had only the name
-            current = mapOf("com.evil" to RiskLevel.CRITICAL),
+            current = mapOf("com.evil" to RiskLevel.CRITICAL)
         )
         assertTrue(alerts.isEmpty())
     }
@@ -79,7 +79,7 @@ class WatchdogPolicyTest {
     fun `uninstalled packages simply disappear without alerting`() {
         val alerts = WatchdogPolicy.assessChanges(
             known = mapOf("com.gone" to RiskLevel.HIGH),
-            current = emptyMap(),
+            current = emptyMap()
         )
         assertTrue(alerts.isEmpty())
     }
@@ -91,15 +91,15 @@ class WatchdogPolicyTest {
             current = mapOf(
                 "com.sleeper" to RiskLevel.CRITICAL,
                 "com.ok" to RiskLevel.LOW,
-                "com.fresh" to RiskLevel.HIGH,
-            ),
+                "com.fresh" to RiskLevel.HIGH
+            )
         ).toSet()
         assertEquals(
             setOf(
                 Alert("com.sleeper", AlertKind.ESCALATION),
-                Alert("com.fresh", AlertKind.NEW_INSTALL),
+                Alert("com.fresh", AlertKind.NEW_INSTALL)
             ),
-            alerts,
+            alerts
         )
     }
 

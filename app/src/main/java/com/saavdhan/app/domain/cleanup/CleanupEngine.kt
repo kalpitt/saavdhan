@@ -46,7 +46,7 @@ object CleanupEngine {
         return CleanupPlan(
             steps = steps,
             showSafeModeEscalation = showSafeMode,
-            threatRemoved = !state.isInstalled,
+            threatRemoved = !state.isInstalled
         )
     }
 }

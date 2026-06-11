@@ -1,7 +1,6 @@
 package com.saavdhan.app.system.watchdog
 
 import android.content.Context
-
 import com.saavdhan.app.domain.model.RiskLevel
 
 /**
@@ -21,7 +20,7 @@ object InstalledAppsSnapshot {
     fun getLevels(context: Context): Map<String, RiskLevel?>? =
         WatchdogPolicy.decode(
             context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-                .getStringSet(KEY_PACKAGES, null),
+                .getStringSet(KEY_PACKAGES, null)
         )
 
     fun saveLevels(context: Context, levels: Map<String, RiskLevel>) {

@@ -49,7 +49,7 @@ import kotlinx.coroutines.delay
 fun ScanScreen(
     viewModel: ScanViewModel,
     onAppClick: (String) -> Unit,
-    onOpenSettings: () -> Unit,
+    onOpenSettings: () -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -59,9 +59,9 @@ fun ScanScreen(
                     IconButton(onClick = onOpenSettings) {
                         Icon(Icons.Filled.Settings, contentDescription = stringResource(R.string.settings_title))
                     }
-                },
+                }
             )
-        },
+        }
     ) { padding ->
         when (val state = viewModel.state) {
             is ScanState.Idle -> IdleContent(padding, onScan = viewModel::scan)
@@ -71,7 +71,7 @@ fun ScanScreen(
                 apps = state.result.apps,
                 partial = state.result.partial,
                 onAppClick = onAppClick,
-                onScanAgain = viewModel::scan,
+                onScanAgain = viewModel::scan
             )
             is ScanState.Error -> ErrorContent(padding, onRetry = viewModel::scan)
         }
@@ -86,15 +86,22 @@ private fun IdleContent(padding: PaddingValues, onScan: () -> Unit) {
             .padding(padding)
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
+        verticalArrangement = Arrangement.Center
     ) {
         Text(
             text = stringResource(R.string.home_subtitle),
             style = MaterialTheme.typography.titleLarge,
-            textAlign = TextAlign.Center,
+            textAlign = TextAlign.Center
         )
         Spacer(Modifier.height(32.dp))
         PrimaryButton(text = stringResource(R.string.scan_button), onClick = onScan)
+        Spacer(Modifier.height(20.dp))
+        Text(
+            text = stringResource(R.string.home_offline_note),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center
+        )
     }
 }
 
@@ -112,7 +119,7 @@ private fun ScanningContent(padding: PaddingValues) {
             .padding(padding)
             .padding(horizontal = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
+        verticalArrangement = Arrangement.Center
     ) {
         CircularProgressIndicator()
         Spacer(Modifier.height(16.dp))
@@ -123,7 +130,7 @@ private fun ScanningContent(padding: PaddingValues) {
                 stringResource(R.string.scan_slow_note),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center,
+                textAlign = TextAlign.Center
             )
         }
     }
@@ -137,18 +144,18 @@ private fun ErrorContent(padding: PaddingValues, onRetry: () -> Unit) {
             .padding(padding)
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
+        verticalArrangement = Arrangement.Center
     ) {
         Text(
             text = stringResource(R.string.scan_error_title),
             style = MaterialTheme.typography.titleLarge,
-            textAlign = TextAlign.Center,
+            textAlign = TextAlign.Center
         )
         Spacer(Modifier.height(16.dp))
         Text(
             text = stringResource(R.string.scan_error_body),
             style = MaterialTheme.typography.bodyLarge,
-            textAlign = TextAlign.Center,
+            textAlign = TextAlign.Center
         )
         Spacer(Modifier.height(32.dp))
         PrimaryButton(text = stringResource(R.string.scan_again), onClick = onRetry)
@@ -161,7 +168,7 @@ private fun ResultsContent(
     apps: List<AssessedApp>,
     partial: Boolean,
     onAppClick: (String) -> Unit,
-    onScanAgain: () -> Unit,
+    onScanAgain: () -> Unit
 ) {
     val allFlagged = apps.filter { it.assessment.level != RiskLevel.LOW }
     val serious = allFlagged.filter { it.assessment.level == RiskLevel.CRITICAL || it.assessment.level == RiskLevel.HIGH }
@@ -172,7 +179,7 @@ private fun ResultsContent(
             .fillMaxSize()
             .padding(padding),
         contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         if (partial) {
             item { InfoCard(text = stringResource(R.string.partial_scan_note)) }
@@ -185,13 +192,13 @@ private fun ResultsContent(
                     Text(
                         stringResource(R.string.result_safe_title),
                         style = MaterialTheme.typography.titleLarge,
-                        textAlign = TextAlign.Center,
+                        textAlign = TextAlign.Center
                     )
                     Spacer(Modifier.height(8.dp))
                     Text(
                         stringResource(R.string.result_safe_body),
                         style = MaterialTheme.typography.bodyLarge,
-                        textAlign = TextAlign.Center,
+                        textAlign = TextAlign.Center
                     )
                 }
             }
@@ -233,14 +240,14 @@ private fun AppRiskCard(item: AssessedApp, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick),
+            .clickable(onClick = onClick)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Column(Modifier.padding(end = 12.dp).weight(1f)) {
                 Text(item.app.label, style = MaterialTheme.typography.titleLarge)
@@ -248,12 +255,12 @@ private fun AppRiskCard(item: AssessedApp, onClick: () -> Unit) {
                 Text(
                     item.app.packageName,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
             RiskChip(
                 text = stringResource(item.assessment.level.labelRes()),
-                color = item.assessment.level.color(),
+                color = item.assessment.level.color()
             )
         }
     }

@@ -1,6 +1,5 @@
 package com.saavdhan.app.system.deeplink
 
-import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -63,7 +62,7 @@ object SettingsDeepLinks {
         Toast.makeText(
             context,
             context.getString(com.saavdhan.app.R.string.error_screen_not_found),
-            Toast.LENGTH_LONG,
+            Toast.LENGTH_LONG
         ).show()
     }
 }
