@@ -144,15 +144,6 @@ class AppScanner(private val context: Context) {
             pm.getInstalledPackages(PackageManager.GET_PERMISSIONS)
         }
 
-    /** Lightweight list of all installed package names (no permission data). Used by the watchdog. */
-    @Suppress("DEPRECATION")
-    fun installedPackageNames(): Set<String> =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            pm.getInstalledPackages(PackageManager.PackageInfoFlags.of(0))
-        } else {
-            pm.getInstalledPackages(0)
-        }.mapTo(mutableSetOf()) { it.packageName }
-
     @Suppress("DEPRECATION")
     private fun packageInfo(packageName: String): PackageInfo? = try {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
