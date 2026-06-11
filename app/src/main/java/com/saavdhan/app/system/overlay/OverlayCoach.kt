@@ -17,7 +17,7 @@ object OverlayCoach {
     fun requestPermission(context: Context) {
         val intent = Intent(
             Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-            Uri.fromParts("package", context.packageName, null),
+            Uri.fromParts("package", context.packageName, null)
         ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         try {
             context.startActivity(intent)

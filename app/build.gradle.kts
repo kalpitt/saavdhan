@@ -4,6 +4,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    // Mechanical code-style enforcement (CI runs ktlintCheck; fix locally with ktlintFormat).
+    alias(libs.plugins.ktlint)
 }
 
 // Release signing: reads keystore.properties at the repo root IF it exists (see
@@ -48,7 +50,7 @@ android {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro",
+                "proguard-rules.pro"
             )
             if (keystoreProps.isNotEmpty()) {
                 signingConfig = signingConfigs.getByName("release")

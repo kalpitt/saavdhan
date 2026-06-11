@@ -21,14 +21,14 @@ class KnownAppsTest {
     @Test
     fun `the real Google Play Services is NOT impersonating`() {
         assertFalse(
-            KnownApps.isImpersonating("Google Play Services", "com.google.android.gms", isSystemApp = false),
+            KnownApps.isImpersonating("Google Play Services", "com.google.android.gms", isSystemApp = false)
         )
     }
 
     @Test
     fun `a fake Google Play Services IS impersonating`() {
         assertTrue(
-            KnownApps.isImpersonating("Google Play Services", "com.evil.fake", isSystemApp = false),
+            KnownApps.isImpersonating("Google Play Services", "com.evil.fake", isSystemApp = false)
         )
     }
 
@@ -65,7 +65,7 @@ class KnownAppsTest {
     @Test
     fun `Company Portal in the trusted list is recognized`() {
         assertTrue(
-            KnownApps.isTrustedPackage("com.microsoft.windowsintune.companyportal", InstallSource.PLAY_STORE),
+            KnownApps.isTrustedPackage("com.microsoft.windowsintune.companyportal", InstallSource.PLAY_STORE)
         )
     }
 

@@ -25,7 +25,7 @@ object Watchdog {
         workManager.enqueueUniquePeriodicWork(
             PERIODIC_WORK,
             ExistingPeriodicWorkPolicy.KEEP, // don't reset the schedule on every open
-            periodic,
+            periodic
         )
 
         // Immediate one-off scan to catch installs that happened while we were closed.

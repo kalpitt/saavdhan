@@ -15,7 +15,7 @@ enum class RiskLevel {
     HIGH,
 
     /** The classic spyware fingerprint. Almost certainly malicious. Act now. */
-    CRITICAL,
+    CRITICAL
 }
 
 /**
@@ -46,7 +46,7 @@ enum class RiskSignal {
     HIDDEN_ICON,
 
     /** Pretends to be a trusted system app. */
-    IMPERSONATION,
+    IMPERSONATION
 }
 
 /**
@@ -56,5 +56,5 @@ enum class RiskSignal {
 data class RiskAssessment(
     val level: RiskLevel,
     val signals: List<RiskSignal>,
-    val allowlisted: Boolean,
+    val allowlisted: Boolean
 )

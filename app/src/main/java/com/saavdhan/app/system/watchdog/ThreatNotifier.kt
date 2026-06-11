@@ -27,7 +27,7 @@ object ThreatNotifier {
         val channel = NotificationChannel(
             CHANNEL_ID,
             context.getString(R.string.watchdog_channel_name),
-            NotificationManager.IMPORTANCE_HIGH,
+            NotificationManager.IMPORTANCE_HIGH
         ).apply {
             description = context.getString(R.string.watchdog_channel_desc)
         }
@@ -39,7 +39,7 @@ object ThreatNotifier {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return true
         return ContextCompat.checkSelfPermission(
             context,
-            Manifest.permission.POST_NOTIFICATIONS,
+            Manifest.permission.POST_NOTIFICATIONS
         ) == PackageManager.PERMISSION_GRANTED
     }
 
@@ -61,7 +61,7 @@ object ThreatNotifier {
             context,
             assessed.app.packageName.hashCode(),
             openApp,
-            android.app.PendingIntent.FLAG_IMMUTABLE or android.app.PendingIntent.FLAG_UPDATE_CURRENT,
+            android.app.PendingIntent.FLAG_IMMUTABLE or android.app.PendingIntent.FLAG_UPDATE_CURRENT
         )
 
         val titleRes = if (escalation) R.string.watchdog_escalation_title else R.string.watchdog_title

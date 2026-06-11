@@ -19,7 +19,7 @@ import com.saavdhan.app.data.scanner.AppScanner
  */
 class NewAppScanWorker(
     context: Context,
-    params: WorkerParameters,
+    params: WorkerParameters
 ) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result {
@@ -28,7 +28,7 @@ class NewAppScanWorker(
         // Full assessment (same brain as the on-demand scan). Needed because an escalation —
         // an existing app gaining Accessibility/Device-Admin — is invisible to a name-only diff.
         val assessedByPackage = try {
-            scanner.scan().apps.associateBy { it.app.packageName }
+            scanner.scan(includeDemoFixtures = false).apps.associateBy { it.app.packageName }
         } catch (e: Exception) {
             // Background scan failed (e.g. binder pressure); try again at the next interval.
             return Result.retry()
@@ -42,7 +42,7 @@ class NewAppScanWorker(
             ThreatNotifier.notifyThreat(
                 applicationContext,
                 assessed,
-                escalation = alert.kind == WatchdogPolicy.AlertKind.ESCALATION,
+                escalation = alert.kind == WatchdogPolicy.AlertKind.ESCALATION
             )
         }
 

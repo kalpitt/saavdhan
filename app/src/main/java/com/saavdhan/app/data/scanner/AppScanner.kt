@@ -20,13 +20,13 @@ import com.saavdhan.app.domain.risk.RiskEngine
 /** One app plus the verdict the brain reached about it. */
 data class AssessedApp(
     val app: ScannedApp,
-    val assessment: RiskAssessment,
+    val assessment: RiskAssessment
 )
 
 /** The outcome of a whole scan: every app assessed (scariest first), and whether the scan was limited. */
 data class ScanResult(
     val apps: List<AssessedApp>,
-    val partial: Boolean,
+    val partial: Boolean
 )
 
 /**
@@ -37,7 +37,12 @@ class AppScanner(private val context: Context) {
 
     private val pm: PackageManager = context.packageManager
 
-    fun scan(): ScanResult {
+    /**
+     * @param includeDemoFixtures inject the fake demo threats on emulator debug builds (UI
+     * exercise). The watchdog passes false: its baseline must contain only REAL packages, or the
+     * decoyapp test fixture (same package name as a demo entry) could never alert as "new".
+     */
+    fun scan(includeDemoFixtures: Boolean = true): ScanResult {
         val accessibilityPackages = try {
             enabledAccessibilityPackages()
         } catch (e: Exception) {
@@ -67,7 +72,7 @@ class AppScanner(private val context: Context) {
             .toMutableList()
 
         // On an emulator there is no real malware, so add demo threats to exercise the UI.
-        if (BuildConfig.DEBUG && isEmulator()) assessed += demoApps()
+        if (includeDemoFixtures && BuildConfig.DEBUG && isEmulator()) assessed += demoApps()
 
         // Scariest first, and de-duplicated by package: a package name must be unique in the list
         // (the UI uses it as a stable key, and a duplicate would otherwise crash the results list).
@@ -96,7 +101,7 @@ class AppScanner(private val context: Context) {
         accessibilityPackages: Set<String>,
         adminPackages: Set<String>,
         notificationListenerPackages: Set<String>,
-        myPackage: String,
+        myPackage: String
     ): AssessedApp? {
         val appInfo = info.applicationInfo ?: return null
         val pkg = info.packageName
@@ -117,7 +122,7 @@ class AppScanner(private val context: Context) {
             hasNotificationListener = pkg in notificationListenerPackages,
             hasHiddenIcon = !isSystem && pm.getLaunchIntentForPackage(pkg) == null,
             impersonatesSystemApp = KnownApps.isImpersonating(label, pkg, isSystem),
-            firstInstallTimeMillis = info.firstInstallTime,
+            firstInstallTimeMillis = info.firstInstallTime
         )
         return AssessedApp(scanned, RiskEngine.assess(scanned))
     }
@@ -138,7 +143,7 @@ class AppScanner(private val context: Context) {
     private fun installedPackages(): List<PackageInfo> =
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             pm.getInstalledPackages(
-                PackageManager.PackageInfoFlags.of(PackageManager.GET_PERMISSIONS.toLong()),
+                PackageManager.PackageInfoFlags.of(PackageManager.GET_PERMISSIONS.toLong())
             )
         } else {
             pm.getInstalledPackages(PackageManager.GET_PERMISSIONS)
@@ -170,7 +175,7 @@ class AppScanner(private val context: Context) {
     private fun enabledNotificationListenerPackages(): Set<String> {
         // Colon-separated flattened ComponentNames, e.g. "com.foo/com.foo.Listener:com.bar/..."
         val flat = android.provider.Settings.Secure.getString(
-            context.contentResolver, "enabled_notification_listeners",
+            context.contentResolver, "enabled_notification_listeners"
         ) ?: return emptySet()
         return flat.split(':').mapNotNull {
             android.content.ComponentName.unflattenFromString(it)?.packageName
@@ -194,7 +199,7 @@ class AppScanner(private val context: Context) {
     private val smsPermissions = setOf(
         android.Manifest.permission.RECEIVE_SMS,
         android.Manifest.permission.READ_SMS,
-        android.Manifest.permission.SEND_SMS,  // trojans send fraud SMS/UPI requests from the victim's number
+        android.Manifest.permission.SEND_SMS // trojans send fraud SMS/UPI requests from the victim's number
     )
 
     private fun requestsSms(info: PackageInfo): Boolean =
@@ -242,7 +247,7 @@ class AppScanner(private val context: Context) {
                 hasNotificationListener = true,
                 hasHiddenIcon = true,
                 impersonatesSystemApp = true,
-                firstInstallTimeMillis = now,
+                firstInstallTimeMillis = now
             ),
             ScannedApp(
                 packageName = "com.demo.fastcash",
@@ -255,8 +260,8 @@ class AppScanner(private val context: Context) {
                 smsGranted = true,
                 hasHiddenIcon = false,
                 impersonatesSystemApp = false,
-                firstInstallTimeMillis = now,
-            ),
+                firstInstallTimeMillis = now
+            )
         )
         return demo.map { AssessedApp(it, RiskEngine.assess(it)) }
     }

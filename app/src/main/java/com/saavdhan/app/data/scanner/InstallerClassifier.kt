@@ -19,10 +19,10 @@ object InstallerClassifier {
         null -> InstallSource.SIDELOADED
         "com.android.packageinstaller",
         "com.google.android.packageinstaller",
-        "com.miui.packageinstaller",  // Xiaomi file manager / sideload installer
-        "com.samsung.android.packageinstaller",  // Samsung package manager
-        "com.coloros.filemanager",  // Oppo/Realme file manager
-        "com.transsion.packageinstaller",  // Tecno/Infinix file manager
+        "com.miui.packageinstaller", // Xiaomi file manager / sideload installer
+        "com.samsung.android.packageinstaller", // Samsung package manager
+        "com.coloros.filemanager", // Oppo/Realme file manager
+        "com.transsion.packageinstaller" // Tecno/Infinix file manager
         -> InstallSource.SIDELOADED
         else -> InstallSource.OTHER_STORE
     }

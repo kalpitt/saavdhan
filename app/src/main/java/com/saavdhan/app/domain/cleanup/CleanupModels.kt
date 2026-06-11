@@ -20,7 +20,7 @@ enum class CleanupStepId {
     UNINSTALL,
 
     /** After the app is gone: secure your accounts. */
-    SECURE_ACCOUNTS,
+    SECURE_ACCOUNTS
 }
 
 enum class StepStatus {
@@ -31,7 +31,7 @@ enum class StepStatus {
     CURRENT,
 
     /** Comes later. */
-    PENDING,
+    PENDING
 }
 
 data class CleanupStep(val id: CleanupStepId, val status: StepStatus)
@@ -47,7 +47,7 @@ data class CleanupState(
     val hasAccessibility: Boolean,
     val wasDeviceAdmin: Boolean,
     val isDeviceAdmin: Boolean,
-    val isIsolated: Boolean,
+    val isIsolated: Boolean
 )
 
 data class CleanupPlan(
@@ -56,5 +56,5 @@ data class CleanupPlan(
     /** Surface the Safe Mode escalation prominently (the app resists normal removal). */
     val showSafeModeEscalation: Boolean,
     /** True once the malicious app is no longer installed. */
-    val threatRemoved: Boolean,
+    val threatRemoved: Boolean
 )

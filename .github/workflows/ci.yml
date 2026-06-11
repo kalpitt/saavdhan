@@ -31,6 +31,9 @@ jobs:
       - name: Drift check (docs consistency)
         run: bash scripts/drift_check.sh
 
+      - name: Code style (ktlint)
+        run: ./gradlew :app:ktlintCheck
+
       - name: Unit tests (the detection engine)
         run: ./gradlew testDebugUnitTest
 

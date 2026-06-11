@@ -10,6 +10,8 @@
 
     <!-- Scan home -->
     <string name="home_subtitle">खतरनाक ऐप्स के लिए अपना फ़ोन जाँचें</string>
+    <string name="home_offline_note">🛡️ पूरी तरह ऑफ़लाइन काम करता है — आपके फ़ोन से कुछ भी बाहर नहीं जाता।</string>
+    <string name="detail_not_found">यह ऐप अब स्कैन परिणामों में नहीं है। वापस जाकर दोबारा स्कैन करें।</string>
     <string name="scan_button">मेरा फ़ोन स्कैन करें</string>
     <string name="scanning">स्कैन हो रहा है…</string>
     <string name="scan_again">फिर से स्कैन करें</string>

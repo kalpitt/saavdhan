@@ -8,12 +8,12 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.ContextCompat
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -56,7 +56,7 @@ class MainActivity : ComponentActivity() {
                             LocaleManager.setLanguage(this, language)
                             // Rebuild the activity so the new language takes effect everywhere.
                             recreate()
-                        },
+                        }
                     )
                 }
             }
@@ -78,7 +78,7 @@ class MainActivity : ComponentActivity() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return
         val granted = ContextCompat.checkSelfPermission(
             this,
-            Manifest.permission.POST_NOTIFICATIONS,
+            Manifest.permission.POST_NOTIFICATIONS
         ) == PackageManager.PERMISSION_GRANTED
         if (!granted) notificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
     }
@@ -98,7 +98,7 @@ private object Routes {
 fun SaavdhanApp(
     hasChosenLanguage: Boolean,
     currentLanguage: String,
-    onChooseLanguage: (String) -> Unit,
+    onChooseLanguage: (String) -> Unit
 ) {
     val navController = rememberNavController()
     // One shared scan view-model so Home and Detail see the same results.
@@ -118,7 +118,7 @@ fun SaavdhanApp(
 
     NavHost(
         navController = navController,
-        startDestination = if (hasChosenLanguage) Routes.HOME else Routes.ONBOARDING,
+        startDestination = if (hasChosenLanguage) Routes.HOME else Routes.ONBOARDING
     ) {
         composable(Routes.ONBOARDING) {
             LanguageScreen(onChosen = onChooseLanguage)
@@ -127,24 +127,24 @@ fun SaavdhanApp(
             ScanScreen(
                 viewModel = scanViewModel,
                 onAppClick = { pkg -> navController.navigate(Routes.detail(pkg)) },
-                onOpenSettings = { navController.navigate(Routes.SETTINGS) },
+                onOpenSettings = { navController.navigate(Routes.SETTINGS) }
             )
         }
         composable(
             route = Routes.DETAIL,
-            arguments = listOf(navArgument("pkg") { type = NavType.StringType }),
+            arguments = listOf(navArgument("pkg") { type = NavType.StringType })
         ) { backStackEntry ->
             val pkg = backStackEntry.arguments?.getString("pkg").orEmpty()
             AppDetailScreen(
                 viewModel = scanViewModel,
                 packageName = pkg,
                 onBack = { navController.popBackStack() },
-                onStartCleanup = { navController.navigate(Routes.cleanup(pkg)) },
+                onStartCleanup = { navController.navigate(Routes.cleanup(pkg)) }
             )
         }
         composable(
             route = Routes.CLEANUP,
-            arguments = listOf(navArgument("pkg") { type = NavType.StringType }),
+            arguments = listOf(navArgument("pkg") { type = NavType.StringType })
         ) { backStackEntry ->
             val pkg = backStackEntry.arguments?.getString("pkg").orEmpty()
             // A fresh CleanupViewModel per cleanup, scoped to this nav entry.
@@ -152,14 +152,14 @@ fun SaavdhanApp(
             CleanupScreen(
                 viewModel = cleanupViewModel,
                 packageName = pkg,
-                onBack = { navController.popBackStack() },
+                onBack = { navController.popBackStack() }
             )
         }
         composable(Routes.SETTINGS) {
             SettingsScreen(
                 currentLanguage = currentLanguage,
                 onChooseLanguage = onChooseLanguage,
-                onBack = { navController.popBackStack() },
+                onBack = { navController.popBackStack() }
             )
         }
     }
