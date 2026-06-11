@@ -63,10 +63,11 @@ A living plan. Checked = done; unchecked = planned. Order within a phase is roug
 - [x] Release signing wiring: Gradle reads optional `keystore.properties` (see the `.example`
       template); unsigned builds keep working without it
 - [x] Landing page built: `docs/index.html` (bilingual, promises, install guide, download button)
-- [ ] **Human:** generate + back up the keystore (`keystore.properties.example` has the command)
-- [ ] **Human:** enable GitHub Pages on the public repo (Settings → Pages → main, /docs)
-- [ ] First signed v0.2.0 on GitHub Releases (after keystore exists)
-- [ ] ktlint in CI: enforce code style on all commits
+- [x] Keystore generated + backed up (human, 2026-06-12)
+- [x] GitHub Pages enabled — landing page live at kalpitt.github.io/saavdhan
+- [x] **v0.2.0 released**: signed APK on GitHub Releases, signature verified, download
+      button live (2026-06-12)
+- [ ] ktlint in CI: enforce code style on all commits (moves to M3)
 
 ### Milestone 3 — Polish & reach
 - [ ] Real-device testing across phone makers (OEM deep-link variants, edge cases)
