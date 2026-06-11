@@ -25,8 +25,8 @@ android {
         // ...but the app still runs on phones as old as Android 7 (API 24).
         minSdk = 24
         targetSdk = 35
-        versionCode = 1
-        versionName = "0.1.0"
+        versionCode = 2
+        versionName = "0.2.0"
 
         // Ship ONLY English and Hindi resources.
         resourceConfigurations += listOf("en", "hi")

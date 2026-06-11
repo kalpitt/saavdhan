@@ -6,6 +6,9 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); the pro
 
 ## [Unreleased]
 
+## [0.2.0] — 2026-06-11
+Failure-path hardening + watchdog v2. First release distributed as a signed APK on GitHub Releases.
+
 ### Added
 - **Watchdog v2.** The background watchdog now also warns when an *already-installed* app gains
   dangerous powers (Accessibility / Device Admin / OTP access) — the real-world scam sequence where
@@ -51,5 +54,6 @@ engine.
 - Detection is heuristic (behavioural signals, not a malware database): it can raise false alarms and
   can miss brand-new threats. It guides — it never silently changes or removes anything.
 
-[Unreleased]: https://github.com/kalpitt/Saavdhan---Anti-Scam-App/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/kalpitt/Saavdhan---Anti-Scam-App/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/kalpitt/Saavdhan---Anti-Scam-App/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/kalpitt/Saavdhan---Anti-Scam-App/releases/tag/v0.1.0
