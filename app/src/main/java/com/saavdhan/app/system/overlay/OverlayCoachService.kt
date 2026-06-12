@@ -62,7 +62,7 @@ class OverlayCoachService : Service() {
             type,
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
                 WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
-            PixelFormat.TRANSLUCENT,
+            PixelFormat.TRANSLUCENT
         ).apply {
             gravity = Gravity.TOP
         }

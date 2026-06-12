@@ -46,7 +46,6 @@ import com.saavdhan.app.system.deeplink.SettingsDeepLinks
 import com.saavdhan.app.system.overlay.OverlayCoach
 import com.saavdhan.app.ui.components.InfoCard
 import com.saavdhan.app.ui.components.SecondaryButton
-import com.saavdhan.app.ui.theme.RiskCritical
 import com.saavdhan.app.ui.theme.RiskHigh
 import com.saavdhan.app.ui.theme.RiskLow
 
@@ -61,7 +60,7 @@ import com.saavdhan.app.ui.theme.RiskLow
 fun CleanupScreen(
     viewModel: CleanupViewModel,
     packageName: String,
-    onBack: () -> Unit,
+    onBack: () -> Unit
 ) {
     val context = LocalContext.current
 
@@ -93,12 +92,12 @@ fun CleanupScreen(
                     IconButton(onClick = onBack) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.back),
+                            contentDescription = stringResource(R.string.back)
                         )
                     }
-                },
+                }
             )
-        },
+        }
     ) { padding ->
         Column(
             modifier = Modifier
@@ -106,7 +105,7 @@ fun CleanupScreen(
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
                 .padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             if (plan == null) return@Column // first frame, before the live state is read
 
@@ -119,7 +118,7 @@ fun CleanupScreen(
                 Text(
                     stringResource(R.string.cleanup_done_title),
                     style = MaterialTheme.typography.titleLarge,
-                    color = RiskLow,
+                    color = RiskLow
                 )
                 InfoCard(text = stringResource(R.string.cleanup_done_desc))
                 Spacer(Modifier.height(4.dp))
@@ -129,7 +128,7 @@ fun CleanupScreen(
             plan.steps.forEach { step ->
                 StepCard(
                     step = step,
-                    onAction = actionFor(step.id, packageName, context, coachAccessibility, coachDeviceAdmin),
+                    onAction = actionFor(step.id, packageName, context, coachAccessibility, coachDeviceAdmin)
                 )
             }
 
@@ -138,7 +137,7 @@ fun CleanupScreen(
                 Spacer(Modifier.height(4.dp))
                 WarningCard(
                     title = stringResource(R.string.safe_mode_title),
-                    body = stringResource(R.string.safe_mode_desc),
+                    body = stringResource(R.string.safe_mode_desc)
                 )
             }
 
@@ -148,14 +147,14 @@ fun CleanupScreen(
                     title = stringResource(R.string.factory_reset_title),
                     body = stringResource(R.string.factory_reset_desc),
                     actionLabel = stringResource(R.string.factory_reset_action),
-                    onAction = { SettingsDeepLinks.launch(context, SettingsDeepLinks.mainSettings()) },
+                    onAction = { SettingsDeepLinks.launch(context, SettingsDeepLinks.mainSettings()) }
                 )
             }
 
             Spacer(Modifier.height(8.dp))
             SecondaryButton(
                 text = stringResource(R.string.cleanup_recheck),
-                onClick = { viewModel.refresh() },
+                onClick = { viewModel.refresh() }
             )
             Spacer(Modifier.height(16.dp))
         }
@@ -170,7 +169,7 @@ private fun StepCard(step: CleanupStep, onAction: (() -> Unit)?) {
         StepStatus.DONE -> StepHeader(
             icon = { Icon(Icons.Filled.CheckCircle, contentDescription = null, tint = RiskLow) },
             title = title,
-            trailing = stringResource(R.string.status_done),
+            trailing = stringResource(R.string.status_done)
         )
 
         StepStatus.PENDING -> StepHeader(
@@ -178,33 +177,33 @@ private fun StepCard(step: CleanupStep, onAction: (() -> Unit)?) {
                 Icon(
                     Icons.Filled.RadioButtonUnchecked,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             },
             title = title,
-            dimmed = true,
+            dimmed = true
         )
 
         StepStatus.CURRENT -> Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.08f),
-            ),
+                containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.08f)
+            )
         ) {
             Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     Icon(
                         Icons.Filled.RadioButtonChecked,
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
+                        tint = MaterialTheme.colorScheme.primary
                     )
                     Text(
                         stringResource(R.string.status_current),
                         style = MaterialTheme.typography.labelLarge,
-                        color = MaterialTheme.colorScheme.primary,
+                        color = MaterialTheme.colorScheme.primary
                     )
                 }
                 Text(title, style = MaterialTheme.typography.titleLarge)
@@ -219,7 +218,7 @@ private fun StepCard(step: CleanupStep, onAction: (() -> Unit)?) {
                     Text(
                         stringResource(hint),
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
@@ -233,26 +232,26 @@ private fun StepHeader(
     icon: @Composable () -> Unit,
     title: String,
     trailing: String? = null,
-    dimmed: Boolean = false,
+    dimmed: Boolean = false
 ) {
     Row(
         modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(10.dp),
+        horizontalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         icon()
         Text(
             title,
             style = MaterialTheme.typography.bodyLarge,
             color = if (dimmed) MaterialTheme.colorScheme.onSurfaceVariant else Color.Unspecified,
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.weight(1f)
         )
         if (trailing != null) {
             Text(
                 trailing,
                 style = MaterialTheme.typography.labelLarge,
                 color = RiskLow,
-                fontWeight = FontWeight.SemiBold,
+                fontWeight = FontWeight.SemiBold
             )
         }
     }
@@ -264,22 +263,22 @@ private fun WarningCard(
     title: String,
     body: String,
     actionLabel: String? = null,
-    onAction: (() -> Unit)? = null,
+    onAction: (() -> Unit)? = null
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = RiskHigh.copy(alpha = 0.10f)),
+        colors = CardDefaults.cardColors(containerColor = RiskHigh.copy(alpha = 0.10f))
     ) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 Icon(
                     Icons.Filled.RadioButtonChecked,
                     contentDescription = null,
                     tint = RiskHigh,
-                    modifier = Modifier.size(20.dp),
+                    modifier = Modifier.size(20.dp)
                 )
                 Text(title, style = MaterialTheme.typography.titleLarge)
             }
@@ -329,7 +328,7 @@ private fun actionFor(
     packageName: String,
     context: android.content.Context,
     coachAccessibility: String,
-    coachDeviceAdmin: String,
+    coachDeviceAdmin: String
 ): (() -> Unit)? = when (id) {
     CleanupStepId.ISOLATE -> {
         { SettingsDeepLinks.launch(context, SettingsDeepLinks.airplaneSettings()) }

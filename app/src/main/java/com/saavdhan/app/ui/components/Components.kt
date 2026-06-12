@@ -32,7 +32,7 @@ fun RiskChip(text: String, color: Color, modifier: Modifier = Modifier) {
         modifier = modifier
             .clip(RoundedCornerShape(50))
             .background(color)
-            .padding(horizontal = 14.dp, vertical = 6.dp),
+            .padding(horizontal = 14.dp, vertical = 6.dp)
     )
 }
 
@@ -44,7 +44,7 @@ fun PrimaryButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifi
         modifier = modifier
             .fillMaxWidth()
             .height(56.dp),
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(14.dp)
     ) {
         Text(text, style = MaterialTheme.typography.labelLarge)
     }
@@ -58,7 +58,7 @@ fun SecondaryButton(text: String, onClick: () -> Unit, modifier: Modifier = Modi
         modifier = modifier
             .fillMaxWidth()
             .height(52.dp),
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(14.dp)
     ) {
         Text(text, style = MaterialTheme.typography.labelLarge)
     }
@@ -73,7 +73,7 @@ fun DangerButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifie
         modifier = modifier
             .fillMaxWidth()
             .height(56.dp),
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(14.dp)
     ) {
         Text(text, color = Color.White, style = MaterialTheme.typography.labelLarge)
     }
@@ -87,7 +87,7 @@ fun SignalRow(text: String) {
             .fillMaxWidth()
             .padding(vertical = 6.dp),
         verticalAlignment = Alignment.Top,
-        horizontalArrangement = Arrangement.spacedBy(10.dp),
+        horizontalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         Text("•", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
         Text(text, style = MaterialTheme.typography.bodyLarge)
@@ -100,13 +100,13 @@ fun InfoCard(text: String, modifier: Modifier = Modifier) {
     Card(
         modifier = modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.08f),
-        ),
+            containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.08f)
+        )
     ) {
         Text(
             text = text,
             style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(16.dp)
         )
     }
 }

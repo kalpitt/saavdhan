@@ -10,6 +10,8 @@
 
     <!-- Scan home -->
     <string name="home_subtitle">Check your phone for dangerous apps</string>
+    <string name="home_offline_note">🛡️ Works fully offline — nothing ever leaves your phone.</string>
+    <string name="detail_not_found">This app is no longer in the scan results. Go back and scan again to see the latest picture.</string>
     <string name="scan_button">Scan my phone</string>
     <string name="scanning">Scanning…</string>
     <string name="scan_again">Scan again</string>

@@ -67,7 +67,15 @@ A living plan. Checked = done; unchecked = planned. Order within a phase is roug
 - [x] GitHub Pages enabled — landing page live at kalpitt.github.io/saavdhan
 - [x] **v0.2.0 released**: signed APK on GitHub Releases, signature verified, download
       button live (2026-06-12)
-- [ ] ktlint in CI: enforce code style on all commits (moves to M3)
+- [x] ktlint in CI: enforced via `ktlintCheck` (.editorconfig keeps the repo's inline-comment style)
+
+### Milestone 3 — Quality & polish (in progress)
+- [x] Watchdog v2 live-tested on emulator (decoyapp → notification verified; fixture regression
+      found & fixed in the process)
+- [x] Home screen offline-promise note; honest detail-page "scan again" fallback; style cleanups
+- [ ] Real-device testing across phone makers (OEM deep-link variants) — needs human + phones
+- [ ] Accessibility audit (TalkBack, contrast, touch targets, font scaling) — needs human judgment
+- [ ] Dependency bumps (Compose BOM / AGP / Kotlin) — deferred; do with an emulator pass
 
 ### Milestone 3 — Polish & reach
 - [ ] Real-device testing across phone makers (OEM deep-link variants, edge cases)

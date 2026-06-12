@@ -33,6 +33,7 @@ class CleanupViewModel(application: Application, private val savedState: SavedSt
         private set
 
     private var packageName: String = ""
+
     // What the app held when cleanup began — persisted in SavedStateHandle so the data survives
     // process death. Steps still show (and can be ticked off) after the user turns the power off.
     private var hadAccessibility: Boolean
@@ -52,9 +53,14 @@ class CleanupViewModel(application: Application, private val savedState: SavedSt
 
     fun refresh() {
         if (packageName.isEmpty()) return
+        // Restore the label after process death (the app may already be uninstalled by now).
+        if (appLabel.isEmpty()) appLabel = savedState.get("appLabel") ?: ""
         viewModelScope.launch {
             val (state, label) = withContext(Dispatchers.Default) { readState() }
-            if (label.isNotEmpty()) appLabel = label
+            if (label.isNotEmpty()) {
+                appLabel = label
+                savedState.set("appLabel", label)
+            }
             plan = CleanupEngine.plan(state)
         }
     }
@@ -79,7 +85,7 @@ class CleanupViewModel(application: Application, private val savedState: SavedSt
             hasAccessibility = hasAccessibility,
             wasDeviceAdmin = wasDeviceAdmin,
             isDeviceAdmin = isDeviceAdmin,
-            isIsolated = isAirplaneModeOn(),
+            isIsolated = isAirplaneModeOn()
         )
         return state to label
     }
@@ -88,6 +94,6 @@ class CleanupViewModel(application: Application, private val savedState: SavedSt
         Settings.Global.getInt(
             getApplication<Application>().contentResolver,
             Settings.Global.AIRPLANE_MODE_ON,
-            0,
+            0
         ) != 0
 }

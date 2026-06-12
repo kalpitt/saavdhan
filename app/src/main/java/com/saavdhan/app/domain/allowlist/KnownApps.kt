@@ -28,7 +28,7 @@ object KnownApps {
         "play store" to "com.android.vending",
         "google" to "com.google.android.googlequicksearchbox",
         "settings" to "com.android.settings",
-        "chrome" to "com.android.chrome",
+        "chrome" to "com.android.chrome"
     )
 
     /**
@@ -36,11 +36,11 @@ object KnownApps {
      * (e.g. screen readers that genuinely need Accessibility). Prevents needless alarm.
      */
     val TRUSTED_PACKAGES: Set<String> = setOf(
-        "com.google.android.marvin.talkback",             // TalkBack screen reader
-        "com.android.vending",                            // Google Play Store
-        "com.google.android.gms",                         // Google Play Services
-        "com.huawei.health",                              // Huawei Health
-        "com.microsoft.windowsintune.companyportal",      // Company Portal
+        "com.google.android.marvin.talkback", // TalkBack screen reader
+        "com.android.vending", // Google Play Store
+        "com.google.android.gms", // Google Play Services
+        "com.huawei.health", // Huawei Health
+        "com.microsoft.windowsintune.companyportal" // Company Portal
     )
 
     /**
@@ -50,7 +50,7 @@ object KnownApps {
     val TRUSTED_PREFIXES: Set<String> = setOf(
         "com.google.android.",
         "com.samsung.android.",
-        "com.samsung.accessory.",
+        "com.samsung.accessory."
     )
 
     /**
