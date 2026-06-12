@@ -10,11 +10,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -42,6 +46,9 @@ import com.saavdhan.app.ui.components.InfoCard
 import com.saavdhan.app.ui.components.PrimaryButton
 import com.saavdhan.app.ui.components.RiskChip
 import com.saavdhan.app.ui.labelRes
+import com.saavdhan.app.ui.onColor
+import com.saavdhan.app.ui.theme.RiskCritical
+import com.saavdhan.app.ui.theme.RiskLow
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -187,8 +194,18 @@ private fun ResultsContent(
 
         if (serious.isEmpty() && mild.isEmpty()) {
             item {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
                     Spacer(Modifier.height(24.dp))
+                    Icon(
+                        Icons.Filled.CheckCircle,
+                        contentDescription = null, // decorative — the title below says it
+                        tint = RiskLow,
+                        modifier = Modifier.size(64.dp)
+                    )
+                    Spacer(Modifier.height(12.dp))
                     Text(
                         stringResource(R.string.result_safe_title),
                         style = MaterialTheme.typography.titleLarge,
@@ -210,7 +227,13 @@ private fun ResultsContent(
                     } else {
                         stringResource(R.string.result_found_title_plural, serious.size)
                     }
-                    Text(title, style = MaterialTheme.typography.titleLarge)
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Icon(Icons.Filled.Warning, contentDescription = null, tint = RiskCritical)
+                        Text(title, style = MaterialTheme.typography.titleLarge)
+                    }
                 }
                 items(serious, key = { it.app.packageName }) { item ->
                     AppRiskCard(item, onClick = { onAppClick(item.app.packageName) })
@@ -237,10 +260,14 @@ private fun ResultsContent(
 
 @Composable
 private fun AppRiskCard(item: AssessedApp, onClick: () -> Unit) {
+    // Tint the whole card with the risk colour so a dangerous row never looks like a mild one.
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick)
+            .clickable(onClick = onClick),
+        colors = CardDefaults.cardColors(
+            containerColor = item.assessment.level.color().copy(alpha = 0.10f)
+        )
     ) {
         Row(
             modifier = Modifier
@@ -260,7 +287,8 @@ private fun AppRiskCard(item: AssessedApp, onClick: () -> Unit) {
             }
             RiskChip(
                 text = stringResource(item.assessment.level.labelRes()),
-                color = item.assessment.level.color()
+                color = item.assessment.level.color(),
+                textColor = item.assessment.level.onColor()
             )
         }
     }
