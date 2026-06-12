@@ -5,12 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Saavdhan (सावधान) — free offline anti-scam app for Android</title>
 <meta name="description" content="Saavdhan detects scam and spyware apps on Android phones, explains the danger in plain Hindi or English, and guides removal step by step. Fully offline — no internet permission.">
+<script>
+(function(){
+  var l=localStorage.getItem('lang')||(navigator.language.startsWith('hi')?'hi':'en');
+  document.documentElement.lang=l;
+})();
+</script>
 <style>
   :root { --teal:#00695C; --teal-dark:#004D43; --bg:#FAFAF7; --ink:#1d2a28; --muted:#5c6b68; --danger:#C62828; }
   * { box-sizing:border-box; margin:0; }
   body { font-family:-apple-system,"Segoe UI",Roboto,"Noto Sans Devanagari",sans-serif; background:var(--bg); color:var(--ink); line-height:1.6; }
   .wrap { max-width:760px; margin:0 auto; padding:0 20px; }
-  header { background:var(--teal); color:#fff; padding:56px 0 48px; text-align:center; }
+  header { background:var(--teal); color:#fff; padding:56px 0 48px; text-align:center; position:relative; }
   header h1 { font-size:2.4rem; }
   header .hindi { font-size:1.2rem; opacity:.9; margin-top:4px; }
   header p.tag { max-width:560px; margin:16px auto 0; font-size:1.1rem; }
@@ -27,66 +33,132 @@
   .disclaimer b { color:var(--danger); }
   footer { padding:32px 0 48px; color:var(--muted); font-size:.9rem; text-align:center; }
   footer a { color:var(--teal-dark); }
-  .hi { color:var(--muted); font-size:.95em; display:block; margin-top:2px; }
+  .lang-toggle { position:absolute; top:16px; right:20px; }
+  .lang-toggle button { background:rgba(255,255,255,0.2); border:1px solid rgba(255,255,255,0.5); color:#fff; border-radius:8px; padding:5px 14px; font-size:.85rem; cursor:pointer; font-family:inherit; line-height:1.5; }
+  .lang-toggle button:hover { background:rgba(255,255,255,0.3); }
+  html[lang="en"] .hi { display:none; }
+  html[lang="hi"] .en { display:none; }
 </style>
 </head>
 <body>
 
 <header>
+  <div class="lang-toggle">
+    <button id="langBtn" onclick="toggleLang()">हिन्दी</button>
+  </div>
   <div class="wrap">
     <h1>🛡️ Saavdhan</h1>
     <div class="hindi">सावधान — "be alert"</div>
-    <p class="tag">A free, fully-offline Android app that finds scam &amp; spyware apps on your phone,
-    explains the danger in plain <b>Hindi or English</b>, and walks you through removing them — one
-    calm step at a time.</p>
-    <a class="btn" href="https://github.com/kalpitt/saavdhan/releases/latest">⬇ Download APK (free)</a>
-    <div class="note">Android 7.0+ · no account · no ads · no internet permission</div>
+    <p class="tag">
+      <span class="en">A free, fully-offline Android app that finds scam &amp; spyware apps on your phone,
+      explains the danger in plain <b>Hindi or English</b>, and walks you through removing them — one
+      calm step at a time.</span>
+      <span class="hi">एक मुफ़्त, पूरी तरह ऑफ़लाइन Android ऐप — जो आपके फ़ोन में स्कैम और जासूसी ऐप्स ढूँढता है, खतरे को आसान भाषा में समझाता है, और बिना घबराए एक-एक कदम पर उन्हें हटाने में आपकी मदद करता है।</span>
+    </p>
+    <!-- TODO after v0.3.0 ships: change href to .../releases/latest/download/saavdhan.apk for a
+         direct APK download. Only do this once v0.3.0 is released — that is the first build
+         where Gradle outputs saavdhan.apk, making the /download/ URL permanently stable. -->
+    <a class="btn" href="https://github.com/kalpitt/saavdhan/releases/latest">
+      <span class="en">⬇ Download APK (free)</span>
+      <span class="hi">⬇ APK डाउनलोड करें (मुफ़्त)</span>
+    </a>
+    <div class="note">
+      <span class="en">Android 7.0+ · no account · no ads · no internet permission</span>
+      <span class="hi">Android 7.0+ · कोई अकाउंट नहीं · कोई विज्ञापन नहीं · इंटरनेट की परमिशन नहीं</span>
+    </div>
   </div>
 </header>
 
 <div class="wrap">
 
 <section>
-  <h2>Why it exists</h2>
-  <p>Scam APKs spread on WhatsApp disguised as wedding invitations, courier updates, KYC notices, or
-  electricity bills. One install sideloads banking spyware that reads OTPs and drains accounts — and
-  resists being removed. Saavdhan finds these apps, explains what they can do, and takes you straight
-  to the exact Settings screen to fix it.
-  <span class="hi">शादी के निमंत्रण या बिजली बिल के बहाने WhatsApp पर फैलने वाले स्कैम ऐप्स आपके बैंक OTP चुरा लेते हैं। सावधान उन्हें ढूँढता है और हटाने में आपकी मदद करता है।</span></p>
+  <h2>
+    <span class="en">Why it exists</span>
+    <span class="hi">इसे क्यों बनाया गया?</span>
+  </h2>
+  <p>
+    <span class="en">Scam APKs spread on WhatsApp disguised as wedding invitations, courier updates, KYC notices, or
+    electricity bills. One install sideloads banking spyware that reads OTPs and drains accounts — and
+    resists being removed. Saavdhan finds these apps, explains what they can do, and takes you straight
+    to the exact Settings screen to fix it.</span>
+    <span class="hi">WhatsApp पर शादी के कार्ड, कूरियर अपडेट, KYC नोटिस या बिजली बिल के बहाने स्कैम ऐप्स फैलाए जाते हैं। एक बार install होने पर ये आपके फोन में ऐसा बैंकिंग स्पाईवेयर (जासूसी ऐप) डाल देते हैं जो आपके OTP पढ़ लेता है और बैंक खाता खाली कर देता है — और इन्हें डिलीट करना भी बहुत मुश्किल होता है। 'सावधान' ऐसे ऐप्स को ढूँढता है, बताता है कि इनसे क्या नुकसान हो सकता है, और उन्हें हटाने के लिए आपको सीधे सही Settings स्क्रीन पर ले जाता है।</span>
+  </p>
 </section>
 
 <section>
-  <h2>The promises that never change</h2>
+  <h2>
+    <span class="en">The promises that never change</span>
+    <span class="hi">हमारे वादे जो कभी नहीं बदलेंगे</span>
+  </h2>
   <div class="cards">
-    <div class="card"><b>Fully offline.</b> The app does not hold the INTERNET permission, so the operating system makes any network call impossible. Your data has nowhere to go.</div>
-    <div class="card"><b>Detective + guide, not enforcer.</b> Android only lets <i>you</i> turn off another app's powers — so Saavdhan takes you to the right screen and coaches the final tap. It never fakes an "auto-fix".</div>
-    <div class="card"><b>Explainable, not magic.</b> Every verdict lists its reasons in plain words. No black-box AI.</div>
-    <div class="card"><b>Calm under panic.</b> Big buttons, simple language, one clear step at a time — in हिन्दी or English.</div>
+    <div class="card">
+      <span class="en"><b>Fully offline.</b> The app does not hold the INTERNET permission, so the operating system makes any network call impossible. Your data has nowhere to go.</span>
+      <span class="hi"><b>पूरी तरह ऑफ़लाइन।</b> इस ऐप के पास INTERNET की परमिशन नहीं है, इसलिए फोन का सिस्टम इसके लिए इंटरनेट से जुड़ना नामुमकिन कर देता है। आपका डेटा कहीं बाहर जा ही नहीं सकता।</span>
+    </div>
+    <div class="card">
+      <span class="en"><b>Detective + guide, not enforcer.</b> Android only lets <i>you</i> turn off another app's powers — so Saavdhan takes you to the right screen and coaches the final tap. It never fakes an "auto-fix".</span>
+      <span class="hi"><b>डिटेक्टिव और गाइड, कोई ज़बरदस्ती नहीं।</b> Android में सिर्फ़ आप ही किसी दूसरे ऐप की परमिशन बंद कर सकते हैं — इसलिए 'सावधान' आपको सही स्क्रीन पर ले जाकर आखिरी कदम उठाने में मदद करता है। यह कभी झूठा "ऑटो-फिक्स" (अपने आप ठीक करने का दावा) नहीं करता।</span>
+    </div>
+    <div class="card">
+      <span class="en"><b>Explainable, not magic.</b> Every verdict lists its reasons in plain words. No black-box AI.</span>
+      <span class="hi"><b>सब कुछ साफ-साफ समझाता है, कोई जादू नहीं।</b> हर फैसले का कारण आपको बिल्कुल आसान भाषा में बताया जाता है। इसमें कोई छुपा हुआ (ब्लैक-बॉक्स) AI नहीं है।</span>
+    </div>
+    <div class="card">
+      <span class="en"><b>Calm under panic.</b> Big buttons, simple language, one clear step at a time — in हिन्दी or English.</span>
+      <span class="hi"><b>घबराहट के वक्त भी शांत।</b> बड़े बटन, आसान भाषा, और एक बार में सिर्फ एक साफ कदम — हिन्दी या English में।</span>
+    </div>
   </div>
 </section>
 
 <section>
-  <h2>How it works</h2>
+  <h2>
+    <span class="en">How it works</span>
+    <span class="hi">यह कैसे काम करता है?</span>
+  </h2>
   <ol class="steps">
-    <li><b>Scan</b> — reads public, no-root signals about each installed app: Accessibility, Device Admin, SMS access, sideloading, hidden icons, fake system names.</li>
-    <li><b>Explain</b> — a deterministic, fully-tested rule engine turns those signals into a risk level with reasons in plain language.</li>
-    <li><b>Guide</b> — a reactive checklist (isolate → strip powers → uninstall → secure accounts) that ticks itself off as you complete each step, plus a background watchdog that warns about new threats.</li>
+    <li>
+      <span class="en"><b>Scan</b> — reads public, no-root signals about each installed app: Accessibility, Device Admin, SMS access, sideloading, hidden icons, fake system names.</span>
+      <span class="hi"><b>स्कैन (Scan)</b> — बिना root किए आपके हर installed ऐप की बेसिक जानकारी पढ़ता है: जैसे Accessibility, Device Admin, SMS access, बाहर से डाउनलोड (sideloading), छुपे हुए आइकॉन और नकली सिस्टम के नाम।</span>
+    </li>
+    <li>
+      <span class="en"><b>Explain</b> — a deterministic, fully-tested rule engine turns those signals into a risk level with reasons in plain language.</span>
+      <span class="hi"><b>समझाना (Explain)</b> — एक पूरी तरह से टेस्ट किया गया सिस्टम इन जानकारियों के आधार पर खतरे का स्तर तय करता है और इसके कारण आपको बिल्कुल आसान भाषा में समझाता है।</span>
+    </li>
+    <li>
+      <span class="en"><b>Guide</b> — a reactive checklist (isolate → strip powers → uninstall → secure accounts) that ticks itself off as you complete each step, plus a background watchdog that warns about new threats.</span>
+      <span class="hi"><b>गाइड (Guide)</b> — एक स्मार्ट चेकलिस्ट (ऐप को अलग करें → परमिशन हटाएँ → uninstall करें → खाते सुरक्षित करें) जो हर कदम पूरा होने पर खुद-ब-खुद टिक हो जाती है। साथ ही, बैकग्राउंड में चलने वाला एक वॉचडॉग (पहरेदार) जो नए खतरों की चेतावनी देता है।</span>
+    </li>
   </ol>
 </section>
 
 <section>
-  <div class="disclaimer"><b>Honest disclaimer.</b> Saavdhan is a defensive aid, not a guarantee. It uses
-  behavioural heuristics (not a malware database), so it can raise false alarms and can miss brand-new
-  threats. It guides you — it never silently changes or deletes anything. If money has already been
-  stolen, contact your bank and cyber-crime authorities (in India: call <b>1930</b> / cybercrime.gov.in).</div>
+  <div class="disclaimer">
+    <span class="en"><b>Honest disclaimer.</b> Saavdhan is a defensive aid, not a guarantee. It uses
+    behavioural heuristics (not a malware database), so it can raise false alarms and can miss brand-new
+    threats. It guides you — it never silently changes or deletes anything. If money has already been
+    stolen, contact your bank and cyber-crime authorities (in India: call <b>1930</b> / cybercrime.gov.in).</span>
+    <span class="hi"><b>एक ज़रूरी और सच्ची बात।</b> सावधान आपकी सुरक्षा के लिए एक मदद है, कोई गारंटी नहीं। यह ऐप्स के व्यवहार (behaviour) को देखकर काम करता है, किसी मैलवेयर डेटाबेस से नहीं। इसलिए हो सकता है कि यह कभी-कभी सुरक्षित ऐप पर भी अलार्म दे दे, या बिल्कुल नए किस्म के खतरों को न पहचान पाए। यह सिर्फ आपको रास्ता दिखाता है — आपके फोन में चुपचाप कुछ भी बदलता या डिलीट नहीं करता। अगर आपके पैसे पहले ही चोरी हो चुके हैं, तो तुरंत अपने बैंक और साइबर क्राइम पुलिस से संपर्क करें (भारत में: <b>1930</b> डायल करें या cybercrime.gov.in पर जाएँ)।</span>
+  </div>
 </section>
 
 <section>
-  <h2>Install (2 minutes)</h2>
+  <h2>
+    <span class="en">Install (2 minutes)</span>
+    <span class="hi">इंस्टॉल करें (2 मिनट में)</span>
+  </h2>
   <ol class="steps">
-    <li>Download the APK from the button above on the phone you want to protect.</li>
-    <li>Open the downloaded file. If asked, allow your browser to install apps — Android will warn because the app is not from the Play Store; that warning is normal for direct downloads.</li>
-    <li>Open Saavdhan, pick your language, and tap <b>Scan my phone</b>.</li>
+    <li>
+      <span class="en">Download the APK from the button above on the phone you want to protect.</span>
+      <span class="hi">जिस फ़ोन को सुरक्षित करना है, उस पर ऊपर दिए बटन से APK डाउनलोड करें।</span>
+    </li>
+    <li>
+      <span class="en">Open the downloaded file. If asked, allow your browser to install apps — Android will warn because the app is not from the Play Store; that warning is normal for direct downloads.</span>
+      <span class="hi">डाउनलोड की गई फ़ाइल को खोलें। अगर पूछा जाए, तो अपने ब्राउज़र को ऐप install करने की परमिशन दें — Android आपको चेतावनी देगा क्योंकि यह ऐप Play Store से नहीं है; सीधे डाउनलोड किए गए ऐप्स के लिए यह चेतावनी आना एकदम नॉर्मल है।</span>
+    </li>
+    <li>
+      <span class="en">Open Saavdhan, pick your language, and tap <b>Scan my phone</b>.</span>
+      <span class="hi">सावधान खोलें, अपनी भाषा चुनें, और <b>'मेरा फ़ोन स्कैन करें' (Scan my phone)</b> पर टैप करें।</span>
+    </li>
   </ol>
 </section>
 
@@ -94,12 +166,25 @@
 
 <footer>
   <div class="wrap">
-    Free &amp; open source under the MIT license ·
+    <span class="en">Free &amp; open source under the MIT license ·
     <a href="https://github.com/kalpitt/saavdhan">Source code on GitHub</a> ·
-    <a href="https://github.com/kalpitt/saavdhan/issues">Report a problem</a><br>
-    © 2026 Kalpit Tiwari and the Saavdhan contributors
+    <a href="https://github.com/kalpitt/saavdhan/issues">Report a problem</a></span>
+    <span class="hi">MIT लाइसेंस के तहत मुफ़्त और ओपन सोर्स ·
+    <a href="https://github.com/kalpitt/saavdhan">GitHub पर सोर्स कोड</a> ·
+    <a href="https://github.com/kalpitt/saavdhan/issues">समस्या रिपोर्ट करें</a></span>
+    <br>© 2026 Kalpit Tiwari and the Saavdhan contributors
   </div>
 </footer>
+
+<script>
+function toggleLang() {
+  var l = document.documentElement.lang === 'hi' ? 'en' : 'hi';
+  document.documentElement.lang = l;
+  document.getElementById('langBtn').textContent = l === 'hi' ? 'EN' : 'हिन्दी';
+  localStorage.setItem('lang', l);
+}
+document.getElementById('langBtn').textContent = document.documentElement.lang === 'hi' ? 'EN' : 'हिन्दी';
+</script>
 
 </body>
 </html>

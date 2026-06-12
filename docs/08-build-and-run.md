@@ -60,6 +60,22 @@ Saavdhan/
 > it), and check the [version catalog](../gradle/libs.versions.toml). It's almost never your app
 > code — it's the config.
 
+## Building a signed release APK
+
+Release builds require the keystore file at the repo root (see `keystore.properties.example`).
+Without it, `assembleRelease` still runs but produces an unsigned APK.
+
+```bash
+# Produces app/build/outputs/apk/release/saavdhan.apk
+# The filename is always saavdhan.apk (Gradle enforces this) so the landing-page
+# direct-download link at releases/latest/download/saavdhan.apk stays stable.
+./gradlew assembleRelease
+
+# Verify the signature before uploading to GitHub Releases
+"$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose \
+  app/build/outputs/apk/release/saavdhan.apk
+```
+
 ## Running it on the emulator (virtual phone)
 
 The emulator is a real Android phone in a window on your Mac — no physical device needed.
