@@ -71,6 +71,17 @@ android {
         // Generates BuildConfig, which lets code ask "is this a debug build?" (BuildConfig.DEBUG).
         buildConfig = true
     }
+
+    // Keep the release APK filename stable across versions so the landing page direct-download
+    // URL (releases/latest/download/saavdhan.apk) never breaks after an update.
+    applicationVariants.all {
+        outputs.all {
+            val out = this as com.android.build.gradle.internal.api.BaseVariantOutputImpl
+            if (buildType.name == "release") {
+                out.outputFileName = "saavdhan.apk"
+            }
+        }
+    }
 }
 
 dependencies {
