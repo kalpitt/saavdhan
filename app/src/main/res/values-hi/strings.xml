@@ -52,6 +52,11 @@
     <string name="detail_what_low">इस ऐप के लिए हमें कोई मजबूत चेतावनी संकेत नहीं मिला।</string>
     <string name="detail_allowlisted_note">यह एक बिल्ट-इन या जाना-पहचाना ऐप है। हम इसे सिर्फ़ इसलिए दिखाते हैं ताकि आपको पूरी तस्वीर दिखे।</string>
 
+    <!-- App detail — the "what to do next" hierarchy -->
+    <string name="detail_do_now_title">अब क्या करें</string>
+    <string name="detail_do_now_body">घबराएँ नहीं — नीचे वाला बटन दबाएँ, हम आपको एक-एक कदम करके पूरा रास्ता दिखाएँगे।</string>
+    <string name="detail_diy_title">या खुद करें, एक-एक कदम करके</string>
+
     <!-- Honesty banner -->
     <string name="honesty_note">आपकी सुरक्षा के लिए, Android सिर्फ़ आपको ये सेटिंग बंद करने देता है — कोई ऐप आपके लिए यह नहीं कर सकता। सावधान आपको सीधे सही स्क्रीन पर ले जाता है; आखिरी टैप आप करते हैं।</string>
 
@@ -97,6 +102,7 @@
     <string name="cleanup_recheck">फिर से जाँचें</string>
     <string name="status_done">हो गया</string>
     <string name="status_current">अभी यह करें</string>
+    <string name="cleanup_step_counter">कदम %1$d / %2$d</string>
 
     <string name="step_isolate_title">फ़ोन को अलग करें</string>
     <string name="step_isolate_desc">Airplane मोड चालू करें ताकि सफ़ाई के दौरान यह ऐप आपकी जानकारी न भेज सके।</string>

@@ -27,6 +27,12 @@ fun RiskLevel.color(): Color = when (this) {
     RiskLevel.LOW -> RiskLow
 }
 
+/** Text colour that stays readable on top of [color] — amber needs dark text (WCAG contrast). */
+fun RiskLevel.onColor(): Color = when (this) {
+    RiskLevel.SUSPICIOUS -> Color(0xFF212121)
+    else -> Color.White
+}
+
 /** The "what this app could do" explanation paragraph, tuned to the overall level. */
 @StringRes
 fun RiskLevel.explanationRes(): Int = when (this) {
