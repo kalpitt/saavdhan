@@ -1,7 +1,7 @@
 # 10 — Roadmap
 
 A living plan. Checked = done; unchecked = planned. Order within a phase is rough priority.
-**Last synced:** 2026-06-11 after Phase 3 shipped. See [`context/STATE.md`](../context/STATE.md) for "now".
+**Last synced:** 2026-06-13 after the first family-feedback round. See [`context/STATE.md`](../context/STATE.md) for "now".
 
 ## Phase 1 — Scanner core ✅ Complete
 
@@ -69,19 +69,33 @@ A living plan. Checked = done; unchecked = planned. Order within a phase is roug
       button live (2026-06-12)
 - [x] ktlint in CI: enforced via `ktlintCheck` (.editorconfig keeps the repo's inline-comment style)
 
-### Milestone 3 — Quality & polish (in progress)
+### Milestone 3 — Quality & polish ✅ (merged in PR #9)
 - [x] Watchdog v2 live-tested on emulator (decoyapp → notification verified; fixture regression
       found & fixed in the process)
 - [x] Home screen offline-promise note; honest detail-page "scan again" fallback; style cleanups
-- [ ] Real-device testing across phone makers (OEM deep-link variants) — needs human + phones
-- [ ] Accessibility audit (TalkBack, contrast, touch targets, font scaling) — needs human judgment
-- [ ] Dependency bumps (Compose BOM / AGP / Kotlin) — deferred; do with an emulator pass
+- [x] ktlint enforced in CI
 
-### Milestone 3 — Polish & reach
-- [ ] Real-device testing across phone makers (OEM deep-link variants, edge cases)
-- [ ] Accessibility audit: TalkBack, contrast, touch targets, font scaling (for real users, not just dev testing)
-- [ ] Play Store evaluation: decide whether Play is a future target (v0.3+) or GitHub Releases only
-- [ ] Dependency updates: routine version bumps (Compose BOM, AGP, Kotlin)
+### Milestone 4 — First feedback & reach (in progress)
+- [x] First family feedback round (2026-06-13): "app looks too simple; once a threat is found,
+      all the steps look the same" → visual-hierarchy redesign: severity banner, "What to do
+      now" hero card, numbered do-it-yourself steps, cleanup step counters ("Step 2 of 5"),
+      risk-tinted result cards. Emulator-verified: EN + HI, light + dark, 1.5× font scale.
+- [x] Accessibility — automated first-pass (lint, contrast measurements, touch targets, font
+      scaling, decorative-icon labels): see [`12-accessibility.md`](12-accessibility.md);
+      fixed the amber-chip contrast failure (white→dark text)
+- [ ] Accessibility — human pass: TalkBack walkthrough, OEM skins, max font scale
+      (checklist at the bottom of [`12-accessibility.md`](12-accessibility.md))
+- [ ] Real-device testing across phone makers (OEM deep-link variants) — needs human + phones
+- [x] Play Store decision & prep: going to Play (removes the sideloading irony, adds
+      auto-updates). Privacy policy ([`privacy.html`](privacy.html)), data-safety answers,
+      bilingual listing copy, policy declarations all ready: [`11-play-store-prep.md`](11-play-store-prep.md)
+- [ ] Play Store execution (human): $25 dev account → closed test (12 testers × 14 days —
+      use the family testers) → production
+- [ ] v0.3.0 release, then flip the landing-page button to the direct
+      `releases/latest/download/saavdhan.apk` URL (TODO comment in `index.html`)
+- [ ] F-Droid submission evaluation (community store; builds from source — independently
+      verifies the offline promise)
+- [ ] Dependency bumps (Compose BOM / AGP / Kotlin) — deferred; do with an emulator pass
 
 ## Known limitations to revisit
 

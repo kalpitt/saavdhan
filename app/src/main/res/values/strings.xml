@@ -52,6 +52,11 @@
     <string name="detail_what_low">We did not find strong warning signs for this app.</string>
     <string name="detail_allowlisted_note">This is a built-in or well-known app. We show it only so you can see the full picture.</string>
 
+    <!-- App detail — the "what to do next" hierarchy -->
+    <string name="detail_do_now_title">What to do now</string>
+    <string name="detail_do_now_body">Don\'t worry — tap the button below and we will walk you through the fix, one step at a time.</string>
+    <string name="detail_diy_title">Or do it yourself, step by step</string>
+
     <!-- Honesty banner about what the app can and cannot do -->
     <string name="honesty_note">For your safety, Android only lets YOU turn these settings off — no app can do it for you. Saavdhan takes you straight to the right screen; you make the final tap.</string>
 
@@ -97,6 +102,7 @@
     <string name="cleanup_recheck">Re-check</string>
     <string name="status_done">Done</string>
     <string name="status_current">Do this now</string>
+    <string name="cleanup_step_counter">Step %1$d of %2$d</string>
 
     <string name="step_isolate_title">Isolate the phone</string>
     <string name="step_isolate_desc">Turn on Airplane mode so the app can\'t send your information while you clean up.</string>

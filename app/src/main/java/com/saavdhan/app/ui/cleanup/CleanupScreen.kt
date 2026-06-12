@@ -14,8 +14,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.RadioButtonChecked
-import androidx.compose.material.icons.filled.RadioButtonUnchecked
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -45,6 +44,8 @@ import com.saavdhan.app.domain.cleanup.StepStatus
 import com.saavdhan.app.system.deeplink.SettingsDeepLinks
 import com.saavdhan.app.system.overlay.OverlayCoach
 import com.saavdhan.app.ui.components.InfoCard
+import com.saavdhan.app.ui.components.NumberBadge
+import com.saavdhan.app.ui.components.PrimaryButton
 import com.saavdhan.app.ui.components.SecondaryButton
 import com.saavdhan.app.ui.theme.RiskHigh
 import com.saavdhan.app.ui.theme.RiskLow
@@ -124,10 +125,12 @@ fun CleanupScreen(
                 Spacer(Modifier.height(4.dp))
             }
 
-            // The reactive checklist.
-            plan.steps.forEach { step ->
+            // The reactive checklist. Steps are numbered so the order is visible at a glance.
+            plan.steps.forEachIndexed { index, step ->
                 StepCard(
                     step = step,
+                    number = index + 1,
+                    total = plan.steps.size,
                     onAction = actionFor(step.id, packageName, context, coachAccessibility, coachDeviceAdmin)
                 )
             }
@@ -163,7 +166,7 @@ fun CleanupScreen(
 
 /** One step row. DONE = compact + green check; CURRENT = expanded card with its action; PENDING = dimmed. */
 @Composable
-private fun StepCard(step: CleanupStep, onAction: (() -> Unit)?) {
+private fun StepCard(step: CleanupStep, number: Int, total: Int, onAction: (() -> Unit)?) {
     val title = stringResource(step.id.titleRes())
     when (step.status) {
         StepStatus.DONE -> StepHeader(
@@ -174,10 +177,10 @@ private fun StepCard(step: CleanupStep, onAction: (() -> Unit)?) {
 
         StepStatus.PENDING -> StepHeader(
             icon = {
-                Icon(
-                    Icons.Filled.RadioButtonUnchecked,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                NumberBadge(
+                    number,
+                    container = MaterialTheme.colorScheme.surfaceVariant,
+                    content = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             },
             title = title,
@@ -192,18 +195,21 @@ private fun StepCard(step: CleanupStep, onAction: (() -> Unit)?) {
         ) {
             Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Row(
+                    modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    Icon(
-                        Icons.Filled.RadioButtonChecked,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary
-                    )
+                    NumberBadge(number)
                     Text(
                         stringResource(R.string.status_current),
                         style = MaterialTheme.typography.labelLarge,
-                        color = MaterialTheme.colorScheme.primary
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.weight(1f)
+                    )
+                    Text(
+                        stringResource(R.string.cleanup_step_counter, number, total),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
                 Text(title, style = MaterialTheme.typography.titleLarge)
@@ -211,7 +217,8 @@ private fun StepCard(step: CleanupStep, onAction: (() -> Unit)?) {
                 onAction?.let {
                     val actionLabelRes = step.id.actionRes()
                     if (actionLabelRes != null) {
-                        SecondaryButton(text = stringResource(actionLabelRes), onClick = it)
+                        // The one thing to do right now — the only filled button on this screen.
+                        PrimaryButton(text = stringResource(actionLabelRes), onClick = it)
                     }
                 }
                 step.id.hintRes()?.let { hint ->
@@ -275,7 +282,7 @@ private fun WarningCard(
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 Icon(
-                    Icons.Filled.RadioButtonChecked,
+                    Icons.Filled.Warning,
                     contentDescription = null,
                     tint = RiskHigh,
                     modifier = Modifier.size(20.dp)
