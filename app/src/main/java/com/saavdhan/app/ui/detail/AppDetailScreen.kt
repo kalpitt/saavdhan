@@ -2,14 +2,19 @@ package com.saavdhan.app.ui.detail
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -18,6 +23,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -29,13 +35,15 @@ import com.saavdhan.app.system.deeplink.SettingsDeepLinks
 import com.saavdhan.app.system.overlay.OverlayCoach
 import com.saavdhan.app.ui.color
 import com.saavdhan.app.ui.components.DangerButton
+import com.saavdhan.app.ui.components.HeroActionCard
 import com.saavdhan.app.ui.components.InfoCard
-import com.saavdhan.app.ui.components.PrimaryButton
+import com.saavdhan.app.ui.components.NumberedStep
 import com.saavdhan.app.ui.components.RiskChip
 import com.saavdhan.app.ui.components.SecondaryButton
 import com.saavdhan.app.ui.components.SignalRow
 import com.saavdhan.app.ui.explanationRes
 import com.saavdhan.app.ui.labelRes
+import com.saavdhan.app.ui.onColor
 import com.saavdhan.app.ui.scan.ScanViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -73,6 +81,8 @@ fun AppDetailScreen(
         }
 
         val assessment = item.assessment
+        val levelColor = assessment.level.color()
+        val flagged = assessment.level != RiskLevel.LOW
         // Coaching messages are built here (composable scope) and used inside click lambdas.
         val coachAccessibility = stringResource(R.string.coach_accessibility, item.app.label)
         val coachDeviceAdmin = stringResource(R.string.coach_device_admin, item.app.label)
@@ -84,20 +94,49 @@ fun AppDetailScreen(
                 .padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            RiskChip(
-                text = stringResource(assessment.level.labelRes()),
-                color = assessment.level.color()
-            )
-            Text(item.app.label, style = MaterialTheme.typography.headlineSmall)
-            Text(
-                item.app.packageName,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+            // Severity banner — the verdict, name and package in one block tinted by risk colour,
+            // so "how bad is this?" is answered before any reading.
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = levelColor.copy(alpha = 0.12f))
+            ) {
+                Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        if (flagged) {
+                            Icon(Icons.Filled.Warning, contentDescription = null, tint = levelColor)
+                        }
+                        RiskChip(
+                            text = stringResource(assessment.level.labelRes()),
+                            color = levelColor,
+                            textColor = assessment.level.onColor()
+                        )
+                    }
+                    Text(item.app.label, style = MaterialTheme.typography.headlineSmall)
+                    Text(
+                        item.app.packageName,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
 
             if (assessment.allowlisted) {
-                Spacer(Modifier.height(8.dp))
                 InfoCard(text = stringResource(R.string.detail_allowlisted_note))
+            }
+
+            // THE one thing to do next — guided cleanup, deliberately louder than everything else
+            // on this screen. The do-it-yourself links further down are the quiet alternative.
+            if (flagged) {
+                Spacer(Modifier.height(4.dp))
+                HeroActionCard(
+                    title = stringResource(R.string.detail_do_now_title),
+                    body = stringResource(R.string.detail_do_now_body),
+                    buttonText = stringResource(R.string.start_cleanup),
+                    onClick = onStartCleanup
+                )
             }
 
             // What this app could do
@@ -110,7 +149,7 @@ fun AppDetailScreen(
                 Spacer(Modifier.height(12.dp))
                 Text(stringResource(R.string.detail_why_title), style = MaterialTheme.typography.titleLarge)
                 assessment.signals.forEach { signal ->
-                    SignalRow(text = stringResource(signal.labelRes()))
+                    SignalRow(text = stringResource(signal.labelRes()), tint = levelColor)
                 }
             }
 
@@ -118,34 +157,67 @@ fun AppDetailScreen(
             Spacer(Modifier.height(12.dp))
             InfoCard(text = stringResource(R.string.honesty_note))
 
-            // Optional on-screen helper: only offered when a guided action exists and the overlay
-            // permission isn't granted yet.
-            val hasGuidedAction = RiskSignal.ACCESSIBILITY in assessment.signals ||
-                RiskSignal.DEVICE_ADMIN in assessment.signals
-            if (hasGuidedAction && !OverlayCoach.isAvailable(context)) {
-                Spacer(Modifier.height(8.dp))
-                SecondaryButton(
-                    text = stringResource(R.string.enable_helper),
-                    onClick = { OverlayCoach.requestPermission(context) }
-                )
-                Text(
-                    stringResource(R.string.enable_helper_hint),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-
-            // Guided cleanup — the headline action for a flagged app: a reactive, step-by-step
-            // walk-through (isolate → strip powers → uninstall → secure accounts).
-            if (assessment.level != RiskLevel.LOW) {
+            if (flagged) {
+                // The do-it-yourself path: the same fixes the guided cleanup walks through,
+                // numbered so the right order is obvious at a glance.
                 Spacer(Modifier.height(12.dp))
-                PrimaryButton(
-                    text = stringResource(R.string.start_cleanup),
-                    onClick = onStartCleanup
-                )
+                Text(stringResource(R.string.detail_diy_title), style = MaterialTheme.typography.titleLarge)
+
+                // Optional on-screen helper: only offered when a guided action exists and the
+                // overlay permission isn't granted yet.
+                val hasGuidedAction = RiskSignal.ACCESSIBILITY in assessment.signals ||
+                    RiskSignal.DEVICE_ADMIN in assessment.signals
+                if (hasGuidedAction && !OverlayCoach.isAvailable(context)) {
+                    SecondaryButton(
+                        text = stringResource(R.string.enable_helper),
+                        onClick = { OverlayCoach.requestPermission(context) }
+                    )
+                    Text(
+                        stringResource(R.string.enable_helper_hint),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Spacer(Modifier.height(4.dp))
+                }
+
+                var stepNumber = 1
+                if (RiskSignal.ACCESSIBILITY in assessment.signals) {
+                    NumberedStep(
+                        number = stepNumber++,
+                        hint = stringResource(R.string.action_accessibility_hint)
+                    ) {
+                        SecondaryButton(
+                            text = stringResource(R.string.action_accessibility),
+                            onClick = {
+                                OverlayCoach.show(context, coachAccessibility) // shows only if permission granted
+                                SettingsDeepLinks.launch(context, SettingsDeepLinks.accessibilitySettings(), SettingsDeepLinks.mainSettings())
+                            }
+                        )
+                    }
+                }
+                if (RiskSignal.DEVICE_ADMIN in assessment.signals) {
+                    NumberedStep(
+                        number = stepNumber++,
+                        hint = stringResource(R.string.action_device_admin_hint)
+                    ) {
+                        SecondaryButton(
+                            text = stringResource(R.string.action_device_admin),
+                            onClick = {
+                                OverlayCoach.show(context, coachDeviceAdmin) // shows only if permission granted
+                                SettingsDeepLinks.launch(context, SettingsDeepLinks.deviceAdminSettings(), SettingsDeepLinks.mainSettings())
+                            }
+                        )
+                    }
+                }
+                NumberedStep(number = stepNumber, hint = null) {
+                    DangerButton(
+                        text = stringResource(R.string.action_uninstall),
+                        onClick = { SettingsDeepLinks.launch(context, SettingsDeepLinks.uninstall(packageName)) }
+                    )
+                }
             }
 
-            // Actions — the one-tap deep links
+            // App info — useful at every risk level, but deliberately the quietest action here.
             Spacer(Modifier.height(12.dp))
             SecondaryButton(
                 text = stringResource(R.string.action_app_info),
@@ -157,43 +229,13 @@ fun AppDetailScreen(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
-            if (RiskSignal.ACCESSIBILITY in assessment.signals) {
-                Spacer(Modifier.height(8.dp))
-                SecondaryButton(
-                    text = stringResource(R.string.action_accessibility),
-                    onClick = {
-                        OverlayCoach.show(context, coachAccessibility) // shows only if permission granted
-                        SettingsDeepLinks.launch(context, SettingsDeepLinks.accessibilitySettings(), SettingsDeepLinks.mainSettings())
-                    }
-                )
-                Text(
-                    stringResource(R.string.action_accessibility_hint),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+            if (!flagged) {
+                Spacer(Modifier.height(12.dp))
+                DangerButton(
+                    text = stringResource(R.string.action_uninstall),
+                    onClick = { SettingsDeepLinks.launch(context, SettingsDeepLinks.uninstall(packageName)) }
                 )
             }
-
-            if (RiskSignal.DEVICE_ADMIN in assessment.signals) {
-                Spacer(Modifier.height(8.dp))
-                SecondaryButton(
-                    text = stringResource(R.string.action_device_admin),
-                    onClick = {
-                        OverlayCoach.show(context, coachDeviceAdmin) // shows only if permission granted
-                        SettingsDeepLinks.launch(context, SettingsDeepLinks.deviceAdminSettings(), SettingsDeepLinks.mainSettings())
-                    }
-                )
-                Text(
-                    stringResource(R.string.action_device_admin_hint),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-
-            Spacer(Modifier.height(12.dp))
-            DangerButton(
-                text = stringResource(R.string.action_uninstall),
-                onClick = { SettingsDeepLinks.launch(context, SettingsDeepLinks.uninstall(packageName)) }
-            )
             Spacer(Modifier.height(24.dp))
         }
     }
