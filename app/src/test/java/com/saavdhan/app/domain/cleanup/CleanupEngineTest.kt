@@ -18,14 +18,14 @@ class CleanupEngineTest {
         hasAccessibility: Boolean = true,
         wasDeviceAdmin: Boolean = true,
         isDeviceAdmin: Boolean = true,
-        isIsolated: Boolean = false,
+        isIsolated: Boolean = false
     ) = CleanupState(
         isInstalled = isInstalled,
         hadAccessibility = hadAccessibility,
         hasAccessibility = hasAccessibility,
         wasDeviceAdmin = wasDeviceAdmin,
         isDeviceAdmin = isDeviceAdmin,
-        isIsolated = isIsolated,
+        isIsolated = isIsolated
     )
 
     private fun CleanupPlan.statusOf(id: CleanupStepId) = steps.firstOrNull { it.id == id }?.status
@@ -55,7 +55,7 @@ class CleanupEngineTest {
     @Test
     fun `after admin removed, uninstall is current and Safe Mode is no longer pushed`() {
         val plan = CleanupEngine.plan(
-            state(isIsolated = true, hasAccessibility = false, isDeviceAdmin = false),
+            state(isIsolated = true, hasAccessibility = false, isDeviceAdmin = false)
         )
         assertEquals(StepStatus.DONE, plan.statusOf(CleanupStepId.REMOVE_ADMIN))
         assertEquals(CleanupStepId.UNINSTALL, plan.current())
@@ -71,7 +71,7 @@ class CleanupEngineTest {
     @Test
     fun `once uninstalled, secure-accounts is current and the threat is removed`() {
         val plan = CleanupEngine.plan(
-            state(isInstalled = false, hasAccessibility = false, isDeviceAdmin = false, isIsolated = true),
+            state(isInstalled = false, hasAccessibility = false, isDeviceAdmin = false, isIsolated = true)
         )
         assertEquals(StepStatus.DONE, plan.statusOf(CleanupStepId.UNINSTALL))
         assertEquals(CleanupStepId.SECURE_ACCOUNTS, plan.current())
@@ -82,7 +82,7 @@ class CleanupEngineTest {
     @Test
     fun `a simple app with no special powers skips the accessibility and admin steps`() {
         val plan = CleanupEngine.plan(
-            state(hadAccessibility = false, hasAccessibility = false, wasDeviceAdmin = false, isDeviceAdmin = false, isIsolated = true),
+            state(hadAccessibility = false, hasAccessibility = false, wasDeviceAdmin = false, isDeviceAdmin = false, isIsolated = true)
         )
         val ids = plan.steps.map { it.id }
         assertFalse(ids.contains(CleanupStepId.DISABLE_ACCESSIBILITY))
@@ -93,7 +93,7 @@ class CleanupEngineTest {
     @Test
     fun `an admin app that never had accessibility goes straight to removing admin`() {
         val plan = CleanupEngine.plan(
-            state(hadAccessibility = false, hasAccessibility = false, isIsolated = true),
+            state(hadAccessibility = false, hasAccessibility = false, isIsolated = true)
         )
         assertFalse(plan.steps.map { it.id }.contains(CleanupStepId.DISABLE_ACCESSIBILITY))
         assertEquals(CleanupStepId.REMOVE_ADMIN, plan.current())

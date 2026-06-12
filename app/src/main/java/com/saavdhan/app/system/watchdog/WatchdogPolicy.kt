@@ -21,7 +21,7 @@ object WatchdogPolicy {
         NEW_INSTALL,
 
         /** An already-installed app crossed up into HIGH/CRITICAL since the last check. */
-        ESCALATION,
+        ESCALATION
     }
 
     data class Alert(val packageName: String, val kind: AlertKind)
@@ -38,7 +38,7 @@ object WatchdogPolicy {
      */
     fun assessChanges(
         known: Map<String, RiskLevel?>?,
-        current: Map<String, RiskLevel>,
+        current: Map<String, RiskLevel>
     ): List<Alert> {
         if (known == null) return emptyList()
         return current.mapNotNull { (pkg, level) ->

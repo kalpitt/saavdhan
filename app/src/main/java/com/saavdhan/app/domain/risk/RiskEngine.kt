@@ -1,6 +1,7 @@
 package com.saavdhan.app.domain.risk
 
 import com.saavdhan.app.domain.allowlist.KnownApps
+import com.saavdhan.app.domain.model.InstallSource
 import com.saavdhan.app.domain.model.RiskAssessment
 import com.saavdhan.app.domain.model.RiskLevel
 import com.saavdhan.app.domain.model.RiskSignal
@@ -39,7 +40,7 @@ object RiskEngine {
 
         // Exact-match trusted packages must also pass a power check for sideloaded impostors
         if (app.packageName in KnownApps.TRUSTED_PACKAGES) {
-            if (app.installSource == com.saavdhan.app.domain.model.InstallSource.SIDELOADED &&
+            if (app.installSource == InstallSource.SIDELOADED &&
                 (app.hasAccessibilityEnabled || app.isDeviceAdmin || app.smsGranted)
             ) {
                 return false
@@ -52,7 +53,7 @@ object RiskEngine {
         // unknown source) claiming a trusted prefix while holding dangerous powers. Only a
         // Play-verified install of such a package is trusted unconditionally.
         if (KnownApps.isTrustedPackage(app.packageName, app.installSource)) {
-            if (app.installSource != com.saavdhan.app.domain.model.InstallSource.PLAY_STORE &&
+            if (app.installSource != InstallSource.PLAY_STORE &&
                 (app.hasAccessibilityEnabled || app.isDeviceAdmin || app.smsGranted)
             ) {
                 return false
@@ -70,15 +71,15 @@ object RiskEngine {
         // Granted SMS access is the dangerous state (that's where OTPs can be read).
         if (app.smsGranted) add(RiskSignal.SMS_ACCESS)
         // Sideloaded app that requests SMS is a warning sign (even if not granted yet).
-        if (app.installSource == com.saavdhan.app.domain.model.InstallSource.SIDELOADED &&
+        if (app.installSource == InstallSource.SIDELOADED &&
             app.requestsSms && !app.smsGranted
         ) {
             add(RiskSignal.SMS_REQUESTED)
         }
         if (app.hasNotificationListener) add(RiskSignal.NOTIFICATION_LISTENER)
-        if (app.installSource == com.saavdhan.app.domain.model.InstallSource.SIDELOADED) add(RiskSignal.SIDELOADED)
+        if (app.installSource == InstallSource.SIDELOADED) add(RiskSignal.SIDELOADED)
         // Hidden icon is only a flag for sideloaded apps (store apps may legitimately lack icons).
-        if (app.installSource == com.saavdhan.app.domain.model.InstallSource.SIDELOADED && app.hasHiddenIcon) {
+        if (app.installSource == InstallSource.SIDELOADED && app.hasHiddenIcon) {
             add(RiskSignal.HIDDEN_ICON)
         }
         if (app.impersonatesSystemApp) add(RiskSignal.IMPERSONATION)

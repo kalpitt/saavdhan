@@ -44,7 +44,7 @@ fun AppDetailScreen(
     viewModel: ScanViewModel,
     packageName: String,
     onBack: () -> Unit,
-    onStartCleanup: () -> Unit,
+    onStartCleanup: () -> Unit
 ) {
     val item = viewModel.find(packageName)
     val context = LocalContext.current
@@ -57,16 +57,17 @@ fun AppDetailScreen(
                     IconButton(onClick = onBack) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.back),
+                            contentDescription = stringResource(R.string.back)
                         )
                     }
-                },
+                }
             )
-        },
+        }
     ) { padding ->
         if (item == null) {
+            // No scan in memory for this package (e.g. process death restored us here directly).
             Column(Modifier.fillMaxSize().padding(padding).padding(24.dp)) {
-                Text(stringResource(R.string.result_safe_title))
+                Text(stringResource(R.string.detail_not_found), style = MaterialTheme.typography.bodyLarge)
             }
             return@Scaffold
         }
@@ -81,17 +82,17 @@ fun AppDetailScreen(
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
                 .padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             RiskChip(
                 text = stringResource(assessment.level.labelRes()),
-                color = assessment.level.color(),
+                color = assessment.level.color()
             )
             Text(item.app.label, style = MaterialTheme.typography.headlineSmall)
             Text(
                 item.app.packageName,
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
             if (assessment.allowlisted) {
@@ -125,12 +126,12 @@ fun AppDetailScreen(
                 Spacer(Modifier.height(8.dp))
                 SecondaryButton(
                     text = stringResource(R.string.enable_helper),
-                    onClick = { OverlayCoach.requestPermission(context) },
+                    onClick = { OverlayCoach.requestPermission(context) }
                 )
                 Text(
                     stringResource(R.string.enable_helper_hint),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
 
@@ -140,7 +141,7 @@ fun AppDetailScreen(
                 Spacer(Modifier.height(12.dp))
                 PrimaryButton(
                     text = stringResource(R.string.start_cleanup),
-                    onClick = onStartCleanup,
+                    onClick = onStartCleanup
                 )
             }
 
@@ -148,12 +149,12 @@ fun AppDetailScreen(
             Spacer(Modifier.height(12.dp))
             SecondaryButton(
                 text = stringResource(R.string.action_app_info),
-                onClick = { SettingsDeepLinks.launch(context, SettingsDeepLinks.appInfo(packageName)) },
+                onClick = { SettingsDeepLinks.launch(context, SettingsDeepLinks.appInfo(packageName)) }
             )
             Text(
                 stringResource(R.string.action_app_info_hint),
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
             if (RiskSignal.ACCESSIBILITY in assessment.signals) {
@@ -163,12 +164,12 @@ fun AppDetailScreen(
                     onClick = {
                         OverlayCoach.show(context, coachAccessibility) // shows only if permission granted
                         SettingsDeepLinks.launch(context, SettingsDeepLinks.accessibilitySettings(), SettingsDeepLinks.mainSettings())
-                    },
+                    }
                 )
                 Text(
                     stringResource(R.string.action_accessibility_hint),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
 
@@ -179,19 +180,19 @@ fun AppDetailScreen(
                     onClick = {
                         OverlayCoach.show(context, coachDeviceAdmin) // shows only if permission granted
                         SettingsDeepLinks.launch(context, SettingsDeepLinks.deviceAdminSettings(), SettingsDeepLinks.mainSettings())
-                    },
+                    }
                 )
                 Text(
                     stringResource(R.string.action_device_admin_hint),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
 
             Spacer(Modifier.height(12.dp))
             DangerButton(
                 text = stringResource(R.string.action_uninstall),
-                onClick = { SettingsDeepLinks.launch(context, SettingsDeepLinks.uninstall(packageName)) },
+                onClick = { SettingsDeepLinks.launch(context, SettingsDeepLinks.uninstall(packageName)) }
             )
             Spacer(Modifier.height(24.dp))
         }

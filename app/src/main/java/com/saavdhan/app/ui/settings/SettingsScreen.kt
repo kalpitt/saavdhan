@@ -4,8 +4,10 @@ import android.content.Context
 import android.text.format.DateUtils
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.selection.selectable
@@ -24,8 +26,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -47,7 +47,7 @@ import com.saavdhan.app.ui.components.PrimaryButton
 fun SettingsScreen(
     currentLanguage: String,
     onChooseLanguage: (String) -> Unit,
-    onBack: () -> Unit,
+    onBack: () -> Unit
 ) {
     val context = LocalContext.current
     val batteryExempt = remember { mutableStateOf(BatteryStatus.isExempt(context)) }
@@ -74,31 +74,31 @@ fun SettingsScreen(
                     IconButton(onClick = onBack) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.back),
+                            contentDescription = stringResource(R.string.back)
                         )
                     }
-                },
+                }
             )
-        },
+        }
     ) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
                 .padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Text(stringResource(R.string.settings_language), style = MaterialTheme.typography.titleLarge)
 
             LanguageOption(
                 label = stringResource(R.string.lang_english),
                 selected = currentLanguage == LocaleManager.ENGLISH,
-                onClick = { onChooseLanguage(LocaleManager.ENGLISH) },
+                onClick = { onChooseLanguage(LocaleManager.ENGLISH) }
             )
             LanguageOption(
                 label = stringResource(R.string.lang_hindi),
                 selected = currentLanguage == LocaleManager.HINDI,
-                onClick = { onChooseLanguage(LocaleManager.HINDI) },
+                onClick = { onChooseLanguage(LocaleManager.HINDI) }
             )
 
             Spacer(Modifier.height(12.dp))
@@ -109,7 +109,7 @@ fun SettingsScreen(
             BatteryOptimizationCard(
                 isExempt = batteryExempt.value,
                 lastRunMillis = lastRunMillis.value,
-                context = context,
+                context = context
             )
 
             Spacer(Modifier.height(12.dp))
@@ -126,7 +126,7 @@ private fun LanguageOption(label: String, selected: Boolean, onClick: () -> Unit
             .fillMaxWidth()
             .selectable(selected = selected, onClick = onClick)
             .padding(vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically,
+        verticalAlignment = Alignment.CenterVertically
     ) {
         RadioButton(selected = selected, onClick = onClick)
         Text(label, style = MaterialTheme.typography.bodyLarge)
@@ -149,9 +149,9 @@ private fun BatteryOptimizationCard(isExempt: Boolean, lastRunMillis: Long, cont
                     SettingsDeepLinks.launch(
                         context,
                         BatteryStatus.settingsIntent(),
-                        SettingsDeepLinks.mainSettings(),
+                        SettingsDeepLinks.mainSettings()
                     )
-                },
+                }
             )
         }
     }
@@ -167,6 +167,6 @@ private fun BatteryOptimizationCard(isExempt: Boolean, lastRunMillis: Long, cont
     Text(
         lastCheckText,
         style = MaterialTheme.typography.bodyMedium,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        color = MaterialTheme.colorScheme.onSurfaceVariant
     )
 }

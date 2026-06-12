@@ -27,7 +27,7 @@ class RiskEngineTest {
         smsGranted: Boolean = false,
         notificationListener: Boolean = false,
         hiddenIcon: Boolean = false,
-        impersonates: Boolean = false,
+        impersonates: Boolean = false
     ) = ScannedApp(
         packageName = packageName,
         label = label,
@@ -40,7 +40,7 @@ class RiskEngineTest {
         hasNotificationListener = notificationListener,
         hasHiddenIcon = hiddenIcon,
         impersonatesSystemApp = impersonates,
-        firstInstallTimeMillis = 0L,
+        firstInstallTimeMillis = 0L
     )
 
     @Test
@@ -50,8 +50,8 @@ class RiskEngineTest {
                 installSource = InstallSource.SIDELOADED,
                 accessibility = true,
                 deviceAdmin = true,
-                smsGranted = true,
-            ),
+                smsGranted = true
+            )
         )
         assertEquals(RiskLevel.CRITICAL, result.level)
         assertTrue(RiskSignal.ACCESSIBILITY in result.signals)
@@ -62,7 +62,7 @@ class RiskEngineTest {
     @Test
     fun `sideloaded plus accessibility is HIGH`() {
         val result = RiskEngine.assess(
-            app(installSource = InstallSource.SIDELOADED, accessibility = true),
+            app(installSource = InstallSource.SIDELOADED, accessibility = true)
         )
         assertEquals(RiskLevel.HIGH, result.level)
     }
@@ -70,7 +70,7 @@ class RiskEngineTest {
     @Test
     fun `hidden icon on a sideloaded app alone is SUSPICIOUS`() {
         val result = RiskEngine.assess(
-            app(installSource = InstallSource.SIDELOADED, hiddenIcon = true),
+            app(installSource = InstallSource.SIDELOADED, hiddenIcon = true)
         )
         assertEquals(RiskLevel.SUSPICIOUS, result.level)
     }
@@ -78,7 +78,7 @@ class RiskEngineTest {
     @Test
     fun `sideloaded hidden icon plus SMS request is HIGH`() {
         val result = RiskEngine.assess(
-            app(installSource = InstallSource.SIDELOADED, hiddenIcon = true, requestsSms = true),
+            app(installSource = InstallSource.SIDELOADED, hiddenIcon = true, requestsSms = true)
         )
         assertEquals(RiskLevel.HIGH, result.level)
     }
@@ -86,7 +86,7 @@ class RiskEngineTest {
     @Test
     fun `store-installed app with no icon is LOW (not flagged)`() {
         val result = RiskEngine.assess(
-            app(installSource = InstallSource.PLAY_STORE, hiddenIcon = true),
+            app(installSource = InstallSource.PLAY_STORE, hiddenIcon = true)
         )
         assertEquals(RiskLevel.LOW, result.level)
     }
@@ -94,7 +94,7 @@ class RiskEngineTest {
     @Test
     fun `impersonating a system app is HIGH`() {
         val result = RiskEngine.assess(
-            app(label = "System Update", impersonates = true, installSource = InstallSource.SIDELOADED),
+            app(label = "System Update", impersonates = true, installSource = InstallSource.SIDELOADED)
         )
         assertEquals(RiskLevel.HIGH, result.level)
     }
@@ -119,8 +119,8 @@ class RiskEngineTest {
                 isSystemApp = true,
                 accessibility = true,
                 deviceAdmin = true,
-                smsGranted = true,
-            ),
+                smsGranted = true
+            )
         )
         assertEquals(RiskLevel.LOW, result.level)
         assertTrue(result.allowlisted)
@@ -129,7 +129,7 @@ class RiskEngineTest {
     @Test
     fun `an explicitly trusted package is not alarming`() {
         val result = RiskEngine.assess(
-            app(packageName = "com.google.android.marvin.talkback", accessibility = true),
+            app(packageName = "com.google.android.marvin.talkback", accessibility = true)
         )
         assertEquals(RiskLevel.LOW, result.level)
         assertTrue(result.allowlisted)
@@ -138,7 +138,7 @@ class RiskEngineTest {
     @Test
     fun `sideloaded plus SMS is HIGH`() {
         val result = RiskEngine.assess(
-            app(installSource = InstallSource.SIDELOADED, smsGranted = true),
+            app(installSource = InstallSource.SIDELOADED, smsGranted = true)
         )
         assertEquals(RiskLevel.HIGH, result.level)
     }
@@ -146,7 +146,7 @@ class RiskEngineTest {
     @Test
     fun `sideloaded plus notification listener is HIGH`() {
         val result = RiskEngine.assess(
-            app(installSource = InstallSource.SIDELOADED, notificationListener = true),
+            app(installSource = InstallSource.SIDELOADED, notificationListener = true)
         )
         assertEquals(RiskLevel.HIGH, result.level)
     }
@@ -154,7 +154,7 @@ class RiskEngineTest {
     @Test
     fun `accessibility plus SMS is HIGH`() {
         val result = RiskEngine.assess(
-            app(accessibility = true, smsGranted = true),
+            app(accessibility = true, smsGranted = true)
         )
         assertEquals(RiskLevel.HIGH, result.level)
     }
@@ -162,7 +162,7 @@ class RiskEngineTest {
     @Test
     fun `accessibility plus notification listener is HIGH`() {
         val result = RiskEngine.assess(
-            app(accessibility = true, notificationListener = true),
+            app(accessibility = true, notificationListener = true)
         )
         assertEquals(RiskLevel.HIGH, result.level)
     }
@@ -170,7 +170,7 @@ class RiskEngineTest {
     @Test
     fun `device admin plus SMS is HIGH`() {
         val result = RiskEngine.assess(
-            app(deviceAdmin = true, smsGranted = true),
+            app(deviceAdmin = true, smsGranted = true)
         )
         assertEquals(RiskLevel.HIGH, result.level)
     }
@@ -178,7 +178,7 @@ class RiskEngineTest {
     @Test
     fun `device admin plus notification listener is HIGH`() {
         val result = RiskEngine.assess(
-            app(deviceAdmin = true, notificationListener = true),
+            app(deviceAdmin = true, notificationListener = true)
         )
         assertEquals(RiskLevel.HIGH, result.level)
     }
@@ -186,7 +186,7 @@ class RiskEngineTest {
     @Test
     fun `accessibility plus device admin plus notification listener (no SMS) is CRITICAL`() {
         val result = RiskEngine.assess(
-            app(accessibility = true, deviceAdmin = true, notificationListener = true),
+            app(accessibility = true, deviceAdmin = true, notificationListener = true)
         )
         assertEquals(RiskLevel.CRITICAL, result.level)
         assertTrue(RiskSignal.NOTIFICATION_LISTENER in result.signals)
@@ -209,8 +209,8 @@ class RiskEngineTest {
             app(
                 packageName = "com.google.android.safetycore",
                 installSource = InstallSource.PLAY_STORE,
-                hiddenIcon = true,
-            ),
+                hiddenIcon = true
+            )
         )
         assertEquals(RiskLevel.LOW, result.level)
         assertTrue(result.allowlisted)
@@ -222,8 +222,8 @@ class RiskEngineTest {
             app(
                 packageName = "com.google.android.gms",
                 installSource = InstallSource.SIDELOADED,
-                accessibility = true,
-            ),
+                accessibility = true
+            )
         )
         assertEquals(RiskLevel.HIGH, result.level)
         assertFalse(result.allowlisted)
@@ -235,8 +235,8 @@ class RiskEngineTest {
             app(
                 packageName = "com.google.android.gms",
                 installSource = InstallSource.SIDELOADED,
-                accessibility = false,
-            ),
+                accessibility = false
+            )
         )
         assertEquals(RiskLevel.LOW, result.level)
         assertTrue(result.allowlisted)
@@ -250,8 +250,8 @@ class RiskEngineTest {
             app(
                 packageName = "com.google.android.evil",
                 installSource = InstallSource.SIDELOADED,
-                accessibility = true,
-            ),
+                accessibility = true
+            )
         )
         assertEquals(RiskLevel.HIGH, result.level)
         assertFalse(result.allowlisted)
@@ -266,8 +266,8 @@ class RiskEngineTest {
                 packageName = "com.google.android.evil",
                 installSource = InstallSource.OTHER_STORE,
                 accessibility = true,
-                deviceAdmin = true,
-            ),
+                deviceAdmin = true
+            )
         )
         assertEquals(RiskLevel.HIGH, result.level)
         assertFalse(result.allowlisted)
@@ -280,8 +280,8 @@ class RiskEngineTest {
                 packageName = "com.samsung.android.fake",
                 installSource = InstallSource.UNKNOWN,
                 deviceAdmin = true,
-                smsGranted = true,
-            ),
+                smsGranted = true
+            )
         )
         assertEquals(RiskLevel.HIGH, result.level)
         assertFalse(result.allowlisted)
@@ -294,8 +294,8 @@ class RiskEngineTest {
             app(
                 packageName = "com.google.android.something",
                 installSource = InstallSource.PLAY_STORE,
-                accessibility = true,
-            ),
+                accessibility = true
+            )
         )
         assertEquals(RiskLevel.LOW, result.level)
         assertTrue(result.allowlisted)
