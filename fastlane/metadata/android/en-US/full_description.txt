@@ -1,0 +1,19 @@
+Scam APKs spread on WhatsApp disguised as wedding invitations, courier updates, KYC notices, or electricity bills. One install plants banking spyware that reads OTPs and drains accounts — and resists being removed.
+
+Saavdhan (सावधान, "be alert") finds these apps, explains the danger in plain Hindi or English, and walks you through removing them — one calm step at a time.
+
+HOW IT WORKS
+* Scan — checks every installed app for the warning signs of scam spyware: Accessibility abuse, Device-Admin abuse, SMS access, sideloading, hidden icons, fake system names.
+* Explain — every verdict lists its reasons in plain words. No black-box AI.
+* Guide — a step-by-step cleanup checklist (isolate the phone → strip the app's powers → uninstall → secure your accounts) that ticks itself off as you complete each step.
+* Watch — a background watchdog warns you when a new or changed app looks dangerous.
+
+PROMISES THAT NEVER CHANGE
+* Fully offline. The app does not hold the INTERNET permission, so the operating system makes any network connection impossible. Nothing about you or your phone is ever collected or sent.
+* No ads, no account, no tracking. Free and open source (MIT license).
+* Honest. Android only lets YOU turn off another app's powers — Saavdhan takes you straight to the right screen and coaches the final tap. It never fakes an "auto-fix".
+
+HONEST DISCLAIMER
+Saavdhan is a defensive aid, not a guarantee. It uses behavioural warning signs (not a malware database), so it can raise false alarms and can miss brand-new threats. If money has already been stolen, contact your bank and cyber-crime authorities (in India: dial 1930 or visit cybercrime.gov.in).
+
+Designed for the family members everyone worries about — big buttons, simple language, full support for Hindi and English.
