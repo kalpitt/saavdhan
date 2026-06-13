@@ -40,7 +40,7 @@ on a clean emulator that has no real malware. This is for *seeing* the UI, not a
 `decoyapp/` is a **harmless** test app (no code; labelled "System Update"; no launcher icon). It
 exists only as a real detection target. Installing it makes the background `NewAppScanWorker`
 flag it (impersonation + hidden-icon + sideloaded ⇒ HIGH) and post the *"A new app looks
-dangerous"* notification — verified on the emulator (`docs/screenshots/08-watchdog-notification.png`).
+dangerous"* notification — verified on the emulator (`docs/screenshots/09-watchdog-notification.png`).
 This is how we caught that a manifest `PACKAGE_ADDED` receiver is blocked in the background and
 switched to WorkManager ([ADR-0007](decisions/0007-scan-model.md)).
 
