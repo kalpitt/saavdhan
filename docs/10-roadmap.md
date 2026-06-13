@@ -96,8 +96,9 @@ A living plan. Checked = done; unchecked = planned. Order within a phase is roug
 - [x] Public site redesign: landing + privacy pages restyled to the "AI Glass Bento" design from
       the [kalpit.me](https://kalpit.me) portfolio (glass cards, green mesh, self-hosted Inter,
       screenshot showcase) — brand teal kept, bilingual + zero-build preserved
-- [ ] F-Droid submission evaluation (community store; builds from source — independently
-      verifies the offline promise)
+- [x] F-Droid prep: fastlane listing metadata (EN + HI) + screenshots in-repo, FOSS/anti-features
+      check, and the fdroiddata build recipe — all ready in [`13-fdroid.md`](13-fdroid.md). Submitting
+      the recipe to fdroiddata is the remaining human step.
 - [x] Dependency bumps: AGP 8.7.3→8.9.1, Kotlin 2.0.21→2.1.0, Compose BOM 2024.12.01→2025.01.00,
       core-ktx/lifecycle/activity/navigation/work to current stable (Gradle wrapper 8.11.1 kept).
       Build + 78 unit tests + lint green; emulator smoke-tested (scan renders, no crashes)
