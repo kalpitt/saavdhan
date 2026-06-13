@@ -100,6 +100,11 @@ object RiskEngine {
         // Also: accessibility + deviceAdmin + notification (trojans read notifications instead of SMS sometimes).
         if (accessibility && deviceAdmin && (sms || notif)) return RiskLevel.CRITICAL
 
+        // 1b. A fake identity that ALSO holds a real spy/control power is an active banking trojan,
+        // not just a suspicious name — e.g. a "System Update" that can read the screen or your OTPs.
+        // (Impersonation on its own stays HIGH in the combo block below.)
+        if (impersonation && (accessibility || deviceAdmin || sms || notif)) return RiskLevel.CRITICAL
+
         // 2. Strong two-signal combinations, and the standalone "this is hiding / faking" flags.
         val highCombo =
             (sideloaded && accessibility) ||

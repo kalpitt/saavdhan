@@ -43,6 +43,36 @@ class KnownAppsTest {
     }
 
     @Test
+    fun `name match ignores punctuation, emoji and extra spaces`() {
+        assertTrue(KnownApps.isImpersonating("System  Update!", "com.evil.fake", isSystemApp = false))
+        assertTrue(KnownApps.isImpersonating("System-Update ⬇️", "com.evil.fake", isSystemApp = false))
+        assertTrue(KnownApps.isImpersonating("SYSTEM_UPDATE", "com.evil.fake", isSystemApp = false))
+    }
+
+    @Test
+    fun `a fake Security Update is impersonating`() {
+        assertTrue(KnownApps.isImpersonating("Security Update", "com.evil.fake", isSystemApp = false))
+    }
+
+    @Test
+    fun `a fake Android System WebView is impersonating but the real one is not`() {
+        assertTrue(KnownApps.isImpersonating("Android System WebView", "com.evil.fake", isSystemApp = false))
+        assertFalse(
+            KnownApps.isImpersonating("Android System WebView", "com.google.android.webview", isSystemApp = false)
+        )
+    }
+
+    @Test
+    fun `a fake Play Protect is impersonating`() {
+        assertTrue(KnownApps.isImpersonating("Play Protect", "com.evil.fake", isSystemApp = false))
+    }
+
+    @Test
+    fun `a non-Latin label simply does not match`() {
+        assertFalse(KnownApps.isImpersonating("मेरा ऐप", "com.example.app", isSystemApp = false))
+    }
+
+    @Test
     fun `a Play-Store Google module is trusted by prefix`() {
         assertTrue(KnownApps.isTrustedPackage("com.google.android.safetycore", InstallSource.PLAY_STORE))
     }

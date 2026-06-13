@@ -1,0 +1,5 @@
+v0.4.0
+* Sharper detection: a fake "System Update" that can also read your screen, your OTPs, or resist removal is now flagged Very dangerous.
+* Harder to fool by fake names dressed up with extra punctuation or emoji.
+* Updated app internals.
+* Still fully offline — the app holds no INTERNET permission.
