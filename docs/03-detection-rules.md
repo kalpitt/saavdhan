@@ -25,8 +25,8 @@ The engine checks **scariest first** (`RiskEngine.levelFor()`):
 
 | Verdict | Condition | Meaning to user |
 |---|---|---|
-| 🔴 **CRITICAL** | Accessibility **AND** Device Admin **AND** SMS — the "spyware trinity" | Almost certainly malicious. Act now. |
-| 🟠 **HIGH** | Strong pairs: sideloaded+accessibility, sideloaded+admin, accessibility+admin, accessibility+SMS, admin+SMS; **or** impersonation; **or** hidden-icon + any other flag | Dangerous unless you clearly trust it |
+| 🔴 **CRITICAL** | The "spyware trinity": Accessibility **AND** Device Admin **AND** (SMS **or** notification access); **or** **impersonation + any spy/control power** (a fake "System Update" that can read the screen, your OTPs, or resist removal) | Almost certainly malicious. Act now. |
+| 🟠 **HIGH** | Strong pairs: sideloaded+accessibility, sideloaded+admin, accessibility+admin, accessibility+SMS, admin+SMS (and the notification-access equivalents); **or** impersonation on its own; **or** hidden-icon + any other flag | Dangerous unless you clearly trust it |
 | 🟡 **SUSPICIOUS** | A single mild clue: sideloaded, accessibility, admin, or hidden icon, on its own | Worth a glance |
 | 🟢 **LOW** | Nothing notable (SMS access *alone* is too common to flag) | Looks okay |
 

@@ -92,11 +92,44 @@ class RiskEngineTest {
     }
 
     @Test
-    fun `impersonating a system app is HIGH`() {
+    fun `impersonating a system app (no powers) is HIGH`() {
         val result = RiskEngine.assess(
             app(label = "System Update", impersonates = true, installSource = InstallSource.SIDELOADED)
         )
         assertEquals(RiskLevel.HIGH, result.level)
+    }
+
+    @Test
+    fun `impersonation plus accessibility is CRITICAL`() {
+        // A fake "System Update" that can read the screen and tap = an active banking trojan.
+        val result = RiskEngine.assess(
+            app(label = "System Update", impersonates = true, accessibility = true, installSource = InstallSource.SIDELOADED)
+        )
+        assertEquals(RiskLevel.CRITICAL, result.level)
+    }
+
+    @Test
+    fun `impersonation plus SMS access is CRITICAL`() {
+        val result = RiskEngine.assess(
+            app(label = "System Update", impersonates = true, requestsSms = true, smsGranted = true, installSource = InstallSource.SIDELOADED)
+        )
+        assertEquals(RiskLevel.CRITICAL, result.level)
+    }
+
+    @Test
+    fun `impersonation plus device admin is CRITICAL`() {
+        val result = RiskEngine.assess(
+            app(label = "System Update", impersonates = true, deviceAdmin = true, installSource = InstallSource.SIDELOADED)
+        )
+        assertEquals(RiskLevel.CRITICAL, result.level)
+    }
+
+    @Test
+    fun `impersonation plus notification listener is CRITICAL`() {
+        val result = RiskEngine.assess(
+            app(label = "System Update", impersonates = true, notificationListener = true, installSource = InstallSource.SIDELOADED)
+        )
+        assertEquals(RiskLevel.CRITICAL, result.level)
     }
 
     @Test
