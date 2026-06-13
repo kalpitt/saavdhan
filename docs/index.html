@@ -5,175 +5,335 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Saavdhan (सावधान) — free offline anti-scam app for Android</title>
 <meta name="description" content="Saavdhan detects scam and spyware apps on Android phones, explains the danger in plain Hindi or English, and guides removal step by step. Fully offline — no internet permission.">
+
+<!-- Favicon -->
+<link rel="icon" href="./favicon.svg" type="image/svg+xml">
+
+<!-- Open Graph / social -->
+<meta property="og:title" content="Saavdhan (सावधान) — free offline anti-scam app">
+<meta property="og:description" content="Finds scam & spyware apps, explains the danger in Hindi or English, and walks you through removing them. Fully offline — no internet permission.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://kalpitt.github.io/saavdhan/">
+<meta property="og:image" content="https://kalpitt.github.io/saavdhan/screenshots/03-results.png">
+<meta name="twitter:card" content="summary_large_image">
+
+<!-- Set language before paint to avoid a flash of the wrong language -->
 <script>
 (function(){
   var l=localStorage.getItem('lang')||(navigator.language.startsWith('hi')?'hi':'en');
   document.documentElement.lang=l;
 })();
 </script>
+
 <style>
-  :root { --teal:#00695C; --teal-dark:#004D43; --bg:#FAFAF7; --ink:#1d2a28; --muted:#5c6b68; --danger:#C62828; }
-  * { box-sizing:border-box; margin:0; }
-  body { font-family:-apple-system,"Segoe UI",Roboto,"Noto Sans Devanagari",sans-serif; background:var(--bg); color:var(--ink); line-height:1.6; }
-  .wrap { max-width:760px; margin:0 auto; padding:0 20px; }
-  header { background:var(--teal); color:#fff; padding:56px 0 48px; text-align:center; position:relative; }
-  header h1 { font-size:2.4rem; }
-  header .hindi { font-size:1.2rem; opacity:.9; margin-top:4px; }
-  header p.tag { max-width:560px; margin:16px auto 0; font-size:1.1rem; }
-  .btn { display:inline-block; margin-top:28px; background:#fff; color:var(--teal-dark); font-weight:700; padding:14px 32px; border-radius:14px; text-decoration:none; font-size:1.05rem; }
-  .btn:hover { background:#e6f2f0; }
-  .note { font-size:.85rem; opacity:.85; margin-top:10px; }
-  section { padding:40px 0; }
-  section h2 { color:var(--teal-dark); margin-bottom:16px; font-size:1.5rem; }
-  .cards { display:grid; gap:14px; }
-  .card { background:#fff; border:1px solid #e3e8e6; border-radius:14px; padding:18px 20px; }
-  .card b { color:var(--teal-dark); }
-  .steps li { margin:10px 0 10px 20px; }
-  .disclaimer { background:#FFF6F6; border:1px solid #f0caca; border-radius:14px; padding:18px 20px; font-size:.95rem; }
-  .disclaimer b { color:var(--danger); }
-  footer { padding:32px 0 48px; color:var(--muted); font-size:.9rem; text-align:center; }
-  footer a { color:var(--teal-dark); }
-  .lang-toggle { position:absolute; top:16px; right:20px; }
-  .lang-toggle button { background:rgba(255,255,255,0.2); border:1px solid rgba(255,255,255,0.5); color:#fff; border-radius:8px; padding:5px 14px; font-size:.85rem; cursor:pointer; font-family:inherit; line-height:1.5; }
-  .lang-toggle button:hover { background:rgba(255,255,255,0.3); }
+  /* Self-hosted Inter (Latin). Devanagari falls back to the system Indic font, so we ship
+     no large Devanagari binary — and the page makes ZERO third-party requests. */
+  @font-face { font-family:'Inter'; font-style:normal; font-weight:400; font-display:swap; src:url('./fonts/inter-latin-400.woff2') format('woff2'); }
+  @font-face { font-family:'Inter'; font-style:normal; font-weight:600; font-display:swap; src:url('./fonts/inter-latin-600.woff2') format('woff2'); }
+  @font-face { font-family:'Inter'; font-style:normal; font-weight:700; font-display:swap; src:url('./fonts/inter-latin-700.woff2') format('woff2'); }
+
+  :root {
+    --teal:#00695C; --teal-bright:#0D9373; --teal-dark:#004D43;
+    --ink:#16201f; --muted:#566763;
+    --bg:#F4F8F6;
+    --surface:rgba(255,255,255,0.72); --surface-hover:rgba(255,255,255,0.95);
+    --border:rgba(210,226,221,0.7);
+    --danger:#C62828; --amber:#B45309;
+    --radius-sm:10px; --radius-md:16px; --radius-lg:22px; --radius-xl:30px;
+  }
+
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html { scroll-behavior:smooth; }
+  body {
+    font-family:'Inter',-apple-system,"Segoe UI",Roboto,"Noto Sans Devanagari",sans-serif;
+    background:var(--bg); color:var(--ink); line-height:1.6;
+    min-height:100vh; position:relative; overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* Language toggle */
   html[lang="en"] .hi { display:none; }
   html[lang="hi"] .en { display:none; }
+
+  /* Animated mesh background (fixed, behind everything) */
+  .mesh-bg { position:fixed; inset:0; z-index:-1; overflow:hidden; background:var(--bg); }
+  .blob { position:absolute; filter:blur(80px); opacity:.55; border-radius:50%; animation:float 22s infinite alternate ease-in-out; }
+  .blob-1 { top:-12%; left:-8%; width:48vw; height:48vw; background:radial-gradient(circle,#bdf0dd 0%,transparent 70%); }
+  .blob-2 { bottom:-14%; right:-10%; width:58vw; height:58vw; background:radial-gradient(circle,#cdf6ef 0%,transparent 70%); animation-delay:-7s; }
+  .blob-3 { top:38%; left:58%; width:40vw; height:40vw; background:radial-gradient(circle,#a7f3d0 0%,transparent 70%); animation-delay:-12s; }
+  @keyframes float {
+    0% { transform:translate(0,0) scale(1); }
+    50% { transform:translate(4%,5%) scale(1.08); }
+    100% { transform:translate(-4%,-4%) scale(.96); }
+  }
+
+  .wrap { max-width:1140px; margin:0 auto; padding:24px 22px 0; }
+
+  /* Glass header */
+  .topbar {
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    padding:14px 20px; margin-bottom:26px;
+    background:var(--surface); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
+    border:1px solid var(--border); border-radius:var(--radius-xl);
+  }
+  .brand { display:flex; align-items:center; gap:10px; font-weight:700; font-size:1.15rem; letter-spacing:-.01em; }
+  .brand img { width:30px; height:30px; }
+  .topbar-right { display:flex; align-items:center; gap:14px; }
+  .status-chip {
+    display:flex; align-items:center; gap:8px; font-size:.72rem; font-weight:600;
+    text-transform:uppercase; letter-spacing:.06em; color:var(--muted); white-space:nowrap;
+  }
+  .dot { width:8px; height:8px; border-radius:50%; background:#10b981; box-shadow:0 0 8px #10b981; animation:pulse 2.4s infinite; }
+  @keyframes pulse { 0%,100% { opacity:.5; box-shadow:0 0 0 #10b981; } 50% { opacity:1; box-shadow:0 0 9px #10b981; } }
+  .lang-btn {
+    background:rgba(0,105,92,.08); border:1px solid rgba(0,105,92,.22); color:var(--teal);
+    border-radius:var(--radius-sm); padding:7px 16px; font-size:.85rem; font-weight:600;
+    cursor:pointer; font-family:inherit; transition:background .2s,transform .2s;
+  }
+  .lang-btn:hover { background:rgba(0,105,92,.15); transform:translateY(-1px); }
+
+  /* Bento grid */
+  .grid { display:grid; grid-template-columns:repeat(4,1fr); gap:20px; }
+  .span-2 { grid-column:span 2; }
+  .span-4 { grid-column:span 4; }
+
+  .card {
+    background:var(--surface); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
+    border:1px solid var(--border); border-radius:var(--radius-xl); padding:26px;
+    position:relative; overflow:hidden;
+    transition:transform .35s cubic-bezier(.175,.885,.32,1.275), background .3s ease, box-shadow .3s ease, border-color .3s ease;
+    animation:slideUp .6s cubic-bezier(.16,1,.3,1) both;
+  }
+  .card:hover { background:var(--surface-hover); box-shadow:0 22px 44px rgba(16,40,36,.08); border-color:rgba(13,147,115,.25); }
+  @keyframes slideUp { from { opacity:0; transform:translateY(22px); } to { opacity:1; transform:translateY(0); } }
+  .card:nth-child(1){animation-delay:.05s} .card:nth-child(2){animation-delay:.1s}
+  .card:nth-child(3){animation-delay:.15s} .card:nth-child(4){animation-delay:.2s}
+  .card:nth-child(5){animation-delay:.25s} .card:nth-child(6){animation-delay:.3s}
+  .card:nth-child(7){animation-delay:.35s} .card:nth-child(8){animation-delay:.4s}
+  .card:nth-child(9){animation-delay:.45s}
+
+  .eyebrow { display:inline-block; font-size:.72rem; font-weight:600; text-transform:uppercase; letter-spacing:.1em; color:var(--muted); margin-bottom:14px; }
+  .gradient { background:linear-gradient(135deg,var(--teal),var(--teal-bright)); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+
+  /* Hero */
+  .hero { display:flex; flex-direction:column; justify-content:center; }
+  .hero .pill { display:inline-block; align-self:flex-start; padding:5px 14px; border-radius:var(--radius-sm); background:rgba(0,105,92,.1); color:var(--teal); font-size:.78rem; font-weight:600; margin-bottom:16px; }
+  .hero h1 { font-size:2.7rem; font-weight:700; line-height:1.08; letter-spacing:-.02em; }
+  .hero .sub { font-size:1.18rem; font-weight:600; margin-top:8px; }
+  .hero p.tag { color:var(--muted); margin-top:14px; font-size:1.02rem; max-width:34em; }
+  .cta { display:inline-flex; align-items:center; gap:9px; align-self:flex-start; margin-top:24px;
+    background:var(--teal); color:#fff; font-weight:600; font-size:1.05rem; padding:14px 30px;
+    border-radius:var(--radius-lg); text-decoration:none; transition:transform .2s,box-shadow .2s,background .2s; }
+  .cta:hover { transform:translateY(-2px); background:var(--teal-dark); box-shadow:0 12px 26px rgba(0,105,92,.32); }
+  .trust { margin-top:14px; font-size:.85rem; color:var(--muted); }
+
+  /* Screenshot showcase */
+  .shots { display:flex; align-items:center; justify-content:center; gap:18px; height:100%; min-height:340px; flex-wrap:wrap; }
+  .shots img { height:330px; max-width:46%; object-fit:contain; border-radius:20px;
+    box-shadow:0 18px 40px rgba(16,40,36,.18); border:1px solid rgba(255,255,255,.6); }
+
+  /* Promise cards */
+  .promise { display:flex; flex-direction:column; }
+  .icon-badge { width:46px; height:46px; border-radius:14px; display:flex; align-items:center; justify-content:center;
+    background:rgba(0,105,92,.1); color:var(--teal); margin-bottom:14px; }
+  .icon-badge svg { width:24px; height:24px; }
+  .card h3 { font-size:1.15rem; font-weight:600; line-height:1.3; margin-bottom:6px; }
+  .card h2 { font-size:1.45rem; font-weight:700; letter-spacing:-.01em; margin-bottom:14px; }
+  .card p { color:var(--ink); }
+  .promise p { color:var(--muted); font-size:.97rem; }
+
+  /* Timeline (how it works) */
+  .timeline { display:flex; flex-direction:column; gap:18px; margin-top:4px; }
+  .tl-item { position:relative; padding-left:26px; }
+  .tl-item::before { content:""; position:absolute; left:0; top:6px; width:11px; height:11px; border-radius:50%; background:var(--teal); box-shadow:0 0 0 4px rgba(0,105,92,.12); }
+  .tl-item:not(:last-child)::after { content:""; position:absolute; left:5px; top:16px; bottom:-18px; width:2px; background:var(--border); }
+  .tl-item b { color:var(--teal-dark); }
+
+  /* Numbered steps (install) */
+  .steps { display:flex; flex-direction:column; gap:16px; margin-top:4px; counter-reset:step; }
+  .step { display:flex; gap:14px; align-items:flex-start; }
+  .step-num { flex:none; width:30px; height:30px; border-radius:50%; background:var(--teal); color:#fff;
+    font-weight:700; font-size:.95rem; display:flex; align-items:center; justify-content:center; }
+
+  /* Disclaimer */
+  .disclaimer { background:rgba(255,247,237,.8); border-color:rgba(245,158,11,.35); }
+  .disclaimer .eyebrow { color:var(--amber); }
+  .disclaimer b { color:var(--danger); }
+
+  /* Footer */
+  footer { text-align:center; color:var(--muted); font-size:.9rem; padding:34px 0 46px; }
+  footer a { color:var(--teal-dark); text-decoration:none; }
+  footer a:hover { text-decoration:underline; }
+
+  /* Responsive */
+  @media (max-width:1024px) { .grid { grid-template-columns:repeat(2,1fr); } .span-4 { grid-column:span 2; } .hero h1 { font-size:2.3rem; } }
+  @media (max-width:640px) {
+    .grid { grid-template-columns:1fr; } .span-2,.span-4 { grid-column:span 1; }
+    .wrap { padding:16px 14px 0; } .card { padding:22px; }
+    .hero h1 { font-size:2.05rem; } .shots img { height:300px; }
+    .topbar { flex-direction:column; align-items:flex-start; gap:10px; }
+  }
+
+  /* Respect reduced-motion: no blobs, no entrance, no tilt */
+  @media (prefers-reduced-motion:reduce) {
+    .blob { animation:none; } .card { animation:none; } .dot { animation:none; }
+    html { scroll-behavior:auto; }
+  }
 </style>
 </head>
 <body>
 
-<header>
-  <div class="lang-toggle">
-    <button id="langBtn" onclick="toggleLang()">हिन्दी</button>
-  </div>
-  <div class="wrap">
-    <h1>🛡️ Saavdhan</h1>
-    <div class="hindi">सावधान — "be alert"</div>
-    <p class="tag">
-      <span class="en">A free, fully-offline Android app that finds scam &amp; spyware apps on your phone,
-      explains the danger in plain <b>Hindi or English</b>, and walks you through removing them — one
-      calm step at a time.</span>
-      <span class="hi">एक मुफ़्त, पूरी तरह ऑफ़लाइन Android ऐप — जो आपके फ़ोन में स्कैम और जासूसी ऐप्स ढूँढता है, खतरे को आसान भाषा में समझाता है, और बिना घबराए एक-एक कदम पर उन्हें हटाने में आपकी मदद करता है।</span>
-    </p>
-    <a class="btn" href="https://github.com/kalpitt/saavdhan/releases/latest/download/saavdhan.apk">
-      <span class="en">⬇ Download APK (free)</span>
-      <span class="hi">⬇ APK डाउनलोड करें (मुफ़्त)</span>
-    </a>
-    <div class="note">
-      <span class="en">Android 7.0+ · no account · no ads · no internet permission</span>
-      <span class="hi">Android 7.0+ · कोई अकाउंट नहीं · कोई विज्ञापन नहीं · इंटरनेट की परमिशन नहीं</span>
-    </div>
-  </div>
-</header>
+<div class="mesh-bg"><div class="blob blob-1"></div><div class="blob blob-2"></div><div class="blob blob-3"></div></div>
 
 <div class="wrap">
 
-<section>
-  <h2>
-    <span class="en">Why it exists</span>
-    <span class="hi">इसे क्यों बनाया गया?</span>
-  </h2>
-  <p>
-    <span class="en">Scam APKs spread on WhatsApp disguised as wedding invitations, courier updates, KYC notices, or
-    electricity bills. One install sideloads banking spyware that reads OTPs and drains accounts — and
-    resists being removed. Saavdhan finds these apps, explains what they can do, and takes you straight
-    to the exact Settings screen to fix it.</span>
-    <span class="hi">WhatsApp पर शादी के कार्ड, कूरियर अपडेट, KYC नोटिस या बिजली बिल के बहाने स्कैम ऐप्स फैलाए जाते हैं। एक बार install होने पर ये आपके फोन में ऐसा बैंकिंग स्पाईवेयर (जासूसी ऐप) डाल देते हैं जो आपके OTP पढ़ लेता है और बैंक खाता खाली कर देता है — और इन्हें डिलीट करना भी बहुत मुश्किल होता है। 'सावधान' ऐसे ऐप्स को ढूँढता है, बताता है कि इनसे क्या नुकसान हो सकता है, और उन्हें हटाने के लिए आपको सीधे सही Settings स्क्रीन पर ले जाता है।</span>
-  </p>
-</section>
-
-<section>
-  <h2>
-    <span class="en">The promises that never change</span>
-    <span class="hi">हमारे वादे जो कभी नहीं बदलेंगे</span>
-  </h2>
-  <div class="cards">
-    <div class="card">
-      <span class="en"><b>Fully offline.</b> The app does not hold the INTERNET permission, so the operating system makes any network call impossible. Your data has nowhere to go.</span>
-      <span class="hi"><b>पूरी तरह ऑफ़लाइन।</b> इस ऐप के पास INTERNET की परमिशन नहीं है, इसलिए फोन का सिस्टम इसके लिए इंटरनेट से जुड़ना नामुमकिन कर देता है। आपका डेटा कहीं बाहर जा ही नहीं सकता।</span>
+  <header class="topbar">
+    <div class="brand"><img src="./favicon.svg" alt=""> Saavdhan</div>
+    <div class="topbar-right">
+      <div class="status-chip">
+        <span class="dot"></span>
+        <span class="en">Fully offline</span><span class="hi">पूरी तरह ऑफ़लाइन</span>
+      </div>
+      <button id="langBtn" class="lang-btn" onclick="toggleLang()">हिन्दी</button>
     </div>
-    <div class="card">
-      <span class="en"><b>Detective + guide, not enforcer.</b> Android only lets <i>you</i> turn off another app's powers — so Saavdhan takes you to the right screen and coaches the final tap. It never fakes an "auto-fix".</span>
-      <span class="hi"><b>डिटेक्टिव और गाइड, कोई ज़बरदस्ती नहीं।</b> Android में सिर्फ़ आप ही किसी दूसरे ऐप की परमिशन बंद कर सकते हैं — इसलिए 'सावधान' आपको सही स्क्रीन पर ले जाकर आखिरी कदम उठाने में मदद करता है। यह कभी झूठा "ऑटो-फिक्स" (अपने आप ठीक करने का दावा) नहीं करता।</span>
-    </div>
-    <div class="card">
-      <span class="en"><b>Explainable, not magic.</b> Every verdict lists its reasons in plain words. No black-box AI.</span>
-      <span class="hi"><b>सब कुछ साफ-साफ समझाता है, कोई जादू नहीं।</b> हर फैसले का कारण आपको बिल्कुल आसान भाषा में बताया जाता है। इसमें कोई छुपा हुआ (ब्लैक-बॉक्स) AI नहीं है।</span>
-    </div>
-    <div class="card">
-      <span class="en"><b>Calm under panic.</b> Big buttons, simple language, one clear step at a time — in हिन्दी or English.</span>
-      <span class="hi"><b>घबराहट के वक्त भी शांत।</b> बड़े बटन, आसान भाषा, और एक बार में सिर्फ एक साफ कदम — हिन्दी या English में।</span>
-    </div>
-  </div>
-</section>
+  </header>
 
-<section>
-  <h2>
-    <span class="en">How it works</span>
-    <span class="hi">यह कैसे काम करता है?</span>
-  </h2>
-  <ol class="steps">
-    <li>
-      <span class="en"><b>Scan</b> — reads public, no-root signals about each installed app: Accessibility, Device Admin, SMS access, sideloading, hidden icons, fake system names.</span>
-      <span class="hi"><b>स्कैन (Scan)</b> — बिना root किए आपके हर installed ऐप की बेसिक जानकारी पढ़ता है: जैसे Accessibility, Device Admin, SMS access, बाहर से डाउनलोड (sideloading), छुपे हुए आइकॉन और नकली सिस्टम के नाम।</span>
-    </li>
-    <li>
-      <span class="en"><b>Explain</b> — a deterministic, fully-tested rule engine turns those signals into a risk level with reasons in plain language.</span>
-      <span class="hi"><b>समझाना (Explain)</b> — एक पूरी तरह से टेस्ट किया गया सिस्टम इन जानकारियों के आधार पर खतरे का स्तर तय करता है और इसके कारण आपको बिल्कुल आसान भाषा में समझाता है।</span>
-    </li>
-    <li>
-      <span class="en"><b>Guide</b> — a reactive checklist (isolate → strip powers → uninstall → secure accounts) that ticks itself off as you complete each step, plus a background watchdog that warns about new threats.</span>
-      <span class="hi"><b>गाइड (Guide)</b> — एक स्मार्ट चेकलिस्ट (ऐप को अलग करें → परमिशन हटाएँ → uninstall करें → खाते सुरक्षित करें) जो हर कदम पूरा होने पर खुद-ब-खुद टिक हो जाती है। साथ ही, बैकग्राउंड में चलने वाला एक वॉचडॉग (पहरेदार) जो नए खतरों की चेतावनी देता है।</span>
-    </li>
-  </ol>
-</section>
+  <main class="grid">
 
-<section>
-  <div class="disclaimer">
-    <span class="en"><b>Honest disclaimer.</b> Saavdhan is a defensive aid, not a guarantee. It uses
-    behavioural heuristics (not a malware database), so it can raise false alarms and can miss brand-new
-    threats. It guides you — it never silently changes or deletes anything. If money has already been
-    stolen, contact your bank and cyber-crime authorities (in India: call <b>1930</b> / cybercrime.gov.in).</span>
-    <span class="hi"><b>एक ज़रूरी और सच्ची बात।</b> सावधान आपकी सुरक्षा के लिए एक मदद है, कोई गारंटी नहीं। यह ऐप्स के व्यवहार (behaviour) को देखकर काम करता है, किसी मैलवेयर डेटाबेस से नहीं। इसलिए हो सकता है कि यह कभी-कभी सुरक्षित ऐप पर भी अलार्म दे दे, या बिल्कुल नए किस्म के खतरों को न पहचान पाए। यह सिर्फ आपको रास्ता दिखाता है — आपके फोन में चुपचाप कुछ भी बदलता या डिलीट नहीं करता। अगर आपके पैसे पहले ही चोरी हो चुके हैं, तो तुरंत अपने बैंक और साइबर क्राइम पुलिस से संपर्क करें (भारत में: <b>1930</b> डायल करें या cybercrime.gov.in पर जाएँ)।</span>
-  </div>
-</section>
+    <!-- Hero -->
+    <section class="card hero span-2">
+      <span class="pill">🛡️ <span class="en">Free · Offline · Open source</span><span class="hi">मुफ़्त · ऑफ़लाइन · ओपन सोर्स</span></span>
+      <h1><span class="gradient">Saavdhan</span></h1>
+      <div class="sub">सावधान — <span class="en">"be alert"</span><span class="hi">"सतर्क रहें"</span></div>
+      <p class="tag">
+        <span class="en">A free, fully-offline Android app that finds scam &amp; spyware apps on your phone, explains the danger in plain <b>Hindi or English</b>, and walks you through removing them — one calm step at a time.</span>
+        <span class="hi">एक मुफ़्त, पूरी तरह ऑफ़लाइन Android ऐप — जो आपके फ़ोन में स्कैम और जासूसी ऐप्स ढूँढता है, खतरे को आसान भाषा में समझाता है, और बिना घबराए एक-एक कदम पर उन्हें हटाने में आपकी मदद करता है।</span>
+      </p>
+      <a class="cta" href="https://github.com/kalpitt/saavdhan/releases/latest/download/saavdhan.apk">
+        <span class="en">⬇ Download APK (free)</span><span class="hi">⬇ APK डाउनलोड करें (मुफ़्त)</span>
+      </a>
+      <div class="trust">
+        <span class="en">Android 7.0+ · no account · no ads · no internet permission</span>
+        <span class="hi">Android 7.0+ · कोई अकाउंट नहीं · कोई विज्ञापन नहीं · इंटरनेट की परमिशन नहीं</span>
+      </div>
+    </section>
 
-<section>
-  <h2>
-    <span class="en">Install (2 minutes)</span>
-    <span class="hi">इंस्टॉल करें (2 मिनट में)</span>
-  </h2>
-  <ol class="steps">
-    <li>
-      <span class="en">Download the APK from the button above on the phone you want to protect.</span>
-      <span class="hi">जिस फ़ोन को सुरक्षित करना है, उस पर ऊपर दिए बटन से APK डाउनलोड करें।</span>
-    </li>
-    <li>
-      <span class="en">Open the downloaded file. If asked, allow your browser to install apps — Android will warn because the app is not from the Play Store; that warning is normal for direct downloads.</span>
-      <span class="hi">डाउनलोड की गई फ़ाइल को खोलें। अगर पूछा जाए, तो अपने ब्राउज़र को ऐप install करने की परमिशन दें — Android आपको चेतावनी देगा क्योंकि यह ऐप Play Store से नहीं है; सीधे डाउनलोड किए गए ऐप्स के लिए यह चेतावनी आना एकदम नॉर्मल है।</span>
-    </li>
-    <li>
-      <span class="en">Open Saavdhan, pick your language, and tap <b>Scan my phone</b>.</span>
-      <span class="hi">सावधान खोलें, अपनी भाषा चुनें, और <b>'मेरा फ़ोन स्कैन करें' (Scan my phone)</b> पर टैप करें।</span>
-    </li>
-  </ol>
-</section>
+    <!-- Screenshot showcase -->
+    <section class="card span-2">
+      <div class="shots">
+        <img src="./screenshots/04-detail-critical.png" alt="" loading="lazy">
+        <img src="./screenshots/03-results.png" alt="" loading="lazy">
+      </div>
+    </section>
+
+    <!-- Why it exists -->
+    <section class="card span-4">
+      <span class="eyebrow"><span class="en">Why it exists</span><span class="hi">इसे क्यों बनाया गया?</span></span>
+      <p>
+        <span class="en">Scam APKs spread on WhatsApp disguised as wedding invitations, courier updates, KYC notices, or electricity bills. One install sideloads banking spyware that reads OTPs and drains accounts — and resists being removed. Saavdhan finds these apps, explains what they can do, and takes you straight to the exact Settings screen to fix it.</span>
+        <span class="hi">WhatsApp पर शादी के कार्ड, कूरियर अपडेट, KYC नोटिस या बिजली बिल के बहाने स्कैम ऐप्स फैलाए जाते हैं। एक बार install होने पर ये आपके फोन में ऐसा बैंकिंग स्पाईवेयर (जासूसी ऐप) डाल देते हैं जो आपके OTP पढ़ लेता है और बैंक खाता खाली कर देता है — और इन्हें डिलीट करना भी बहुत मुश्किल होता है। 'सावधान' ऐसे ऐप्स को ढूँढता है, बताता है कि इनसे क्या नुकसान हो सकता है, और उन्हें हटाने के लिए आपको सीधे सही Settings स्क्रीन पर ले जाता है।</span>
+      </p>
+    </section>
+
+    <!-- Promises (2x2) -->
+    <section class="card promise span-2">
+      <div class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg></div>
+      <h3><span class="en">Fully offline</span><span class="hi">पूरी तरह ऑफ़लाइन</span></h3>
+      <p>
+        <span class="en">The app does not hold the INTERNET permission, so the operating system makes any network call impossible. Your data has nowhere to go.</span>
+        <span class="hi">इस ऐप के पास INTERNET की परमिशन नहीं है, इसलिए फोन का सिस्टम इसके लिए इंटरनेट से जुड़ना नामुमकिन कर देता है। आपका डेटा कहीं बाहर जा ही नहीं सकता।</span>
+      </p>
+    </section>
+
+    <section class="card promise span-2">
+      <div class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg></div>
+      <h3><span class="en">Detective + guide, not enforcer</span><span class="hi">डिटेक्टिव और गाइड, कोई ज़बरदस्ती नहीं</span></h3>
+      <p>
+        <span class="en">Android only lets <i>you</i> turn off another app's powers — so Saavdhan takes you to the right screen and coaches the final tap. It never fakes an "auto-fix".</span>
+        <span class="hi">Android में सिर्फ़ आप ही किसी दूसरे ऐप की परमिशन बंद कर सकते हैं — इसलिए 'सावधान' आपको सही स्क्रीन पर ले जाकर आखिरी कदम उठाने में मदद करता है। यह कभी झूठा "ऑटो-फिक्स" (अपने आप ठीक करने का दावा) नहीं करता।</span>
+      </p>
+    </section>
+
+    <section class="card promise span-2">
+      <div class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg></div>
+      <h3><span class="en">Explainable, not magic</span><span class="hi">सब कुछ साफ़-साफ़, कोई जादू नहीं</span></h3>
+      <p>
+        <span class="en">Every verdict lists its reasons in plain words. No black-box AI.</span>
+        <span class="hi">हर फैसले का कारण आपको बिल्कुल आसान भाषा में बताया जाता है। इसमें कोई छुपा हुआ (ब्लैक-बॉक्स) AI नहीं है।</span>
+      </p>
+    </section>
+
+    <section class="card promise span-2">
+      <div class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></div>
+      <h3><span class="en">Calm under panic</span><span class="hi">घबराहट के वक्त भी शांत</span></h3>
+      <p>
+        <span class="en">Big buttons, simple language, one clear step at a time — in हिन्दी or English.</span>
+        <span class="hi">बड़े बटन, आसान भाषा, और एक बार में सिर्फ़ एक साफ़ कदम — हिन्दी या English में।</span>
+      </p>
+    </section>
+
+    <!-- How it works -->
+    <section class="card span-2">
+      <span class="eyebrow"><span class="en">How it works</span><span class="hi">यह कैसे काम करता है?</span></span>
+      <div class="timeline">
+        <div class="tl-item">
+          <span class="en"><b>Scan</b> — reads public, no-root signals about each installed app: Accessibility, Device Admin, SMS access, sideloading, hidden icons, fake system names.</span>
+          <span class="hi"><b>स्कैन (Scan)</b> — बिना root किए आपके हर installed ऐप की बेसिक जानकारी पढ़ता है: जैसे Accessibility, Device Admin, SMS access, बाहर से डाउनलोड (sideloading), छुपे हुए आइकॉन और नकली सिस्टम के नाम।</span>
+        </div>
+        <div class="tl-item">
+          <span class="en"><b>Explain</b> — a deterministic, fully-tested rule engine turns those signals into a risk level with reasons in plain language.</span>
+          <span class="hi"><b>समझाना (Explain)</b> — एक पूरी तरह से टेस्ट किया गया सिस्टम इन जानकारियों के आधार पर खतरे का स्तर तय करता है और इसके कारण आपको बिल्कुल आसान भाषा में समझाता है।</span>
+        </div>
+        <div class="tl-item">
+          <span class="en"><b>Guide</b> — a reactive checklist (isolate → strip powers → uninstall → secure accounts) that ticks itself off as you complete each step, plus a background watchdog that warns about new threats.</span>
+          <span class="hi"><b>गाइड (Guide)</b> — एक स्मार्ट चेकलिस्ट (ऐप को अलग करें → परमिशन हटाएँ → uninstall करें → खाते सुरक्षित करें) जो हर कदम पूरा होने पर खुद-ब-खुद टिक हो जाती है। साथ ही, बैकग्राउंड में चलने वाला एक वॉचडॉग (पहरेदार) जो नए खतरों की चेतावनी देता है।</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Install -->
+    <section class="card span-2">
+      <span class="eyebrow"><span class="en">Install (2 minutes)</span><span class="hi">इंस्टॉल करें (2 मिनट में)</span></span>
+      <div class="steps">
+        <div class="step"><span class="step-num">1</span>
+          <span class="en">Download the APK from the button above on the phone you want to protect.</span>
+          <span class="hi">जिस फ़ोन को सुरक्षित करना है, उस पर ऊपर दिए बटन से APK डाउनलोड करें।</span>
+        </div>
+        <div class="step"><span class="step-num">2</span>
+          <span class="en">Open the downloaded file. If asked, allow your browser to install apps — Android will warn because the app is not from the Play Store; that warning is normal for direct downloads.</span>
+          <span class="hi">डाउनलोड की गई फ़ाइल को खोलें। अगर पूछा जाए, तो अपने ब्राउज़र को ऐप install करने की परमिशन दें — Android आपको चेतावनी देगा क्योंकि यह ऐप Play Store से नहीं है; सीधे डाउनलोड किए गए ऐप्स के लिए यह चेतावनी आना एकदम नॉर्मल है।</span>
+        </div>
+        <div class="step"><span class="step-num">3</span>
+          <span class="en">Open Saavdhan, pick your language, and tap <b>Scan my phone</b>.</span>
+          <span class="hi">सावधान खोलें, अपनी भाषा चुनें, और <b>'मेरा फ़ोन स्कैन करें' (Scan my phone)</b> पर टैप करें।</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Honest disclaimer -->
+    <section class="card disclaimer span-4">
+      <span class="eyebrow"><span class="en">Honest disclaimer</span><span class="hi">एक ज़रूरी और सच्ची बात</span></span>
+      <p>
+        <span class="en">Saavdhan is a defensive aid, not a guarantee. It uses behavioural heuristics (not a malware database), so it can raise false alarms and can miss brand-new threats. It guides you — it never silently changes or deletes anything. If money has already been stolen, contact your bank and cyber-crime authorities (in India: call <b>1930</b> / cybercrime.gov.in).</span>
+        <span class="hi">सावधान आपकी सुरक्षा के लिए एक मदद है, कोई गारंटी नहीं। यह ऐप्स के व्यवहार (behaviour) को देखकर काम करता है, किसी मैलवेयर डेटाबेस से नहीं। इसलिए हो सकता है कि यह कभी-कभी सुरक्षित ऐप पर भी अलार्म दे दे, या बिल्कुल नए किस्म के खतरों को न पहचान पाए। यह सिर्फ़ आपको रास्ता दिखाता है — आपके फोन में चुपचाप कुछ भी बदलता या डिलीट नहीं करता। अगर आपके पैसे पहले ही चोरी हो चुके हैं, तो तुरंत अपने बैंक और साइबर क्राइम पुलिस से संपर्क करें (भारत में: <b>1930</b> डायल करें या cybercrime.gov.in पर जाएँ)।</span>
+      </p>
+    </section>
+
+  </main>
+
+  <footer>
+    <span class="en">Free &amp; open source under the MIT license ·
+      <a href="https://github.com/kalpitt/saavdhan">Source code on GitHub</a> ·
+      <a href="https://github.com/kalpitt/saavdhan/issues">Report a problem</a> ·
+      <a href="./privacy.html">Privacy policy</a></span>
+    <span class="hi">MIT लाइसेंस के तहत मुफ़्त और ओपन सोर्स ·
+      <a href="https://github.com/kalpitt/saavdhan">GitHub पर सोर्स कोड</a> ·
+      <a href="https://github.com/kalpitt/saavdhan/issues">समस्या रिपोर्ट करें</a> ·
+      <a href="./privacy.html">प्राइवेसी पॉलिसी</a></span>
+    <br>© 2026 Kalpit Tiwari <span class="en">and the Saavdhan contributors</span><span class="hi">और सावधान योगदानकर्ता</span>
+  </footer>
 
 </div>
-
-<footer>
-  <div class="wrap">
-    <span class="en">Free &amp; open source under the MIT license ·
-    <a href="https://github.com/kalpitt/saavdhan">Source code on GitHub</a> ·
-    <a href="https://github.com/kalpitt/saavdhan/issues">Report a problem</a> ·
-    <a href="./privacy.html">Privacy policy</a></span>
-    <span class="hi">MIT लाइसेंस के तहत मुफ़्त और ओपन सोर्स ·
-    <a href="https://github.com/kalpitt/saavdhan">GitHub पर सोर्स कोड</a> ·
-    <a href="https://github.com/kalpitt/saavdhan/issues">समस्या रिपोर्ट करें</a> ·
-    <a href="./privacy.html">प्राइवेसी पॉलिसी</a></span>
-    <br>© 2026 Kalpit Tiwari and the Saavdhan contributors
-  </div>
-</footer>
 
 <script>
 function toggleLang() {
@@ -183,6 +343,23 @@ function toggleLang() {
   localStorage.setItem('lang', l);
 }
 document.getElementById('langBtn').textContent = document.documentElement.lang === 'hi' ? 'EN' : 'हिन्दी';
+
+// Subtle 3D tilt on pointer devices only — kept gentle to stay "calm". Skipped for touch
+// and for users who prefer reduced motion.
+(function(){
+  var fine = window.matchMedia('(hover:hover) and (pointer:fine)').matches;
+  var reduce = window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  if (!fine || reduce) return;
+  document.querySelectorAll('.card').forEach(function(card){
+    card.addEventListener('mousemove', function(e){
+      var r = card.getBoundingClientRect();
+      var rx = ((e.clientY - r.top) / r.height - .5) * -3;
+      var ry = ((e.clientX - r.left) / r.width - .5) * 3;
+      card.style.transform = 'perspective(1000px) rotateX(' + rx + 'deg) rotateY(' + ry + 'deg) translateY(-5px)';
+    });
+    card.addEventListener('mouseleave', function(){ card.style.transform = ''; });
+  });
+})();
 </script>
 
 </body>
