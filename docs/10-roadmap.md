@@ -93,6 +93,9 @@ A living plan. Checked = done; unchecked = planned. Order within a phase is roug
       use the family testers) → production
 - [x] v0.3.0 release: visual-hierarchy redesign shipped; landing-page button flipped to direct
       `releases/latest/download/saavdhan.apk` URL (stable forever)
+- [x] Public site redesign: landing + privacy pages restyled to the "AI Glass Bento" design from
+      the [kalpit.me](https://kalpit.me) portfolio (glass cards, green mesh, self-hosted Inter,
+      screenshot showcase) — brand teal kept, bilingual + zero-build preserved
 - [ ] F-Droid submission evaluation (community store; builds from source — independently
       verifies the offline promise)
 - [ ] Dependency bumps (Compose BOM / AGP / Kotlin) — deferred; do with an emulator pass
