@@ -48,13 +48,11 @@
     border:1px solid var(--border); border-radius:var(--radius-xl);
   }
   .brand { display:flex; align-items:center; gap:10px; font-weight:700; font-size:1.15rem; letter-spacing:-.01em; text-decoration:none; color:var(--ink); }
-  .brand img { width:30px; height:30px; }
-  .lang-btn {
-    background:rgba(0,105,92,.08); border:1px solid rgba(0,105,92,.22); color:var(--teal);
-    border-radius:var(--radius-sm); padding:7px 16px; font-size:.85rem; font-weight:600;
-    cursor:pointer; font-family:inherit; transition:background .2s,transform .2s;
-  }
-  .lang-btn:hover { background:rgba(0,105,92,.15); transform:translateY(-1px); }
+  .brand svg.logo { width:30px; height:30px; flex:none; }
+  .lang-switch { display:inline-flex; gap:2px; padding:3px; background:rgba(0,105,92,.07); border:1px solid rgba(0,105,92,.18); border-radius:var(--radius-sm); }
+  .lang-opt { border:0; background:transparent; color:var(--muted); font-family:inherit; font-size:.82rem; font-weight:600; padding:6px 12px; border-radius:7px; cursor:pointer; white-space:nowrap; transition:background .2s,color .2s; }
+  .lang-opt[aria-pressed="true"] { background:var(--teal); color:#fff; }
+  .lang-opt[aria-pressed="false"]:hover { color:var(--teal); }
 
   .doc { display:flex; flex-direction:column; gap:18px; }
   .card {
@@ -88,7 +86,7 @@
   footer a { color:var(--teal-dark); text-decoration:none; }
   footer a:hover { text-decoration:underline; }
 
-  @media (max-width:640px) { .wrap { padding:16px 14px 0; } .card { padding:22px; } .hero h1 { font-size:1.6rem; } .topbar { flex-direction:column; align-items:flex-start; gap:10px; } }
+  @media (max-width:640px) { .wrap { padding:16px 14px 0; } .card { padding:22px; } .hero h1 { font-size:1.6rem; } }
   @media (prefers-reduced-motion:reduce) { .blob{animation:none} .card{animation:none} }
 </style>
 </head>
@@ -99,8 +97,11 @@
 <div class="wrap">
 
   <header class="topbar">
-    <a class="brand" href="./index.html"><img src="./favicon.svg" alt=""> Saavdhan</a>
-    <button id="langBtn" class="lang-btn" onclick="toggleLang()">हिन्दी</button>
+    <a class="brand" href="./index.html"><svg class="logo" viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path fill="#00695C" d="M0,24C0,10.745 10.745,0 24,0h60c13.255,0 24,10.745 24,24v60c0,13.255-10.745,24-24,24H24C10.745,108 0,97.255 0,84z"/><g transform="translate(18,18) scale(3)"><path fill="#fff" d="M12,1L3,5v6c0,5.55 3.84,10.74 9,12 5.16-1.26 9-6.45 9-12V5L12,1zM10,17l-4-4 1.41-1.41L10,14.17l6.59-6.59L18,9l-8,8z"/></g></svg> Saavdhan</a>
+    <div class="lang-switch" role="group" aria-label="Language / भाषा">
+      <button type="button" class="lang-opt" data-lang="en">English</button>
+      <button type="button" class="lang-opt" data-lang="hi">हिन्दी</button>
+    </div>
   </header>
 
   <div class="doc">
@@ -205,13 +206,13 @@
 </div>
 
 <script>
-function toggleLang() {
-  var l = document.documentElement.lang === 'hi' ? 'en' : 'hi';
+function setLang(l) {
   document.documentElement.lang = l;
-  document.getElementById('langBtn').textContent = l === 'hi' ? 'EN' : 'हिन्दी';
   localStorage.setItem('lang', l);
+  document.querySelectorAll('.lang-opt').forEach(function(b){ b.setAttribute('aria-pressed', String(b.dataset.lang === l)); });
 }
-document.getElementById('langBtn').textContent = document.documentElement.lang === 'hi' ? 'EN' : 'हिन्दी';
+document.querySelectorAll('.lang-opt').forEach(function(b){ b.addEventListener('click', function(){ setLang(b.dataset.lang); }); });
+setLang(document.documentElement.lang === 'hi' ? 'hi' : 'en');
 </script>
 
 </body>
