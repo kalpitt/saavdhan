@@ -1,7 +1,7 @@
 # 10 — Roadmap
 
 A living plan. Checked = done; unchecked = planned. Order within a phase is rough priority.
-**Last synced:** 2026-06-13 after the first family-feedback round. See [`context/STATE.md`](../context/STATE.md) for "now".
+**Last synced:** 2026-06-13 after v0.3.0 release. See [`context/STATE.md`](../context/STATE.md) for "now".
 
 ## Phase 1 — Scanner core ✅ Complete
 
@@ -91,8 +91,8 @@ A living plan. Checked = done; unchecked = planned. Order within a phase is roug
       bilingual listing copy, policy declarations all ready: [`11-play-store-prep.md`](11-play-store-prep.md)
 - [ ] Play Store execution (human): $25 dev account → closed test (12 testers × 14 days —
       use the family testers) → production
-- [ ] v0.3.0 release, then flip the landing-page button to the direct
-      `releases/latest/download/saavdhan.apk` URL (TODO comment in `index.html`)
+- [x] v0.3.0 release: visual-hierarchy redesign shipped; landing-page button flipped to direct
+      `releases/latest/download/saavdhan.apk` URL (stable forever)
 - [ ] F-Droid submission evaluation (community store; builds from source — independently
       verifies the offline promise)
 - [ ] Dependency bumps (Compose BOM / AGP / Kotlin) — deferred; do with an emulator pass
