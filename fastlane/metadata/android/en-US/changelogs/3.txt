@@ -1,5 +1,0 @@
-v0.3.0
-* Clearer threat screen: a "What to do now" card guides you straight to the fix.
-* Numbered, step-by-step guided cleanup with a "Step N of M" counter.
-* Risk-coloured result cards, scariest first.
-* Still fully offline — the app holds no INTERNET permission.

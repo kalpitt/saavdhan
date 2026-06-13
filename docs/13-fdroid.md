@@ -35,7 +35,7 @@ fastlane/metadata/android/<locale>/
 ├── title.txt                      # "Saavdhan" / "सावधान"
 ├── short_description.txt           # ≤80-char summary
 ├── full_description.txt            # the store description
-├── changelogs/3.txt                # notes for versionCode 3 (v0.3.0)
+├── changelogs/4.txt                # notes for versionCode 4 (v0.4.0)
 └── images/phoneScreenshots/*.png   # from the emulator (EN: home/results/detail/cleanup; HI: results/language)
 ```
 
@@ -61,17 +61,17 @@ RepoType: git
 Repo: https://github.com/kalpitt/saavdhan.git
 
 Builds:
-  - versionName: 0.3.0
-    versionCode: 3
-    commit: v0.3.0
+  - versionName: 0.4.0
+    versionCode: 4
+    commit: v0.4.0
     subdir: app
     gradle:
       - yes
 
 AutoUpdateMode: Version
 UpdateCheckMode: Tags
-CurrentVersion: 0.3.0
-CurrentVersionCode: 3
+CurrentVersion: 0.4.0
+CurrentVersionCode: 4
 ```
 
 `UpdateCheckMode: Tags` + `AutoUpdateMode: Version` means F-Droid automatically picks up each new
@@ -80,10 +80,10 @@ CurrentVersionCode: 3
 ### Steps
 1. Fork **gitlab.com/fdroid/fdroiddata**.
 2. Add `metadata/com.saavdhan.app.yml` (above).
-3. *(Optional, needs `fdroidserver` + Docker)* dry-run locally: `fdroid build com.saavdhan.app:3`.
+3. *(Optional, needs `fdroidserver` + Docker)* dry-run locally: `fdroid build com.saavdhan.app:4`.
 4. Open a **merge request**. (Alternatively, open a *Request For Packaging* (RFP) issue and let an
    F-Droid maintainer write the recipe — slower, but zero local tooling.)
-5. F-Droid builds from the `v0.3.0` tag on the public mirror, signs it, and publishes to the catalogue.
+5. F-Droid builds from the `v0.4.0` tag on the public mirror, signs it, and publishes to the catalogue.
 
 ## 4. The one caveat to know
 
