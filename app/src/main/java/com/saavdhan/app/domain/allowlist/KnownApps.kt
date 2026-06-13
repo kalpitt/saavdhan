@@ -14,19 +14,42 @@ object KnownApps {
      * Compare using lower-cased, trimmed labels (see [isImpersonating]).
      */
     val IMPERSONATED_LABELS: Map<String, String?> = mapOf(
+        // "Update / system" disguises — no normal user-installed app is ever named these.
         "system update" to null,
+        "system update available" to null,
         "android update" to null,
         "update" to null,
+        "update available" to null,
+        "update now" to null,
+        "update service" to null,
         "software update" to null,
         "system" to null,
         "android system" to null,
         "system service" to null,
+        "system services" to null,
+        "android services" to null,
+        "system notification" to null,
+        "system upgrade" to null,
+        "android upgrade" to null,
+        "phone update" to null,
+        "device update" to null,
+        "firmware update" to null,
+        // "Security" disguises — a favourite of fake "your phone is infected" droppers.
+        "security update" to null,
+        "system security" to null,
+        "android security update" to null,
+        "play protect" to "com.google.android.gms",
+        "google play protect" to "com.google.android.gms",
+        // Real Google/Android components — only their genuine package may carry the name.
         "google play services" to "com.google.android.gms",
         "play services" to "com.google.android.gms",
         "google services" to "com.google.android.gms",
         "google play store" to "com.android.vending",
         "play store" to "com.android.vending",
         "google" to "com.google.android.googlequicksearchbox",
+        "carrier services" to "com.google.android.ims",
+        "android system webview" to "com.google.android.webview",
+        "system webview" to "com.google.android.webview",
         "settings" to "com.android.settings",
         "chrome" to "com.android.chrome"
     )
@@ -65,13 +88,25 @@ object KnownApps {
     /**
      * Returns true if [label] matches a commonly-impersonated name but [packageName] is NOT the
      * real package allowed to use it. System apps are never treated as impersonators.
+     *
+     * Matching is done on a [normalize]d label so that punctuation, emoji, and runs of whitespace
+     * a scammer adds to dodge an exact match ("System  Update!", "System‑Update ⬇️") still resolve
+     * to the same key.
      */
     fun isImpersonating(label: String, packageName: String, isSystemApp: Boolean): Boolean {
         if (isSystemApp) return false
-        val key = label.trim().lowercase()
+        val key = normalize(label)
         if (!IMPERSONATED_LABELS.containsKey(key)) return false
         val realOwner = IMPERSONATED_LABELS[key]
         // null owner -> no app should use this name; otherwise it's only OK if the package matches.
         return realOwner != packageName
     }
+
+    /**
+     * Lower-case, then collapse every run of non-alphanumeric characters (spaces, punctuation,
+     * emoji, separators) into a single space and trim. "  System‑Update! ⬇️ " -> "system update".
+     * Non-Latin labels reduce to "" and simply won't match any (English) impersonation key.
+     */
+    private fun normalize(label: String): String =
+        label.lowercase().replace(Regex("[^a-z0-9]+"), " ").trim()
 }
