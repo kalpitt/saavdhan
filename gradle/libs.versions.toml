@@ -3,14 +3,16 @@
 # long coordinates. Change a version here once and it updates everywhere.
 
 [versions]
-agp = "8.7.3"
-kotlin = "2.0.21"
-coreKtx = "1.13.1"
-lifecycle = "2.8.7"
-activityCompose = "1.9.3"
-composeBom = "2024.12.01"
-navigationCompose = "2.8.5"
-workManager = "2.9.1"
+# AGP 8.9.x needs Gradle 8.11.1+ (the wrapper version) and works with JDK 17–21.
+agp = "8.9.1"
+# Bumping Kotlin also bumps the bundled Compose compiler (kotlin-compose plugin tracks this version).
+kotlin = "2.1.0"
+coreKtx = "1.15.0"
+lifecycle = "2.9.0"
+activityCompose = "1.10.0"
+composeBom = "2025.01.00"
+navigationCompose = "2.8.9"
+workManager = "2.10.0"
 junit = "4.13.2"
 
 [libraries]
