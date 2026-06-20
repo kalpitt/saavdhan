@@ -27,6 +27,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.unit.dp
 import com.saavdhan.app.R
 import com.saavdhan.app.domain.model.RiskLevel
@@ -95,6 +97,12 @@ fun AppDetailScreen(
         // Coaching messages are built here (composable scope) and used inside click lambdas.
         val coachAccessibility = stringResource(R.string.coach_accessibility, item.app.label)
         val coachDeviceAdmin = stringResource(R.string.coach_device_admin, item.app.label)
+        // Screen reader hears the verdict first, then the name — not the package id spelled out.
+        val bannerDescription = stringResource(
+            R.string.cd_risk_summary,
+            stringResource(assessment.level.labelRes()),
+            item.app.label
+        )
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -104,9 +112,12 @@ fun AppDetailScreen(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             // Severity banner — the verdict, name and package in one block tinted by risk colour,
-            // so "how bad is this?" is answered before any reading.
+            // so "how bad is this?" is answered before any reading. For TalkBack we collapse it to a
+            // single verdict-first announcement (the package id below is visual-only).
             Card(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clearAndSetSemantics { contentDescription = bannerDescription },
                 colors = CardDefaults.cardColors(containerColor = levelColor.copy(alpha = 0.12f))
             ) {
                 Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {

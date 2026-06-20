@@ -26,6 +26,9 @@
     <string name="result_found_title_plural">%1$d ऐप्स पर ध्यान देने की ज़रूरत है</string>
     <string name="result_mild_section">शायद ठीक हैं — एक नज़र डाल लें</string>
     <string name="partial_scan_note">यह फ़ोन हमें सीमित जानकारी देखने देता है, इसलिए स्कैन अधूरा हो सकता है।</string>
+    <!-- Screen-reader (TalkBack) descriptions. Lead with the verdict, then the app name. %1$s = risk level, %2$s = app name. -->
+    <string name="cd_risk_summary">%1$s — %2$s</string>
+    <string name="action_see_details">क्या करें देखें</string>
 
     <!-- Risk levels -->
     <string name="risk_critical">बहुत खतरनाक</string>

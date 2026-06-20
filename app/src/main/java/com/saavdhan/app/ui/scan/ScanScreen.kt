@@ -36,6 +36,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.onClick
+import androidx.compose.ui.semantics.role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.saavdhan.app.R
@@ -260,11 +265,25 @@ private fun ResultsContent(
 
 @Composable
 private fun AppRiskCard(item: AssessedApp, onClick: () -> Unit) {
+    // A screen-reader user should hear the verdict FIRST, then the app name, then what tapping does —
+    // not the package id spelled out. We replace the card's merged semantics with one ordered
+    // announcement and a labelled tap action. The sighted layout below is unchanged.
+    val riskLabel = stringResource(item.assessment.level.labelRes())
+    val cardDescription = stringResource(R.string.cd_risk_summary, riskLabel, item.app.label)
+    val seeDetailsLabel = stringResource(R.string.action_see_details)
     // Tint the whole card with the risk colour so a dangerous row never looks like a mild one.
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick),
+            .clickable(onClick = onClick)
+            .clearAndSetSemantics {
+                contentDescription = cardDescription
+                role = Role.Button
+                onClick(label = seeDetailsLabel) {
+                    onClick()
+                    true
+                }
+            },
         colors = CardDefaults.cardColors(
             containerColor = item.assessment.level.color().copy(alpha = 0.10f)
         )

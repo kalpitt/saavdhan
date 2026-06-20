@@ -26,6 +26,10 @@
     <string name="result_found_title_plural">%1$d apps need your attention</string>
     <string name="result_mild_section">Probably fine — worth a quick look</string>
     <string name="partial_scan_note">This phone limits what we can see, so the scan may be incomplete.</string>
+    <!-- Screen-reader (TalkBack) descriptions. Lead with the verdict, then the app name, so a
+         non-sighted user hears how worried to be before the app's name. %1$s = risk level, %2$s = app name. -->
+    <string name="cd_risk_summary">%1$s — %2$s</string>
+    <string name="action_see_details">See what to do</string>
 
     <!-- Risk levels -->
     <string name="risk_critical">Very dangerous</string>
