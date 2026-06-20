@@ -32,9 +32,29 @@ object SettingsDeepLinks {
             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
 
     /** Opens Security settings, where the Device-Admin list lives on most phones. Best available. */
-    fun deviceAdminSettings(): Intent =
-        Intent(Settings.ACTION_SECURITY_SETTINGS)
-            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    fun deviceAdminSettings(): Intent {
+        val manufacturer = android.os.Build.MANUFACTURER.lowercase()
+        val intent = when (manufacturer) {
+            "samsung" -> Intent().setComponent(android.content.ComponentName("com.android.settings", "com.android.settings.Settings\$DeviceAdminSettingsActivity"))
+            "xiaomi", "poco", "redmi" -> Intent().setComponent(android.content.ComponentName("com.android.settings", "com.android.settings.Settings\$DeviceAdminSettingsActivity"))
+            else -> Intent(Settings.ACTION_SECURITY_SETTINGS)
+        }
+        return intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    }
+
+    /** Proprietary background-restriction screens for aggressive OEMs. */
+    fun oemAutoStartSettings(): Intent? {
+        val manufacturer = android.os.Build.MANUFACTURER.lowercase()
+        val component = when (manufacturer) {
+            "xiaomi", "poco", "redmi" -> android.content.ComponentName("com.miui.securitycenter", "com.miui.permcenter.autostart.AutoStartManagementActivity")
+            "oppo" -> android.content.ComponentName("com.coloros.safecenter", "com.coloros.safecenter.startupapp.StartupAppListActivity")
+            "vivo" -> android.content.ComponentName("com.vivo.permissionmanager", "com.vivo.permissionmanager.activity.BgStartUpManagerActivity")
+            "huawei", "honor" -> android.content.ComponentName("com.huawei.systemmanager", "com.huawei.systemmanager.startupmgr.ui.StartupNormalAppListActivity")
+            "samsung" -> android.content.ComponentName("com.samsung.android.sm_cn", "com.samsung.android.sm.ui.ram.AutoRunActivity")
+            else -> null
+        }
+        return component?.let { Intent().setComponent(it).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) }
+    }
 
     /** Opens the Airplane-mode / wireless settings. We cannot toggle it — the user taps it. */
     fun airplaneSettings(): Intent =

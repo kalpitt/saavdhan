@@ -46,7 +46,10 @@ data class ScannedApp(
     val impersonatesSystemApp: Boolean,
 
     /** When the app was first installed, in epoch milliseconds. Used only for "this appeared recently" hints. */
-    val firstInstallTimeMillis: Long
+    val firstInstallTimeMillis: Long,
+
+    /** The SHA-256 hashes of the app's signing certificates. Used to verify trusted developers. */
+    val signatureHashes: Set<String> = emptySet()
 )
 
 /** How an app arrived on the phone. */

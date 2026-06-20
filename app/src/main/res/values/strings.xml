@@ -81,6 +81,11 @@
     <string name="watchdog_last_run">Last background check: %1$s</string>
     <string name="watchdog_never_run">The background check hasn\'t run yet.</string>
 
+    <!-- OEM Background Restrictions -->
+    <string name="settings_oem_warning_title">Background Restrictions</string>
+    <string name="settings_oem_warning_body">Your phone (%1$s) might stop Saavdhan from protecting you in the background. Please allow it to run in the background.</string>
+    <string name="settings_oem_fix_button">Fix Restrictions</string>
+
     <!-- Background watchdog (new-app alerts) -->
     <string name="watchdog_channel_name">Threat alerts</string>
     <string name="watchdog_channel_desc">Warns you when a newly installed app looks dangerous.</string>

@@ -112,6 +112,12 @@ fun SettingsScreen(
                 context = context
             )
 
+            val oemIntent = SettingsDeepLinks.oemAutoStartSettings()
+            if (oemIntent != null) {
+                Spacer(Modifier.height(12.dp))
+                OemWarningCard(context = context, intent = oemIntent)
+            }
+
             Spacer(Modifier.height(12.dp))
             Text(stringResource(R.string.settings_about), style = MaterialTheme.typography.titleLarge)
             InfoCard(text = stringResource(R.string.settings_offline_note))
@@ -169,4 +175,25 @@ private fun BatteryOptimizationCard(isExempt: Boolean, lastRunMillis: Long, cont
         style = MaterialTheme.typography.bodyMedium,
         color = MaterialTheme.colorScheme.onSurfaceVariant
     )
+}
+
+@Composable
+private fun OemWarningCard(context: Context, intent: android.content.Intent) {
+    val manufacturer = android.os.Build.MANUFACTURER.uppercase()
+    Column {
+        Text(
+            stringResource(R.string.settings_oem_warning_title),
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.error
+        )
+        Spacer(Modifier.height(4.dp))
+        InfoCard(text = stringResource(R.string.settings_oem_warning_body, manufacturer))
+        Spacer(Modifier.height(8.dp))
+        PrimaryButton(
+            text = stringResource(R.string.settings_oem_fix_button),
+            onClick = {
+                SettingsDeepLinks.launch(context, intent, SettingsDeepLinks.mainSettings())
+            }
+        )
+    }
 }
