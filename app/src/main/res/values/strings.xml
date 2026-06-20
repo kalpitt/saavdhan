@@ -46,6 +46,7 @@
 
     <!-- App detail -->
     <string name="detail_why_title">Why this looks risky</string>
+    <string name="detail_also_noticed">Also noticed</string>
     <string name="detail_what_title">What this app could do</string>
     <string name="detail_what_critical">This app has the exact powers that banking-scam spyware uses: it can watch your screen, read your OTPs, and stop you from removing it. If you did not install it on purpose, treat it as dangerous and remove it.</string>
     <string name="detail_what_high">This app holds powerful permissions that scam apps often misuse. If you do not clearly recognise and trust it, you should remove it.</string>
