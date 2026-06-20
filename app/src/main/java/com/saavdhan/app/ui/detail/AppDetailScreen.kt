@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import com.saavdhan.app.R
 import com.saavdhan.app.domain.model.RiskLevel
 import com.saavdhan.app.domain.model.RiskSignal
+import com.saavdhan.app.domain.risk.RiskEngine
 import com.saavdhan.app.system.deeplink.SettingsDeepLinks
 import com.saavdhan.app.system.overlay.OverlayCoach
 import com.saavdhan.app.ui.color
@@ -45,6 +46,14 @@ import com.saavdhan.app.ui.explanationRes
 import com.saavdhan.app.ui.labelRes
 import com.saavdhan.app.ui.onColor
 import com.saavdhan.app.ui.scan.ScanViewModel
+
+/**
+ * Signals worth at least this many points are decisive evidence — a dangerous capability the app
+ * holds (Accessibility, Device Admin, hidden icon, reads SMS/notifications), an impersonation, or a
+ * sideloaded origin. Below it sit the soft circumstantial clues (a recent install, an as-yet-ungranted
+ * SMS request) shown under "Also noticed". Matches the weight tiers in RiskEngine.
+ */
+private const val KEY_EVIDENCE_MIN_WEIGHT = 20
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -144,12 +153,36 @@ fun AppDetailScreen(
             Text(stringResource(R.string.detail_what_title), style = MaterialTheme.typography.titleLarge)
             Text(stringResource(assessment.level.explanationRes()), style = MaterialTheme.typography.bodyLarge)
 
-            // Why it looks risky (the specific red flags)
+            // Why it looks risky (the specific red flags). We lead with the engine's most damning
+            // evidence: signals are ranked by the very weights that produced the score
+            // (RiskEngine.weightOf), so the explanation can never disagree with the verdict, and the
+            // smoking gun is never buried beneath a minor clue. When both decisive powers and soft
+            // circumstantial clues are present, we split them so a panicking reader sees the
+            // dangerous capabilities first and the contextual notes ("installed recently") below.
             if (assessment.signals.isNotEmpty()) {
                 Spacer(Modifier.height(12.dp))
                 Text(stringResource(R.string.detail_why_title), style = MaterialTheme.typography.titleLarge)
-                assessment.signals.forEach { signal ->
+                val ranked = assessment.signals.sortedByDescending { RiskEngine.weightOf(it) }
+                val (keyEvidence, alsoNoticed) =
+                    ranked.partition { RiskEngine.weightOf(it) >= KEY_EVIDENCE_MIN_WEIGHT }
+                val showTiers = keyEvidence.isNotEmpty() && alsoNoticed.isNotEmpty()
+                (if (showTiers) keyEvidence else ranked).forEach { signal ->
                     SignalRow(text = stringResource(signal.labelRes()), tint = levelColor)
+                }
+                if (showTiers) {
+                    Spacer(Modifier.height(8.dp))
+                    Text(
+                        stringResource(R.string.detail_also_noticed),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    alsoNoticed.forEach { signal ->
+                        SignalRow(
+                            text = stringResource(signal.labelRes()),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            prominent = false
+                        )
+                    }
                 }
             }
 
