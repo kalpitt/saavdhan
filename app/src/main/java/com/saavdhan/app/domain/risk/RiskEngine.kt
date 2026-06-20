@@ -38,6 +38,11 @@ object RiskEngine {
     private fun isAllowlisted(app: ScannedApp, signals: List<RiskSignal>): Boolean {
         if (app.isSystemApp) return true
 
+        // Absolute Override: If the signature matches a trusted key, trust it unconditionally.
+        if (app.signatureHashes.any { it in KnownApps.TRUSTED_SIGNATURES }) {
+            return true
+        }
+
         // Exact-match trusted packages must also pass a power check for sideloaded impostors
         if (app.packageName in KnownApps.TRUSTED_PACKAGES) {
             if (app.installSource == InstallSource.SIDELOADED &&

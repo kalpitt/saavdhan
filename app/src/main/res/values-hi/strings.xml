@@ -81,6 +81,11 @@
     <string name="watchdog_last_run">पिछली बैकग्राउंड जाँच: %1$s</string>
     <string name="watchdog_never_run">बैकग्राउंड जाँच अभी तक नहीं चली है।</string>
 
+    <!-- OEM Background Restrictions -->
+    <string name="settings_oem_warning_title">बैकग्राउंड प्रतिबंध</string>
+    <string name="settings_oem_warning_body">आपका फ़ोन (%1$s) सावधान को बैकग्राउंड में आपकी सुरक्षा करने से रोक सकता है। कृपया इसे बैकग्राउंड में चलने की अनुमति दें।</string>
+    <string name="settings_oem_fix_button">प्रतिबंध ठीक करें</string>
+
     <!-- Background watchdog (new-app alerts) -->
     <string name="watchdog_channel_name">खतरे की चेतावनी</string>
     <string name="watchdog_channel_desc">जब कोई नया इंस्टॉल किया गया ऐप खतरनाक लगता है तो आपको चेतावनी देता है।</string>
