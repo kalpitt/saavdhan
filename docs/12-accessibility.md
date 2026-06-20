@@ -18,6 +18,7 @@ the edge case.
 | Decorative icons | ✅ All decorative icons (warning triangles, check circle) set `contentDescription = null` so TalkBack skips them and reads the adjacent text; functional icons (back, settings) have proper labels |
 | Hindi (Devanagari) rendering | ✅ Verified on emulator across home, results, detail, cleanup |
 | Colour-only meaning | ✅ Risk is never colour-alone: every level also has a text label (chip) and flagged screens add a warning icon |
+| Screen-reader verdict-first announcement | ✅ **2026-06-21:** each result card and the detail banner expose a single merged semantics node that announces the **verdict first, then the app name** ("Very dangerous — System Update"), and omit the package id (gibberish read aloud). Result cards carry `role = Button` and a labelled "See what to do" click action. Verified by dumping the live accessibility tree (`uiautomator dump`) — see `AppRiskCard` / severity banner. |
 
 ## Contrast (WCAG 1.4.3 / 1.4.11) — measured
 
