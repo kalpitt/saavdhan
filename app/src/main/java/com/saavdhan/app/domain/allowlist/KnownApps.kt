@@ -106,13 +106,50 @@ object KnownApps {
      * a scammer adds to dodge an exact match ("System  Update!", "System‑Update ⬇️") still resolve
      * to the same key.
      */
-    fun isImpersonating(label: String, packageName: String, isSystemApp: Boolean): Boolean {
+    fun isImpersonating(
+        label: String,
+        packageName: String,
+        isSystemApp: Boolean,
+        installSource: com.saavdhan.app.domain.model.InstallSource
+    ): Boolean {
         if (isSystemApp) return false
         val key = normalize(label)
-        if (!IMPERSONATED_LABELS.containsKey(key)) return false
-        val realOwner = IMPERSONATED_LABELS[key]
-        // null owner -> no app should use this name; otherwise it's only OK if the package matches.
-        return realOwner != packageName
+        if (IMPERSONATED_LABELS.containsKey(key)) {
+            val realOwner = IMPERSONATED_LABELS[key]
+            return realOwner != packageName
+        }
+
+        // Run heavy fuzzy matching only for sideloaded apps to save CPU on background scans
+        if (installSource == com.saavdhan.app.domain.model.InstallSource.SIDELOADED && key.length > 4) {
+            for ((impersonated, realOwner) in IMPERSONATED_LABELS) {
+                val maxDistance = if (impersonated.length > 8) 2 else 1
+                if (levenshtein(key, impersonated) <= maxDistance) {
+                    return realOwner != packageName
+                }
+            }
+        }
+        return false
+    }
+
+    private fun levenshtein(s1: String, s2: String): Int {
+        if (s1 == s2) return 0
+        if (s1.isEmpty()) return s2.length
+        if (s2.isEmpty()) return s1.length
+
+        var v0 = IntArray(s2.length + 1) { it }
+        var v1 = IntArray(s2.length + 1)
+
+        for (i in s1.indices) {
+            v1[0] = i + 1
+            for (j in s2.indices) {
+                val cost = if (s1[i] == s2[j]) 0 else 1
+                v1[j + 1] = minOf(v1[j] + 1, v0[j + 1] + 1, v0[j] + cost)
+            }
+            val temp = v0
+            v0 = v1
+            v1 = temp
+        }
+        return v0[s2.length]
     }
 
     /**
