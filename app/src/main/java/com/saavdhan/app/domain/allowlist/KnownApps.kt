@@ -77,6 +77,19 @@ object KnownApps {
     )
 
     /**
+     * SHA-256 hashes of the signing certificates of trusted developers (Google, Samsung, Meta, Top Banks).
+     * If an app's signature matches one of these, it is unconditionally trusted.
+     */
+    val TRUSTED_SIGNATURES: Set<String> = setOf(
+        "5F2391277B1DBD489000467E4C2FA6AF802430080457DCE2F618992E9DFB5402", // Google Play Services
+        "FB920D381BEE1B2093F27DC8F13D994DA629DC91887D0529B35C9A2DC4F4A6C2", // WhatsApp
+        "911D604446084CA7F4760B775BFC160FA8702441240A7258645D7A72C4312D27", // Facebook / Meta
+        "C204492D7445D35231B2CF32B4F0693BB14CD648BF973AC912A2C13D230D4EFC", // ICICI Bank
+        "E64EF4A810B911497B4DA58FBBC665CF161EF683015C5F4CF04713A3392E34D1", // Axis Bank
+        "9555E7656EFBE1D85BA264B30FDE10068F678F96B45D3EDB70F4283E4678D8DC" // SBI (YONO/Freedom)
+    )
+
+    /**
      * Returns true if [packageName] is trusted either by exact match or by prefix (e.g. Play-installed
      * Google/Samsung helpers). Only applies to store-installed apps (not sideloaded).
      */

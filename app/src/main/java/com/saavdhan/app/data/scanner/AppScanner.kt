@@ -110,6 +110,9 @@ class AppScanner(private val context: Context) {
         val label = pm.getApplicationLabel(appInfo).toString()
         val isSystem = isSystemApp(appInfo)
 
+        val hashes = getSignatureHashes(info)
+        android.util.Log.d("SaavdhanScanner", "App: $pkg, Signature Hash: $hashes")
+
         val scanned = ScannedApp(
             packageName = pkg,
             label = label,
@@ -122,7 +125,8 @@ class AppScanner(private val context: Context) {
             hasNotificationListener = pkg in notificationListenerPackages,
             hasHiddenIcon = !isSystem && pm.getLaunchIntentForPackage(pkg) == null,
             impersonatesSystemApp = KnownApps.isImpersonating(label, pkg, isSystem),
-            firstInstallTimeMillis = info.firstInstallTime
+            firstInstallTimeMillis = info.firstInstallTime,
+            signatureHashes = hashes
         )
         return AssessedApp(scanned, RiskEngine.assess(scanned))
     }
@@ -143,21 +147,48 @@ class AppScanner(private val context: Context) {
     private fun installedPackages(): List<PackageInfo> =
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             pm.getInstalledPackages(
-                PackageManager.PackageInfoFlags.of(PackageManager.GET_PERMISSIONS.toLong())
+                PackageManager.PackageInfoFlags.of(PackageManager.GET_PERMISSIONS.toLong() or PackageManager.GET_SIGNING_CERTIFICATES.toLong())
             )
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            pm.getInstalledPackages(PackageManager.GET_PERMISSIONS or PackageManager.GET_SIGNING_CERTIFICATES)
         } else {
-            pm.getInstalledPackages(PackageManager.GET_PERMISSIONS)
+            pm.getInstalledPackages(PackageManager.GET_PERMISSIONS or PackageManager.GET_SIGNATURES)
         }
 
     @Suppress("DEPRECATION")
     private fun packageInfo(packageName: String): PackageInfo? = try {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            pm.getPackageInfo(packageName, PackageManager.PackageInfoFlags.of(PackageManager.GET_PERMISSIONS.toLong()))
+            pm.getPackageInfo(packageName, PackageManager.PackageInfoFlags.of(PackageManager.GET_PERMISSIONS.toLong() or PackageManager.GET_SIGNING_CERTIFICATES.toLong()))
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            pm.getPackageInfo(packageName, PackageManager.GET_PERMISSIONS or PackageManager.GET_SIGNING_CERTIFICATES)
         } else {
-            pm.getPackageInfo(packageName, PackageManager.GET_PERMISSIONS)
+            pm.getPackageInfo(packageName, PackageManager.GET_PERMISSIONS or PackageManager.GET_SIGNATURES)
         }
     } catch (e: PackageManager.NameNotFoundException) {
         null
+    }
+
+    @Suppress("DEPRECATION")
+    private fun getSignatureHashes(info: PackageInfo): Set<String> {
+        val signatures = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            val signingInfo = info.signingInfo
+            if (signingInfo == null) return emptySet()
+            if (signingInfo.hasMultipleSigners()) {
+                signingInfo.apkContentsSigners
+            } else {
+                signingInfo.signingCertificateHistory
+            }
+        } else {
+            info.signatures
+        }
+
+        if (signatures == null) return emptySet()
+
+        val md = java.security.MessageDigest.getInstance("SHA-256")
+        return signatures.map { sig ->
+            val hash = md.digest(sig.toByteArray())
+            hash.joinToString("") { "%02X".format(it) }
+        }.toSet()
     }
 
     private fun enabledAccessibilityPackages(): Set<String> {
