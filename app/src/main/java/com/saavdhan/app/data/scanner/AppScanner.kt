@@ -16,6 +16,8 @@ import com.saavdhan.app.domain.model.InstallSource
 import com.saavdhan.app.domain.model.RiskAssessment
 import com.saavdhan.app.domain.model.ScannedApp
 import com.saavdhan.app.domain.risk.RiskEngine
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 /** One app plus the verdict the brain reached about it. */
 data class AssessedApp(
@@ -42,7 +44,7 @@ class AppScanner(private val context: Context) {
      * exercise). The watchdog passes false: its baseline must contain only REAL packages, or the
      * decoyapp test fixture (same package name as a demo entry) could never alert as "new".
      */
-    fun scan(includeDemoFixtures: Boolean = true): ScanResult {
+    suspend fun scan(includeDemoFixtures: Boolean = true): ScanResult = withContext(Dispatchers.IO) {
         val accessibilityPackages = try {
             enabledAccessibilityPackages()
         } catch (e: Exception) {
@@ -82,17 +84,17 @@ class AppScanner(private val context: Context) {
 
         // Mark as partial if visibility is restricted (Play policy, OEM restrictions, etc.)
         val isPartial = !canQueryAllPackages()
-        return ScanResult(apps = sorted, partial = isPartial)
+        ScanResult(apps = sorted, partial = isPartial)
     }
 
     /**
      * Assess ONE app by package name. Used by the background watchdog when a new app is installed.
      * Returns null if the package can't be read or is our own app.
      */
-    fun assessSingle(packageName: String): AssessedApp? {
-        if (packageName == context.packageName) return null
-        val info = packageInfo(packageName) ?: return null
-        return assessInfo(info, enabledAccessibilityPackages(), activeDeviceAdminPackages(), enabledNotificationListenerPackages(), context.packageName)
+    suspend fun assessSingle(packageName: String): AssessedApp? = withContext(Dispatchers.IO) {
+        if (packageName == context.packageName) return@withContext null
+        val info = packageInfo(packageName) ?: return@withContext null
+        assessInfo(info, enabledAccessibilityPackages(), activeDeviceAdminPackages(), enabledNotificationListenerPackages(), context.packageName)
     }
 
     /** Build the facts for one package and run the brain over them. Shared by full and single scans. */
@@ -109,14 +111,29 @@ class AppScanner(private val context: Context) {
 
         val label = pm.getApplicationLabel(appInfo).toString()
         val isSystem = isSystemApp(appInfo)
+        val src = installSource(pkg)
 
         val hashes = getSignatureHashes(info)
         android.util.Log.d("SaavdhanScanner", "App: $pkg, Signature Hash: $hashes")
 
+        var impersonates = KnownApps.isImpersonating(label, pkg, isSystem, src)
+
+        // Task Affinity hijacking check (only for sideloaded)
+        if (src == InstallSource.SIDELOADED) {
+            info.activities?.forEach { activity ->
+                val affinity = activity.taskAffinity
+                if (affinity != null && affinity != pkg) {
+                    if (affinity.startsWith("com.android.settings") || affinity.contains("bank")) {
+                        impersonates = true
+                    }
+                }
+            }
+        }
+
         val scanned = ScannedApp(
             packageName = pkg,
             label = label,
-            installSource = installSource(pkg),
+            installSource = src,
             isSystemApp = isSystem,
             hasAccessibilityEnabled = pkg in accessibilityPackages,
             isDeviceAdmin = pkg in adminPackages,
@@ -124,7 +141,7 @@ class AppScanner(private val context: Context) {
             smsGranted = smsGranted(info),
             hasNotificationListener = pkg in notificationListenerPackages,
             hasHiddenIcon = !isSystem && pm.getLaunchIntentForPackage(pkg) == null,
-            impersonatesSystemApp = KnownApps.isImpersonating(label, pkg, isSystem),
+            impersonatesSystemApp = impersonates,
             firstInstallTimeMillis = info.firstInstallTime,
             signatureHashes = hashes
         )
@@ -144,25 +161,28 @@ class AppScanner(private val context: Context) {
     }
 
     @Suppress("DEPRECATION")
-    private fun installedPackages(): List<PackageInfo> =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+    private fun installedPackages(): List<PackageInfo> {
+        val flags = PackageManager.GET_PERMISSIONS or PackageManager.GET_SIGNATURES or PackageManager.GET_ACTIVITIES
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             pm.getInstalledPackages(
-                PackageManager.PackageInfoFlags.of(PackageManager.GET_PERMISSIONS.toLong() or PackageManager.GET_SIGNING_CERTIFICATES.toLong())
+                PackageManager.PackageInfoFlags.of(PackageManager.GET_PERMISSIONS.toLong() or PackageManager.GET_SIGNING_CERTIFICATES.toLong() or PackageManager.GET_ACTIVITIES.toLong())
             )
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            pm.getInstalledPackages(PackageManager.GET_PERMISSIONS or PackageManager.GET_SIGNING_CERTIFICATES)
+            pm.getInstalledPackages(PackageManager.GET_PERMISSIONS or PackageManager.GET_SIGNING_CERTIFICATES or PackageManager.GET_ACTIVITIES)
         } else {
-            pm.getInstalledPackages(PackageManager.GET_PERMISSIONS or PackageManager.GET_SIGNATURES)
+            pm.getInstalledPackages(flags)
         }
+    }
 
     @Suppress("DEPRECATION")
     private fun packageInfo(packageName: String): PackageInfo? = try {
+        val flags = PackageManager.GET_PERMISSIONS or PackageManager.GET_SIGNATURES or PackageManager.GET_ACTIVITIES
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            pm.getPackageInfo(packageName, PackageManager.PackageInfoFlags.of(PackageManager.GET_PERMISSIONS.toLong() or PackageManager.GET_SIGNING_CERTIFICATES.toLong()))
+            pm.getPackageInfo(packageName, PackageManager.PackageInfoFlags.of(PackageManager.GET_PERMISSIONS.toLong() or PackageManager.GET_SIGNING_CERTIFICATES.toLong() or PackageManager.GET_ACTIVITIES.toLong()))
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            pm.getPackageInfo(packageName, PackageManager.GET_PERMISSIONS or PackageManager.GET_SIGNING_CERTIFICATES)
+            pm.getPackageInfo(packageName, PackageManager.GET_PERMISSIONS or PackageManager.GET_SIGNING_CERTIFICATES or PackageManager.GET_ACTIVITIES)
         } else {
-            pm.getPackageInfo(packageName, PackageManager.GET_PERMISSIONS or PackageManager.GET_SIGNATURES)
+            pm.getPackageInfo(packageName, flags)
         }
     } catch (e: PackageManager.NameNotFoundException) {
         null

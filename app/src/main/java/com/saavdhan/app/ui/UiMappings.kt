@@ -52,4 +52,5 @@ fun RiskSignal.labelRes(): Int = when (this) {
     RiskSignal.SIDELOADED -> R.string.signal_sideloaded
     RiskSignal.HIDDEN_ICON -> R.string.signal_hidden_icon
     RiskSignal.IMPERSONATION -> R.string.signal_impersonation
+    RiskSignal.NEW_INSTALL -> R.string.signal_new_install
 }
