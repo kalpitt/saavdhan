@@ -27,11 +27,35 @@ object RiskEngine {
 
         // Apps we trust are reported calmly regardless of the powers they hold.
         if (allowlisted) {
-            return RiskAssessment(RiskLevel.LOW, signals, allowlisted = true)
+            return RiskAssessment(RiskLevel.LOW, 0, signals, allowlisted = true)
         }
 
-        val level = levelFor(signals, app)
-        return RiskAssessment(level, signals, allowlisted = false)
+        val score = calculateScore(signals)
+        val level = levelForScore(score)
+        return RiskAssessment(level, score, signals, allowlisted = false)
+    }
+
+    private fun calculateScore(signals: List<RiskSignal>): Int {
+        var score = 0
+        if (RiskSignal.IMPERSONATION in signals) score += 50
+        if (RiskSignal.ACCESSIBILITY in signals) score += 40
+        if (RiskSignal.DEVICE_ADMIN in signals) score += 40
+        if (RiskSignal.HIDDEN_ICON in signals) score += 40
+        if (RiskSignal.NOTIFICATION_LISTENER in signals) score += 20
+        if (RiskSignal.SMS_ACCESS in signals) score += 20
+        if (RiskSignal.SIDELOADED in signals) score += 20
+        if (RiskSignal.SMS_REQUESTED in signals) score += 10
+        if (RiskSignal.NEW_INSTALL in signals) score += 10
+        return score
+    }
+
+    private fun levelForScore(score: Int): RiskLevel {
+        return when {
+            score >= 80 -> RiskLevel.CRITICAL
+            score >= 50 -> RiskLevel.HIGH
+            score >= 20 -> RiskLevel.SUSPICIOUS
+            else -> RiskLevel.LOW
+        }
     }
 
     /** Determine if an app should be trusted and hidden from results. */
@@ -88,49 +112,10 @@ object RiskEngine {
             add(RiskSignal.HIDDEN_ICON)
         }
         if (app.impersonatesSystemApp) add(RiskSignal.IMPERSONATION)
-    }
 
-    /** Combine the red flags into one overall level. Order matters: we check scariest first. */
-    private fun levelFor(signals: List<RiskSignal>, app: ScannedApp): RiskLevel {
-        val accessibility = RiskSignal.ACCESSIBILITY in signals
-        val deviceAdmin = RiskSignal.DEVICE_ADMIN in signals
-        val sms = RiskSignal.SMS_ACCESS in signals
-        val smsRequested = RiskSignal.SMS_REQUESTED in signals
-        val notif = RiskSignal.NOTIFICATION_LISTENER in signals
-        val sideloaded = RiskSignal.SIDELOADED in signals
-        val hiddenIcon = RiskSignal.HIDDEN_ICON in signals
-        val impersonation = RiskSignal.IMPERSONATION in signals
-
-        // 1. The spyware trinity — the classic banking-trojan fingerprint.
-        // Also: accessibility + deviceAdmin + notification (trojans read notifications instead of SMS sometimes).
-        if (accessibility && deviceAdmin && (sms || notif)) return RiskLevel.CRITICAL
-
-        // 1b. A fake identity that ALSO holds a real spy/control power is an active banking trojan,
-        // not just a suspicious name — e.g. a "System Update" that can read the screen or your OTPs.
-        // (Impersonation on its own stays HIGH in the combo block below.)
-        if (impersonation && (accessibility || deviceAdmin || sms || notif)) return RiskLevel.CRITICAL
-
-        // 2. Strong two-signal combinations, and the standalone "this is hiding / faking" flags.
-        val highCombo =
-            (sideloaded && accessibility) ||
-                (sideloaded && deviceAdmin) ||
-                (sideloaded && sms) ||
-                (sideloaded && notif) ||
-                (accessibility && deviceAdmin) ||
-                (accessibility && sms) ||
-                (accessibility && notif) ||
-                (deviceAdmin && sms) ||
-                (deviceAdmin && notif) ||
-                (hiddenIcon && (accessibility || deviceAdmin || sms || smsRequested || notif)) ||
-                (sideloaded && smsRequested && (accessibility || deviceAdmin)) ||
-                impersonation
-        if (highCombo) return RiskLevel.HIGH
-
-        // 3. A single mild clue worth a glance.
-        val suspicious = sideloaded || accessibility || deviceAdmin || hiddenIcon || smsRequested || notif
-        if (suspicious) return RiskLevel.SUSPICIOUS
-
-        // 4. Nothing notable (SMS access alone is too common to flag on its own).
-        return RiskLevel.LOW
+        // Installed within the last 24 hours
+        if (app.firstInstallTimeMillis > System.currentTimeMillis() - 86400000L) {
+            add(RiskSignal.NEW_INSTALL)
+        }
     }
 }

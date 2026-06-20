@@ -10,66 +10,66 @@ class KnownAppsTest {
 
     @Test
     fun `a sideloaded app named System Update is impersonating`() {
-        assertTrue(KnownApps.isImpersonating("System Update", "com.evil.fake", isSystemApp = false))
+        assertTrue(KnownApps.isImpersonating("System Update", "com.evil.fake", isSystemApp = false, installSource = InstallSource.SIDELOADED))
     }
 
     @Test
     fun `name match is case and space insensitive`() {
-        assertTrue(KnownApps.isImpersonating("  system update ", "com.evil.fake", isSystemApp = false))
+        assertTrue(KnownApps.isImpersonating("  system update ", "com.evil.fake", isSystemApp = false, installSource = InstallSource.SIDELOADED))
     }
 
     @Test
     fun `the real Google Play Services is NOT impersonating`() {
         assertFalse(
-            KnownApps.isImpersonating("Google Play Services", "com.google.android.gms", isSystemApp = false)
+            KnownApps.isImpersonating("Google Play Services", "com.google.android.gms", isSystemApp = false, installSource = InstallSource.SIDELOADED)
         )
     }
 
     @Test
     fun `a fake Google Play Services IS impersonating`() {
         assertTrue(
-            KnownApps.isImpersonating("Google Play Services", "com.evil.fake", isSystemApp = false)
+            KnownApps.isImpersonating("Google Play Services", "com.evil.fake", isSystemApp = false, installSource = InstallSource.SIDELOADED)
         )
     }
 
     @Test
     fun `system apps are never treated as impersonators`() {
-        assertFalse(KnownApps.isImpersonating("System Update", "com.android.whatever", isSystemApp = true))
+        assertFalse(KnownApps.isImpersonating("System Update", "com.android.whatever", isSystemApp = true, installSource = InstallSource.SIDELOADED))
     }
 
     @Test
     fun `an ordinary app name is not flagged`() {
-        assertFalse(KnownApps.isImpersonating("My Recipes", "com.example.recipes", isSystemApp = false))
+        assertFalse(KnownApps.isImpersonating("My Recipes", "com.example.recipes", isSystemApp = false, installSource = InstallSource.SIDELOADED))
     }
 
     @Test
     fun `name match ignores punctuation, emoji and extra spaces`() {
-        assertTrue(KnownApps.isImpersonating("System  Update!", "com.evil.fake", isSystemApp = false))
-        assertTrue(KnownApps.isImpersonating("System-Update ⬇️", "com.evil.fake", isSystemApp = false))
-        assertTrue(KnownApps.isImpersonating("SYSTEM_UPDATE", "com.evil.fake", isSystemApp = false))
+        assertTrue(KnownApps.isImpersonating("System  Update!", "com.evil.fake", isSystemApp = false, installSource = InstallSource.SIDELOADED))
+        assertTrue(KnownApps.isImpersonating("System-Update ⬇️", "com.evil.fake", isSystemApp = false, installSource = InstallSource.SIDELOADED))
+        assertTrue(KnownApps.isImpersonating("SYSTEM_UPDATE", "com.evil.fake", isSystemApp = false, installSource = InstallSource.SIDELOADED))
     }
 
     @Test
     fun `a fake Security Update is impersonating`() {
-        assertTrue(KnownApps.isImpersonating("Security Update", "com.evil.fake", isSystemApp = false))
+        assertTrue(KnownApps.isImpersonating("Security Update", "com.evil.fake", isSystemApp = false, installSource = InstallSource.SIDELOADED))
     }
 
     @Test
     fun `a fake Android System WebView is impersonating but the real one is not`() {
-        assertTrue(KnownApps.isImpersonating("Android System WebView", "com.evil.fake", isSystemApp = false))
+        assertTrue(KnownApps.isImpersonating("Android System WebView", "com.evil.fake", isSystemApp = false, installSource = InstallSource.SIDELOADED))
         assertFalse(
-            KnownApps.isImpersonating("Android System WebView", "com.google.android.webview", isSystemApp = false)
+            KnownApps.isImpersonating("Android System WebView", "com.google.android.webview", isSystemApp = false, installSource = InstallSource.SIDELOADED)
         )
     }
 
     @Test
     fun `a fake Play Protect is impersonating`() {
-        assertTrue(KnownApps.isImpersonating("Play Protect", "com.evil.fake", isSystemApp = false))
+        assertTrue(KnownApps.isImpersonating("Play Protect", "com.evil.fake", isSystemApp = false, installSource = InstallSource.SIDELOADED))
     }
 
     @Test
     fun `a non-Latin label simply does not match`() {
-        assertFalse(KnownApps.isImpersonating("मेरा ऐप", "com.example.app", isSystemApp = false))
+        assertFalse(KnownApps.isImpersonating("मेरा ऐप", "com.example.app", isSystemApp = false, installSource = InstallSource.SIDELOADED))
     }
 
     @Test

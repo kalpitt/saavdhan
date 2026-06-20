@@ -68,11 +68,11 @@ class RiskEngineTest {
     }
 
     @Test
-    fun `hidden icon on a sideloaded app alone is SUSPICIOUS`() {
+    fun `hidden icon on a sideloaded app alone is HIGH`() {
         val result = RiskEngine.assess(
             app(installSource = InstallSource.SIDELOADED, hiddenIcon = true)
         )
-        assertEquals(RiskLevel.SUSPICIOUS, result.level)
+        assertEquals(RiskLevel.HIGH, result.level)
     }
 
     @Test
@@ -140,9 +140,9 @@ class RiskEngineTest {
     }
 
     @Test
-    fun `SMS access alone is too common to flag`() {
+    fun `SMS access alone is SUSPICIOUS`() {
         val result = RiskEngine.assess(app(requestsSms = true, smsGranted = true))
-        assertEquals(RiskLevel.LOW, result.level)
+        assertEquals(RiskLevel.SUSPICIOUS, result.level)
     }
 
     @Test
@@ -169,19 +169,19 @@ class RiskEngineTest {
     }
 
     @Test
-    fun `sideloaded plus SMS is HIGH`() {
+    fun `sideloaded plus SMS is SUSPICIOUS`() {
         val result = RiskEngine.assess(
             app(installSource = InstallSource.SIDELOADED, smsGranted = true)
         )
-        assertEquals(RiskLevel.HIGH, result.level)
+        assertEquals(RiskLevel.SUSPICIOUS, result.level)
     }
 
     @Test
-    fun `sideloaded plus notification listener is HIGH`() {
+    fun `sideloaded plus notification listener is SUSPICIOUS`() {
         val result = RiskEngine.assess(
             app(installSource = InstallSource.SIDELOADED, notificationListener = true)
         )
-        assertEquals(RiskLevel.HIGH, result.level)
+        assertEquals(RiskLevel.SUSPICIOUS, result.level)
     }
 
     @Test
@@ -291,7 +291,7 @@ class RiskEngineTest {
     }
 
     @Test
-    fun `OTHER_STORE app with a trusted prefix and dangerous powers is flagged (not allowlisted)`() {
+    fun `OTHER_STORE app with a trusted prefix and dangerous powers is flagged CRITICAL (not allowlisted)`() {
         // The real prefix-spoofing gap: a non-Play install (other store / unknown) claiming a
         // trusted prefix while holding Accessibility + Device Admin must NOT be allowlisted.
         val result = RiskEngine.assess(
@@ -302,7 +302,7 @@ class RiskEngineTest {
                 deviceAdmin = true
             )
         )
-        assertEquals(RiskLevel.HIGH, result.level)
+        assertEquals(RiskLevel.CRITICAL, result.level)
         assertFalse(result.allowlisted)
     }
 

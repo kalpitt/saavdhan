@@ -46,15 +46,19 @@ enum class RiskSignal {
     HIDDEN_ICON,
 
     /** Pretends to be a trusted system app. */
-    IMPERSONATION
+    IMPERSONATION,
+
+    /** Was installed very recently (e.g., within the last 24 hours). */
+    NEW_INSTALL
 }
 
 /**
- * The verdict for one app: its [level], the [signals] that explain why, and whether we chose to
+ * The verdict for one app: its [level], its risk [score], the [signals] that explain why, and whether we chose to
  * trust it via the allowlist (so the UI can say "we recognise this app").
  */
 data class RiskAssessment(
     val level: RiskLevel,
+    val score: Int,
     val signals: List<RiskSignal>,
     val allowlisted: Boolean
 )

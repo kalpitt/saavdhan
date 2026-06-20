@@ -65,7 +65,7 @@ class CleanupViewModel(application: Application, private val savedState: SavedSt
         }
     }
 
-    private fun readState(): Pair<CleanupState, String> {
+    private suspend fun readState(): Pair<CleanupState, String> {
         val context = getApplication<Application>()
         val assessed = AppScanner(context).assessSingle(packageName) // null once uninstalled
         val isInstalled = assessed != null

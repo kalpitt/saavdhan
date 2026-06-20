@@ -42,6 +42,7 @@
     <string name="signal_sideloaded">Play Store के बाहर से इंस्टॉल किया गया</string>
     <string name="signal_hidden_icon">आपकी ऐप सूची से अपना आइकन छुपाता है</string>
     <string name="signal_impersonation">किसी भरोसेमंद सिस्टम ऐप का रूप धरता है</string>
+    <string name="signal_new_install">बहुत हाल ही में इंस्टॉल किया गया (24 घंटे से कम समय पहले)</string>
 
     <!-- App detail -->
     <string name="detail_why_title">यह जोखिम भरा क्यों लगता है</string>
