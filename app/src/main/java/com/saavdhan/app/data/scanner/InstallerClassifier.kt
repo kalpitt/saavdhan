@@ -19,7 +19,7 @@ object InstallerClassifier {
         if (installer == null) return InstallSource.SIDELOADED
         if (installer == "com.android.vending") return InstallSource.PLAY_STORE
         if (installer in KnownApps.MESSENGERS) return InstallSource.SIDELOADED
-        
+
         val sideloaders = setOf(
             "com.android.packageinstaller",
             "com.google.android.packageinstaller",

@@ -169,7 +169,7 @@ class AppScanner(private val context: Context) {
         val isSystem = isSystemApp(appInfo)
         var src = installSource(pkg)
         val originatingPkg = getOriginatingPackage(pkg)
-        
+
         val rawInstaller = try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                 pm.getInstallSourceInfo(pkg).installingPackageName
@@ -177,7 +177,9 @@ class AppScanner(private val context: Context) {
                 @Suppress("DEPRECATION")
                 pm.getInstallerPackageName(pkg)
             }
-        } catch (e: Exception) { null }
+        } catch (e: Exception) {
+            null
+        }
 
         val isMessenger = originatingPkg in KnownApps.MESSENGERS || rawInstaller in KnownApps.MESSENGERS
 

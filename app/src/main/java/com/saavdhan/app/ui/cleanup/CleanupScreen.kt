@@ -41,15 +41,14 @@ import com.saavdhan.app.R
 import com.saavdhan.app.domain.cleanup.CleanupStep
 import com.saavdhan.app.domain.cleanup.CleanupStepId
 import com.saavdhan.app.domain.cleanup.StepStatus
+import com.saavdhan.app.domain.model.RiskLevel
 import com.saavdhan.app.system.deeplink.SettingsDeepLinks
 import com.saavdhan.app.system.overlay.OverlayCoach
+import com.saavdhan.app.ui.color
 import com.saavdhan.app.ui.components.InfoCard
 import com.saavdhan.app.ui.components.NumberBadge
 import com.saavdhan.app.ui.components.PrimaryButton
-import com.saavdhan.app.ui.components.PrimaryButton
 import com.saavdhan.app.ui.components.SecondaryButton
-import com.saavdhan.app.ui.color
-import com.saavdhan.app.domain.model.RiskLevel
 
 /**
  * The guided-cleanup checklist. It re-reads the phone's live state every time the screen resumes

@@ -7,7 +7,14 @@ import androidx.compose.ui.graphics.Color
 import com.saavdhan.app.R
 import com.saavdhan.app.domain.model.RiskLevel
 import com.saavdhan.app.domain.model.RiskSignal
-import com.saavdhan.app.ui.theme.*
+import com.saavdhan.app.ui.theme.RiskCriticalDark
+import com.saavdhan.app.ui.theme.RiskCriticalLight
+import com.saavdhan.app.ui.theme.RiskHighDark
+import com.saavdhan.app.ui.theme.RiskHighLight
+import com.saavdhan.app.ui.theme.RiskLowDark
+import com.saavdhan.app.ui.theme.RiskLowLight
+import com.saavdhan.app.ui.theme.RiskSuspiciousDark
+import com.saavdhan.app.ui.theme.RiskSuspiciousLight
 
 /** Maps the pure domain enums to user-facing text and colours. Lives in the UI layer on purpose. */
 
