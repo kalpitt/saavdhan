@@ -1,5 +1,6 @@
 package com.saavdhan.app.ui.scan
 
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -38,11 +39,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -64,7 +67,11 @@ import com.saavdhan.app.ui.components.RiskChip
 import com.saavdhan.app.ui.components.SecondaryButton
 import com.saavdhan.app.ui.labelRes
 import com.saavdhan.app.ui.onColor
+import com.saavdhan.app.ui.theme.RiskCritical
+import com.saavdhan.app.ui.theme.RiskLow
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -301,7 +308,12 @@ private fun ResultsContent(
                         putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.share_subject))
                         putExtra(Intent.EXTRA_TEXT, report)
                     }
-                    context.startActivity(Intent.createChooser(send, shareLabel))
+                    try {
+                        context.startActivity(Intent.createChooser(send, shareLabel))
+                    } catch (e: ActivityNotFoundException) {
+                        // No app can receive shared text (rare — e.g. a locked-down profile). Nothing
+                        // to share to, so fail quietly rather than crash.
+                    }
                 }
             )
         }
@@ -408,14 +420,20 @@ private fun AppRiskCard(item: AssessedApp, onClick: () -> Unit) {
 @Composable
 private fun AppAvatar(item: AssessedApp) {
     val context = LocalContext.current
-    val icon = remember(item.app.packageName) {
-        runCatching {
-            context.packageManager.getApplicationIcon(item.app.packageName).toBitmap().asImageBitmap()
-        }.getOrNull()
+    // Load the icon OFF the main thread (PackageManager IPC + bitmap decode would otherwise jank the
+    // list on a budget phone). Until it resolves — and permanently for an icon-less or unreadable
+    // package — the monogram fallback below is shown.
+    val icon by produceState<ImageBitmap?>(initialValue = null, item.app.packageName) {
+        value = withContext(Dispatchers.IO) {
+            runCatching {
+                context.packageManager.getApplicationIcon(item.app.packageName).toBitmap().asImageBitmap()
+            }.getOrNull()
+        }
     }
-    if (icon != null) {
+    val loaded = icon
+    if (loaded != null) {
         Image(
-            bitmap = icon,
+            bitmap = loaded,
             contentDescription = null,
             modifier = Modifier
                 .size(44.dp)
