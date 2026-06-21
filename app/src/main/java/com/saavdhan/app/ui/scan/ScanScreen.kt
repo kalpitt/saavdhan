@@ -1,8 +1,10 @@
 package com.saavdhan.app.ui.scan
 
 import android.content.Intent
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -14,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Settings
@@ -36,6 +39,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -188,6 +192,8 @@ private fun ResultsContent(
     val allFlagged = apps.filter { it.assessment.level != RiskLevel.LOW }
     val serious = allFlagged.filter { it.assessment.level == RiskLevel.CRITICAL || it.assessment.level == RiskLevel.HIGH }
     val mild = allFlagged.filter { it.assessment.level == RiskLevel.SUSPICIOUS }
+    val worstLevel = allFlagged.maxByOrNull { it.assessment.level.ordinal }?.assessment?.level
+        ?: RiskLevel.SUSPICIOUS
 
     LazyColumn(
         modifier = Modifier
@@ -228,6 +234,7 @@ private fun ResultsContent(
                 }
             }
         } else {
+            item { PhoneHealthBar(worst = worstLevel) }
             if (serious.isNotEmpty()) {
                 item {
                     val title = if (serious.size == 1) {
@@ -295,6 +302,44 @@ private fun ResultsContent(
                 }
             )
         }
+    }
+}
+
+/**
+ * A glanceable phone-health meter: four segments, green→red, filled up to the worst risk found, with
+ * the verdict word beneath it in that colour. Answers "how bad is my phone, overall?" in one look,
+ * above the card list — for a non-technical user who shouldn't have to count cards to feel the stakes.
+ * Reuses the existing risk colours and labels; the bar is decorative (the word carries the meaning to
+ * a screen reader).
+ */
+@Composable
+private fun PhoneHealthBar(worst: RiskLevel) {
+    val segments = listOf(RiskLevel.LOW, RiskLevel.SUSPICIOUS, RiskLevel.HIGH, RiskLevel.CRITICAL)
+    Column(Modifier.fillMaxWidth()) {
+        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            segments.forEach { level ->
+                val filled = level.ordinal <= worst.ordinal
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(10.dp)
+                        .clip(RoundedCornerShape(50))
+                        .background(
+                            if (filled) {
+                                level.color()
+                            } else {
+                                MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
+                            }
+                        )
+                )
+            }
+        }
+        Spacer(Modifier.height(10.dp))
+        Text(
+            text = stringResource(worst.labelRes()),
+            color = worst.color(),
+            style = MaterialTheme.typography.headlineSmall
+        )
     }
 }
 
