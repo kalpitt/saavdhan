@@ -26,6 +26,18 @@
     <string name="result_found_title_plural">%1$d ऐप्स पर ध्यान देने की ज़रूरत है</string>
     <string name="result_mild_section">शायद ठीक हैं — एक नज़र डाल लें</string>
     <string name="partial_scan_note">यह फ़ोन हमें सीमित जानकारी देखने देता है, इसलिए स्कैन अधूरा हो सकता है।</string>
+    <!-- Screen-reader (TalkBack) descriptions. Lead with the verdict, then the app name. %1$s = risk level, %2$s = app name. -->
+    <string name="cd_risk_summary">%1$s — %2$s</string>
+    <string name="action_see_details">क्या करें देखें</string>
+    <!-- Share result with a family member, via the phone's own share sheet (WhatsApp/SMS). Offline. -->
+    <string name="action_share_result">नतीजा परिवार को भेजें</string>
+    <string name="share_subject">सावधान फ़ोन जाँच</string>
+    <string name="share_intro">सावधान ने इस फ़ोन को स्कैम ऐप्स के लिए जाँचा।</string>
+    <string name="share_safe">अच्छी खबर — कोई खतरनाक ऐप नहीं मिला।</string>
+    <string name="share_found_header">इन ऐप्स पर ध्यान देने की ज़रूरत है:</string>
+    <string name="share_app_line">• %1$s — %2$s</string>
+    <string name="share_advice">कृपया इस फ़ोन का इस्तेमाल करने वाले का हाल लें, और इन्हें हटाने में मदद करें।</string>
+    <string name="share_footer">सावधान, एक ऑफ़लाइन एंटी-स्कैम ऐप से भेजा गया।</string>
 
     <!-- Risk levels -->
     <string name="risk_critical">बहुत खतरनाक</string>
@@ -46,6 +58,7 @@
 
     <!-- App detail -->
     <string name="detail_why_title">यह जोखिम भरा क्यों लगता है</string>
+    <string name="detail_also_noticed">यह भी देखा गया</string>
     <string name="detail_what_title">यह ऐप क्या कर सकता है</string>
     <string name="detail_what_critical">इस ऐप के पास ठीक वही शक्तियाँ हैं जो बैंक-स्कैम स्पाईवेयर इस्तेमाल करता है: यह आपकी स्क्रीन देख सकता है, आपके OTP पढ़ सकता है, और आपको इसे हटाने से रोक सकता है। अगर आपने इसे जानबूझकर इंस्टॉल नहीं किया है, तो इसे खतरनाक मानें और हटा दें।</string>
     <string name="detail_what_high">इस ऐप के पास ताकतवर अनुमतियाँ हैं जिनका स्कैम ऐप्स अक्सर दुरुपयोग करते हैं। अगर आप इसे साफ़ तौर पर नहीं पहचानते और इस पर भरोसा नहीं करते, तो इसे हटा दें।</string>
@@ -90,10 +103,10 @@
     <!-- Background watchdog (new-app alerts) -->
     <string name="watchdog_channel_name">खतरे की चेतावनी</string>
     <string name="watchdog_channel_desc">जब कोई नया इंस्टॉल किया गया ऐप खतरनाक लगता है तो आपको चेतावनी देता है।</string>
-    <string name="watchdog_title">एक नया ऐप खतरनाक लगता है</string>
-    <string name="watchdog_text">%1$s एक स्कैम ऐप हो सकता है। सावधान में जाँचने के लिए टैप करें।</string>
-    <string name="watchdog_escalation_title">एक इंस्टॉल किया हुआ ऐप खतरनाक हो गया है</string>
-    <string name="watchdog_escalation_text">%1$s ने ऐसी शक्तियाँ ले ली हैं जिनका स्कैम ऐप्स गलत इस्तेमाल करते हैं। सावधान में जाँचने के लिए टैप करें।</string>
+    <string name="watchdog_title">क्या कोई फ़ोन पर आपसे यह करवा रहा है?</string>
+    <string name="watchdog_text">अगर हाँ, तो अभी फ़ोन काट दें और कोई OTP न बताएँ। %1$s अभी इंस्टॉल हुआ है और खतरनाक लगता है। क्या करें यह देखने के लिए टैप करें।</string>
+    <string name="watchdog_escalation_title">क्या किसी ने अभी कोई सेटिंग चालू करवाई है?</string>
+    <string name="watchdog_escalation_text">अगर हाँ, तो रुकें और कोई OTP न बताएँ। %1$s के पास अब वे शक्तियाँ हैं जिनका स्कैम ऐप्स गलत इस्तेमाल करते हैं। क्या करें यह देखने के लिए टैप करें।</string>
 
     <!-- On-screen overlay coach -->
     <string name="coach_accessibility">इस सूची में \"%1$s\" को ढूँढें और इसे बंद (OFF) करें।</string>

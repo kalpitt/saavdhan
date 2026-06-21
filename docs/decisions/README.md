@@ -25,6 +25,9 @@ An ADR is a short note capturing **one** important decision and **why** we made 
 | [0009](0009-deterministic-rule-engine.md) | Deterministic, explainable rule engine (no ML/cloud) | Accepted |
 | [0010](0010-sdk-levels.md) | minSdk 24, target/compile SDK 35 | Accepted |
 | [0011](0011-no-di-framework-yet.md) | No dependency-injection framework yet | Accepted |
+| [0012](0012-explanation-ranked-by-engine-weight.md) | Detail-screen explanation ranked by the engine's own weights | Accepted |
+| [0013](0013-resilient-package-fetch.md) | Resilient package fetch (survive the Binder limit on cheap phones) | Accepted |
+| [0014](0014-offline-share-to-family.md) | "Send to family" uses the OS share sheet, not a network | Accepted |
 
 ## Statuses
 **Proposed** → under discussion · **Accepted** → in effect · **Superseded** → replaced by a newer ADR.

@@ -86,13 +86,17 @@ fun DangerButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifie
     }
 }
 
-/** One red-flag line inside the detail screen, marked with a warning icon in the risk colour. */
+/**
+ * One red-flag line inside the detail screen, marked with a warning icon in the risk colour.
+ * [prominent] rows are the decisive evidence (full weight); the quieter variant is for the soft,
+ * circumstantial clues shown under "Also noticed", so the two never blur together.
+ */
 @Composable
-fun SignalRow(text: String, tint: Color) {
+fun SignalRow(text: String, tint: Color, prominent: Boolean = true) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 6.dp),
+            .padding(vertical = if (prominent) 6.dp else 4.dp),
         verticalAlignment = Alignment.Top,
         horizontalArrangement = Arrangement.spacedBy(10.dp)
     ) {
@@ -100,9 +104,14 @@ fun SignalRow(text: String, tint: Color) {
             Icons.Filled.Warning,
             contentDescription = null, // decorative — the text beside it carries the meaning
             tint = tint,
-            modifier = Modifier.size(22.dp)
+            modifier = Modifier.size(if (prominent) 22.dp else 18.dp)
         )
-        Text(text, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
+        Text(
+            text = text,
+            style = if (prominent) MaterialTheme.typography.bodyLarge else MaterialTheme.typography.bodyMedium,
+            color = if (prominent) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.weight(1f)
+        )
     }
 }
 

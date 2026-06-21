@@ -35,19 +35,32 @@ object RiskEngine {
         return RiskAssessment(level, score, signals, allowlisted = false)
     }
 
-    private fun calculateScore(signals: List<RiskSignal>): Int {
-        var score = 0
-        if (RiskSignal.IMPERSONATION in signals) score += 50
-        if (RiskSignal.ACCESSIBILITY in signals) score += 40
-        if (RiskSignal.DEVICE_ADMIN in signals) score += 40
-        if (RiskSignal.HIDDEN_ICON in signals) score += 40
-        if (RiskSignal.NOTIFICATION_LISTENER in signals) score += 20
-        if (RiskSignal.SMS_ACCESS in signals) score += 20
-        if (RiskSignal.SIDELOADED in signals) score += 20
-        if (RiskSignal.SMS_REQUESTED in signals) score += 10
-        if (RiskSignal.NEW_INSTALL in signals) score += 10
-        return score
-    }
+    /**
+     * Each signal's contribution to the risk score — the single source of truth for "how damning
+     * is this clue". [calculateScore] sums it, and the UI reads it (via [weightOf]) to show the
+     * most decisive evidence first. Keeping it in one map means the engine's priority and the
+     * reasons the user reads can never drift apart. Every [RiskSignal] must appear here.
+     */
+    private val WEIGHTS: Map<RiskSignal, Int> = mapOf(
+        RiskSignal.IMPERSONATION to 50,
+        RiskSignal.ACCESSIBILITY to 40,
+        RiskSignal.DEVICE_ADMIN to 40,
+        RiskSignal.HIDDEN_ICON to 40,
+        RiskSignal.NOTIFICATION_LISTENER to 20,
+        RiskSignal.SMS_ACCESS to 20,
+        RiskSignal.SIDELOADED to 20,
+        RiskSignal.SMS_REQUESTED to 10,
+        RiskSignal.NEW_INSTALL to 10
+    )
+
+    /**
+     * How many points [signal] adds to an app's risk score. The UI uses this to rank the reasons
+     * it shows — scariest first — so the explanation always agrees with the verdict.
+     */
+    fun weightOf(signal: RiskSignal): Int = WEIGHTS.getValue(signal)
+
+    private fun calculateScore(signals: List<RiskSignal>): Int =
+        signals.sumOf { WEIGHTS.getValue(it) }
 
     private fun levelForScore(score: Int): RiskLevel {
         return when {
