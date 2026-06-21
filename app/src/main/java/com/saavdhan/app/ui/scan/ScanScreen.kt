@@ -1,6 +1,7 @@
 package com.saavdhan.app.ui.scan
 
 import android.content.Intent
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -14,8 +15,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
@@ -40,6 +43,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -49,6 +53,7 @@ import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.core.graphics.drawable.toBitmap
 import com.saavdhan.app.R
 import com.saavdhan.app.data.scanner.AssessedApp
 import com.saavdhan.app.domain.model.RiskLevel
@@ -375,6 +380,8 @@ private fun AppRiskCard(item: AssessedApp, onClick: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
+            AppAvatar(item)
+            Spacer(Modifier.width(12.dp))
             Column(Modifier.padding(end = 12.dp).weight(1f)) {
                 Text(item.app.label, style = MaterialTheme.typography.titleLarge)
                 Spacer(Modifier.height(4.dp))
@@ -388,6 +395,46 @@ private fun AppRiskCard(item: AssessedApp, onClick: () -> Unit) {
                 text = stringResource(item.assessment.level.labelRes()),
                 color = item.assessment.level.color(),
                 textColor = item.assessment.level.onColor()
+            )
+        }
+    }
+}
+
+/**
+ * The app's own launcher icon, so a non-technical user recognises which app this is at a glance (the
+ * way Play Protect shows it). When no icon is available (e.g. an app that hides its launcher icon, or
+ * a package we can't read), we fall back to a tinted monogram circle — the app's first letter in its
+ * risk colour — so the slot always looks deliberate. Decorative: the card's merged semantics already
+ * announce the verdict and name to a screen reader.
+ */
+@Composable
+private fun AppAvatar(item: AssessedApp) {
+    val context = LocalContext.current
+    val icon = remember(item.app.packageName) {
+        runCatching {
+            context.packageManager.getApplicationIcon(item.app.packageName).toBitmap().asImageBitmap()
+        }.getOrNull()
+    }
+    if (icon != null) {
+        Image(
+            bitmap = icon,
+            contentDescription = null,
+            modifier = Modifier
+                .size(44.dp)
+                .clip(CircleShape)
+        )
+    } else {
+        Box(
+            modifier = Modifier
+                .size(44.dp)
+                .clip(CircleShape)
+                .background(item.assessment.level.color()),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = item.app.label.firstOrNull()?.uppercase() ?: "?",
+                color = item.assessment.level.onColor(),
+                style = MaterialTheme.typography.titleLarge
             )
         }
     }
