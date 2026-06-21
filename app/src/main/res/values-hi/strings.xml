@@ -94,10 +94,10 @@
     <!-- Background watchdog (new-app alerts) -->
     <string name="watchdog_channel_name">खतरे की चेतावनी</string>
     <string name="watchdog_channel_desc">जब कोई नया इंस्टॉल किया गया ऐप खतरनाक लगता है तो आपको चेतावनी देता है।</string>
-    <string name="watchdog_title">एक नया ऐप खतरनाक लगता है</string>
-    <string name="watchdog_text">%1$s एक स्कैम ऐप हो सकता है। सावधान में जाँचने के लिए टैप करें।</string>
-    <string name="watchdog_escalation_title">एक इंस्टॉल किया हुआ ऐप खतरनाक हो गया है</string>
-    <string name="watchdog_escalation_text">%1$s ने ऐसी शक्तियाँ ले ली हैं जिनका स्कैम ऐप्स गलत इस्तेमाल करते हैं। सावधान में जाँचने के लिए टैप करें।</string>
+    <string name="watchdog_title">क्या कोई फ़ोन पर आपसे यह करवा रहा है?</string>
+    <string name="watchdog_text">अगर हाँ, तो अभी फ़ोन काट दें और कोई OTP न बताएँ। %1$s अभी इंस्टॉल हुआ है और खतरनाक लगता है। क्या करें यह देखने के लिए टैप करें।</string>
+    <string name="watchdog_escalation_title">क्या किसी ने अभी कोई सेटिंग चालू करवाई है?</string>
+    <string name="watchdog_escalation_text">अगर हाँ, तो रुकें और कोई OTP न बताएँ। %1$s के पास अब वे शक्तियाँ हैं जिनका स्कैम ऐप्स गलत इस्तेमाल करते हैं। क्या करें यह देखने के लिए टैप करें।</string>
 
     <!-- On-screen overlay coach -->
     <string name="coach_accessibility">इस सूची में \"%1$s\" को ढूँढें और इसे बंद (OFF) करें।</string>
