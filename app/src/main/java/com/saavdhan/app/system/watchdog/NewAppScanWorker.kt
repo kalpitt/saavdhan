@@ -30,8 +30,10 @@ class NewAppScanWorker(
         val assessedByPackage = try {
             scanner.scan(includeDemoFixtures = false).apps.associateBy { it.app.packageName }
         } catch (e: Exception) {
-            // Background scan failed (e.g. binder pressure); try again at the next interval.
-            return Result.retry()
+            // Background scan failed unexpectedly. Retry a couple of times, then give up gracefully
+            // and wait for the next periodic run — never an unbounded retry-storm (which, with
+            // WorkManager's exponential backoff, could silently starve the watchdog for hours).
+            return if (runAttemptCount >= 2) Result.success() else Result.retry()
         }
         val currentLevels = assessedByPackage.mapValues { it.value.assessment.level }
         val known = InstalledAppsSnapshot.getLevels(applicationContext)
