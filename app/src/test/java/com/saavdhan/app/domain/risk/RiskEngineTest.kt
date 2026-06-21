@@ -324,7 +324,7 @@ class RiskEngineTest {
     fun `every signal has a weight, and the decisive clues outrank the circumstantial ones`() {
         // The map that drives the score must cover every signal — a missing one would crash the
         // UI ranking (weightOf uses getValue). This guards against adding a signal without a weight.
-        RiskSignal.values().forEach { signal ->
+        RiskSignal.entries.forEach { signal ->
             assertTrue("missing weight for $signal", RiskEngine.weightOf(signal) > 0)
         }
         // Impersonation (the loudest lie) must outrank a single power, which must outrank mere
