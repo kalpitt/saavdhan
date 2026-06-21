@@ -34,7 +34,7 @@ internal fun buildFamilyReport(
     val df = SimpleDateFormat("yyyyMMdd-HHmm", Locale.US)
     df.timeZone = TimeZone.getDefault()
     val dateStr = df.format(Date(timestampMillis))
-    
+
     val contentString = appLines.joinToString("") + timestampMillis.toString()
     val hash = Integer.toHexString(contentString.hashCode()).takeLast(4).uppercase(Locale.US).padStart(4, '0')
     val refId = "SVDN-$dateStr-$hash"

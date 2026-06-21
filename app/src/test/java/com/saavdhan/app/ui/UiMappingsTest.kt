@@ -13,7 +13,7 @@ class UiMappingsTest {
     fun testColorForTheme_lightMode() {
         assertEquals(RiskCriticalLight, RiskLevel.CRITICAL.colorForTheme(isDark = false))
         assertEquals(Color.White, RiskLevel.CRITICAL.onColorForTheme(isDark = false))
-        
+
         // Explicitly test SUSPICIOUS contrast in light mode
         assertEquals(Color(0xFF212121), RiskLevel.SUSPICIOUS.onColorForTheme(isDark = false))
     }
@@ -24,7 +24,7 @@ class UiMappingsTest {
         assertEquals(RiskCriticalDark, RiskLevel.CRITICAL.colorForTheme(isDark = true))
         // And dark text for contrast against the bright pastel
         assertEquals(Color(0xFF212121), RiskLevel.CRITICAL.onColorForTheme(isDark = true))
-        
+
         // SUSPICIOUS must also use dark text in dark mode
         assertEquals(Color(0xFF212121), RiskLevel.SUSPICIOUS.onColorForTheme(isDark = true))
     }
