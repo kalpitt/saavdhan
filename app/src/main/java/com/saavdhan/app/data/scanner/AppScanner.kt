@@ -167,8 +167,15 @@ class AppScanner(private val context: Context) {
 
         val label = pm.getApplicationLabel(appInfo).toString()
         val isSystem = isSystemApp(appInfo)
-        val src = installSource(pkg)
+        var src = installSource(pkg)
         val originatingPkg = getOriginatingPackage(pkg)
+
+        val isMessenger = originatingPkg == "com.whatsapp" || originatingPkg == "com.whatsapp.w4b" ||
+                          originatingPkg == "org.telegram.messenger" || originatingPkg == "org.thunderdog.challegram" ||
+                          originatingPkg == "com.facebook.orca"
+        if (isMessenger && src != InstallSource.PLAY_STORE) {
+            src = InstallSource.SIDELOADED
+        }
 
         val hashes = getSignatureHashes(info)
         android.util.Log.d("SaavdhanScanner", "App: $pkg, Signature Hash: $hashes")

@@ -53,7 +53,12 @@ class InstallerClassifierTest {
     }
 
     @Test
-    fun `WhatsApp as installer is OTHER_STORE (not recognized sideload tool)`() {
-        assertEquals(InstallSource.OTHER_STORE, InstallerClassifier.classify("com.whatsapp"))
+    fun `WhatsApp as installer is SIDELOADED (messenger)`() {
+        assertEquals(InstallSource.SIDELOADED, InstallerClassifier.classify("com.whatsapp"))
+    }
+
+    @Test
+    fun `WhatsApp Business as installer is SIDELOADED`() {
+        assertEquals(InstallSource.SIDELOADED, InstallerClassifier.classify("com.whatsapp.w4b"))
     }
 }
