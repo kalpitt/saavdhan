@@ -30,6 +30,15 @@
          non-sighted user hears how worried to be before the app's name. %1$s = risk level, %2$s = app name. -->
     <string name="cd_risk_summary">%1$s — %2$s</string>
     <string name="action_see_details">See what to do</string>
+    <!-- Share result with a family member, via the phone's own share sheet (WhatsApp/SMS). Offline. -->
+    <string name="action_share_result">Send result to family</string>
+    <string name="share_subject">Saavdhan phone check</string>
+    <string name="share_intro">Saavdhan checked this phone for scam apps.</string>
+    <string name="share_safe">Good news — no dangerous apps were found.</string>
+    <string name="share_found_header">These apps need attention:</string>
+    <string name="share_app_line">• %1$s — %2$s</string>
+    <string name="share_advice">Please check on whoever uses this phone, and help them remove these.</string>
+    <string name="share_footer">Sent from Saavdhan, an offline anti-scam app.</string>
 
     <!-- Risk levels -->
     <string name="risk_critical">Very dangerous</string>
