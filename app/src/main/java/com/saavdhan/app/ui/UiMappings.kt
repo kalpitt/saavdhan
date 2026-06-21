@@ -1,14 +1,13 @@
 package com.saavdhan.app.ui
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import com.saavdhan.app.R
 import com.saavdhan.app.domain.model.RiskLevel
 import com.saavdhan.app.domain.model.RiskSignal
-import com.saavdhan.app.ui.theme.RiskCritical
-import com.saavdhan.app.ui.theme.RiskHigh
-import com.saavdhan.app.ui.theme.RiskLow
-import com.saavdhan.app.ui.theme.RiskSuspicious
+import com.saavdhan.app.ui.theme.*
 
 /** Maps the pure domain enums to user-facing text and colours. Lives in the UI layer on purpose. */
 
@@ -20,18 +19,30 @@ fun RiskLevel.labelRes(): Int = when (this) {
     RiskLevel.LOW -> R.string.risk_low
 }
 
-fun RiskLevel.color(): Color = when (this) {
-    RiskLevel.CRITICAL -> RiskCritical
-    RiskLevel.HIGH -> RiskHigh
-    RiskLevel.SUSPICIOUS -> RiskSuspicious
-    RiskLevel.LOW -> RiskLow
+fun RiskLevel.colorForTheme(isDark: Boolean): Color = when (this) {
+    RiskLevel.CRITICAL -> if (isDark) RiskCriticalDark else RiskCriticalLight
+    RiskLevel.HIGH -> if (isDark) RiskHighDark else RiskHighLight
+    RiskLevel.SUSPICIOUS -> if (isDark) RiskSuspiciousDark else RiskSuspiciousLight
+    RiskLevel.LOW -> if (isDark) RiskLowDark else RiskLowLight
 }
 
-/** Text colour that stays readable on top of [color] — amber needs dark text (WCAG contrast). */
-fun RiskLevel.onColor(): Color = when (this) {
-    RiskLevel.SUSPICIOUS -> Color(0xFF212121)
-    else -> Color.White
+fun RiskLevel.onColorForTheme(isDark: Boolean): Color {
+    if (isDark) {
+        // Dark mode pastels are very bright, so they need dark text for contrast
+        return Color(0xFF212121)
+    }
+    return when (this) {
+        RiskLevel.SUSPICIOUS -> Color(0xFF212121)
+        else -> Color.White
+    }
 }
+
+@Composable
+fun RiskLevel.color(): Color = colorForTheme(isSystemInDarkTheme())
+
+/** Text colour that stays readable on top of [color] — amber needs dark text (WCAG contrast). */
+@Composable
+fun RiskLevel.onColor(): Color = onColorForTheme(isSystemInDarkTheme())
 
 /** The "what this app could do" explanation paragraph, tuned to the overall level. */
 @StringRes
@@ -50,6 +61,7 @@ fun RiskSignal.labelRes(): Int = when (this) {
     RiskSignal.SMS_REQUESTED -> R.string.signal_sms_requested
     RiskSignal.NOTIFICATION_LISTENER -> R.string.signal_notification_listener
     RiskSignal.SIDELOADED -> R.string.signal_sideloaded
+    RiskSignal.SIDELOADED_VIA_MESSENGER -> R.string.signal_sideloaded_via_messenger
     RiskSignal.HIDDEN_ICON -> R.string.signal_hidden_icon
     RiskSignal.IMPERSONATION -> R.string.signal_impersonation
     RiskSignal.NEW_INSTALL -> R.string.signal_new_install

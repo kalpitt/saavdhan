@@ -168,6 +168,7 @@ class AppScanner(private val context: Context) {
         val label = pm.getApplicationLabel(appInfo).toString()
         val isSystem = isSystemApp(appInfo)
         val src = installSource(pkg)
+        val originatingPkg = getOriginatingPackage(pkg)
 
         val hashes = getSignatureHashes(info)
         android.util.Log.d("SaavdhanScanner", "App: $pkg, Signature Hash: $hashes")
@@ -199,7 +200,8 @@ class AppScanner(private val context: Context) {
             hasHiddenIcon = !isSystem && pm.getLaunchIntentForPackage(pkg) == null,
             impersonatesSystemApp = impersonates,
             firstInstallTimeMillis = info.firstInstallTime,
-            signatureHashes = hashes
+            signatureHashes = hashes,
+            originatingPackage = originatingPkg
         )
         return AssessedApp(scanned, RiskEngine.assess(scanned))
     }
@@ -319,6 +321,20 @@ class AppScanner(private val context: Context) {
         return InstallerClassifier.classify(installer)
     }
 
+    @Suppress("DEPRECATION")
+    private fun getOriginatingPackage(packageName: String): String? {
+        return try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                val info = pm.getInstallSourceInfo(packageName)
+                info.originatingPackageName ?: info.initiatingPackageName
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            null
+        }
+    }
+
     private val smsPermissions = setOf(
         android.Manifest.permission.RECEIVE_SMS,
         android.Manifest.permission.READ_SMS,
@@ -370,7 +386,8 @@ class AppScanner(private val context: Context) {
                 hasNotificationListener = true,
                 hasHiddenIcon = true,
                 impersonatesSystemApp = true,
-                firstInstallTimeMillis = now
+                firstInstallTimeMillis = now,
+                originatingPackage = "com.whatsapp"
             ),
             ScannedApp(
                 packageName = "com.demo.fastcash",
