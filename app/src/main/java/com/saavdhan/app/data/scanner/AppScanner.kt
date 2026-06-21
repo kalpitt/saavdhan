@@ -179,7 +179,7 @@ class AppScanner(private val context: Context) {
             info.activities?.forEach { activity ->
                 val affinity = activity.taskAffinity
                 if (affinity != null && affinity != pkg) {
-                    if (affinity.startsWith("com.android.settings") || affinity.contains("bank")) {
+                    if (affinity.startsWith("com.android.settings")) {
                         impersonates = true
                     }
                 }
