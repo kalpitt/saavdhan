@@ -26,6 +26,19 @@
     <string name="result_found_title_plural">%1$d apps need your attention</string>
     <string name="result_mild_section">Probably fine — worth a quick look</string>
     <string name="partial_scan_note">This phone limits what we can see, so the scan may be incomplete.</string>
+    <!-- Screen-reader (TalkBack) descriptions. Lead with the verdict, then the app name, so a
+         non-sighted user hears how worried to be before the app's name. %1$s = risk level, %2$s = app name. -->
+    <string name="cd_risk_summary">%1$s — %2$s</string>
+    <string name="action_see_details">See what to do</string>
+    <!-- Share result with a family member, via the phone's own share sheet (WhatsApp/SMS). Offline. -->
+    <string name="action_share_result">Send result to family</string>
+    <string name="share_subject">Saavdhan phone check</string>
+    <string name="share_intro">Saavdhan checked this phone for scam apps.</string>
+    <string name="share_safe">Good news — no dangerous apps were found.</string>
+    <string name="share_found_header">These apps need attention:</string>
+    <string name="share_app_line">• %1$s — %2$s</string>
+    <string name="share_advice">Please check on whoever uses this phone, and help them remove these.</string>
+    <string name="share_footer">Sent from Saavdhan, an offline anti-scam app.</string>
 
     <!-- Risk levels -->
     <string name="risk_critical">Very dangerous</string>
@@ -46,6 +59,7 @@
 
     <!-- App detail -->
     <string name="detail_why_title">Why this looks risky</string>
+    <string name="detail_also_noticed">Also noticed</string>
     <string name="detail_what_title">What this app could do</string>
     <string name="detail_what_critical">This app has the exact powers that banking-scam spyware uses: it can watch your screen, read your OTPs, and stop you from removing it. If you did not install it on purpose, treat it as dangerous and remove it.</string>
     <string name="detail_what_high">This app holds powerful permissions that scam apps often misuse. If you do not clearly recognise and trust it, you should remove it.</string>
@@ -90,10 +104,10 @@
     <!-- Background watchdog (new-app alerts) -->
     <string name="watchdog_channel_name">Threat alerts</string>
     <string name="watchdog_channel_desc">Warns you when a newly installed app looks dangerous.</string>
-    <string name="watchdog_title">A new app looks dangerous</string>
-    <string name="watchdog_text">%1$s may be a scam app. Tap to check it in Saavdhan.</string>
-    <string name="watchdog_escalation_title">An installed app turned dangerous</string>
-    <string name="watchdog_escalation_text">%1$s has gained powers that scam apps misuse. Tap to check it in Saavdhan.</string>
+    <string name="watchdog_title">Is someone on the phone telling you to do this?</string>
+    <string name="watchdog_text">If yes, hang up now and do not share any OTP. %1$s was just installed and looks dangerous. Tap to see what to do.</string>
+    <string name="watchdog_escalation_title">Did someone just ask you to turn on a setting?</string>
+    <string name="watchdog_escalation_text">If yes, stop and do not share any OTP. %1$s now has powers that scam apps misuse. Tap to see what to do.</string>
 
     <!-- On-screen overlay coach -->
     <string name="coach_accessibility">Find \"%1$s\" in this list and turn it OFF.</string>

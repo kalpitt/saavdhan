@@ -1,7 +1,11 @@
 package com.saavdhan.app.ui.scan
 
+import android.content.Intent
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -11,8 +15,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Settings
@@ -35,9 +42,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.onClick
+import androidx.compose.ui.semantics.role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.core.graphics.drawable.toBitmap
 import com.saavdhan.app.R
 import com.saavdhan.app.data.scanner.AssessedApp
 import com.saavdhan.app.domain.model.RiskLevel
@@ -45,6 +61,7 @@ import com.saavdhan.app.ui.color
 import com.saavdhan.app.ui.components.InfoCard
 import com.saavdhan.app.ui.components.PrimaryButton
 import com.saavdhan.app.ui.components.RiskChip
+import com.saavdhan.app.ui.components.SecondaryButton
 import com.saavdhan.app.ui.labelRes
 import com.saavdhan.app.ui.onColor
 import com.saavdhan.app.ui.theme.RiskCritical
@@ -180,6 +197,8 @@ private fun ResultsContent(
     val allFlagged = apps.filter { it.assessment.level != RiskLevel.LOW }
     val serious = allFlagged.filter { it.assessment.level == RiskLevel.CRITICAL || it.assessment.level == RiskLevel.HIGH }
     val mild = allFlagged.filter { it.assessment.level == RiskLevel.SUSPICIOUS }
+    val worstLevel = allFlagged.maxByOrNull { it.assessment.level.ordinal }?.assessment?.level
+        ?: RiskLevel.SUSPICIOUS
 
     LazyColumn(
         modifier = Modifier
@@ -220,6 +239,7 @@ private fun ResultsContent(
                 }
             }
         } else {
+            item { PhoneHealthBar(worst = worstLevel) }
             if (serious.isNotEmpty()) {
                 item {
                     val title = if (serious.size == 1) {
@@ -254,17 +274,101 @@ private fun ResultsContent(
         item {
             Spacer(Modifier.height(8.dp))
             PrimaryButton(text = stringResource(R.string.scan_again), onClick = onScanAgain)
+
+            // Offline "send to family": hand the worried adult child who set Saavdhan up a plain
+            // summary they can read, via the phone's own share sheet (WhatsApp/SMS). No network.
+            val context = LocalContext.current
+            val shareLabel = stringResource(R.string.action_share_result)
+            Spacer(Modifier.height(12.dp))
+            SecondaryButton(
+                text = shareLabel,
+                onClick = {
+                    val appLines = allFlagged.map { flagged ->
+                        context.getString(
+                            R.string.share_app_line,
+                            flagged.app.label,
+                            context.getString(flagged.assessment.level.labelRes())
+                        )
+                    }
+                    val report = buildFamilyReport(
+                        intro = context.getString(R.string.share_intro),
+                        appLines = appLines,
+                        safeLine = context.getString(R.string.share_safe),
+                        foundHeader = context.getString(R.string.share_found_header),
+                        advice = context.getString(R.string.share_advice),
+                        footer = context.getString(R.string.share_footer)
+                    )
+                    val send = Intent(Intent.ACTION_SEND).apply {
+                        type = "text/plain"
+                        putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.share_subject))
+                        putExtra(Intent.EXTRA_TEXT, report)
+                    }
+                    context.startActivity(Intent.createChooser(send, shareLabel))
+                }
+            )
         }
+    }
+}
+
+/**
+ * A glanceable phone-health meter: four segments, green→red, filled up to the worst risk found, with
+ * the verdict word beneath it in that colour. Answers "how bad is my phone, overall?" in one look,
+ * above the card list — for a non-technical user who shouldn't have to count cards to feel the stakes.
+ * Reuses the existing risk colours and labels; the bar is decorative (the word carries the meaning to
+ * a screen reader).
+ */
+@Composable
+private fun PhoneHealthBar(worst: RiskLevel) {
+    val segments = listOf(RiskLevel.LOW, RiskLevel.SUSPICIOUS, RiskLevel.HIGH, RiskLevel.CRITICAL)
+    Column(Modifier.fillMaxWidth()) {
+        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            segments.forEach { level ->
+                val filled = level.ordinal <= worst.ordinal
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(10.dp)
+                        .clip(RoundedCornerShape(50))
+                        .background(
+                            if (filled) {
+                                level.color()
+                            } else {
+                                MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
+                            }
+                        )
+                )
+            }
+        }
+        Spacer(Modifier.height(10.dp))
+        Text(
+            text = stringResource(worst.labelRes()),
+            color = worst.color(),
+            style = MaterialTheme.typography.headlineSmall
+        )
     }
 }
 
 @Composable
 private fun AppRiskCard(item: AssessedApp, onClick: () -> Unit) {
+    // A screen-reader user should hear the verdict FIRST, then the app name, then what tapping does —
+    // not the package id spelled out. We replace the card's merged semantics with one ordered
+    // announcement and a labelled tap action. The sighted layout below is unchanged.
+    val riskLabel = stringResource(item.assessment.level.labelRes())
+    val cardDescription = stringResource(R.string.cd_risk_summary, riskLabel, item.app.label)
+    val seeDetailsLabel = stringResource(R.string.action_see_details)
     // Tint the whole card with the risk colour so a dangerous row never looks like a mild one.
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick),
+            .clickable(onClick = onClick)
+            .clearAndSetSemantics {
+                contentDescription = cardDescription
+                role = Role.Button
+                onClick(label = seeDetailsLabel) {
+                    onClick()
+                    true
+                }
+            },
         colors = CardDefaults.cardColors(
             containerColor = item.assessment.level.color().copy(alpha = 0.10f)
         )
@@ -276,6 +380,8 @@ private fun AppRiskCard(item: AssessedApp, onClick: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
+            AppAvatar(item)
+            Spacer(Modifier.width(12.dp))
             Column(Modifier.padding(end = 12.dp).weight(1f)) {
                 Text(item.app.label, style = MaterialTheme.typography.titleLarge)
                 Spacer(Modifier.height(4.dp))
@@ -289,6 +395,46 @@ private fun AppRiskCard(item: AssessedApp, onClick: () -> Unit) {
                 text = stringResource(item.assessment.level.labelRes()),
                 color = item.assessment.level.color(),
                 textColor = item.assessment.level.onColor()
+            )
+        }
+    }
+}
+
+/**
+ * The app's own launcher icon, so a non-technical user recognises which app this is at a glance (the
+ * way Play Protect shows it). When no icon is available (e.g. an app that hides its launcher icon, or
+ * a package we can't read), we fall back to a tinted monogram circle — the app's first letter in its
+ * risk colour — so the slot always looks deliberate. Decorative: the card's merged semantics already
+ * announce the verdict and name to a screen reader.
+ */
+@Composable
+private fun AppAvatar(item: AssessedApp) {
+    val context = LocalContext.current
+    val icon = remember(item.app.packageName) {
+        runCatching {
+            context.packageManager.getApplicationIcon(item.app.packageName).toBitmap().asImageBitmap()
+        }.getOrNull()
+    }
+    if (icon != null) {
+        Image(
+            bitmap = icon,
+            contentDescription = null,
+            modifier = Modifier
+                .size(44.dp)
+                .clip(CircleShape)
+        )
+    } else {
+        Box(
+            modifier = Modifier
+                .size(44.dp)
+                .clip(CircleShape)
+                .background(item.assessment.level.color()),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = item.app.label.firstOrNull()?.uppercase() ?: "?",
+                color = item.assessment.level.onColor(),
+                style = MaterialTheme.typography.titleLarge
             )
         }
     }

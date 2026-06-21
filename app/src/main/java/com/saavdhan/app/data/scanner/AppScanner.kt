@@ -31,6 +31,49 @@ data class ScanResult(
     val partial: Boolean
 )
 
+/** Result of [resilientPackageFetch]: the items we got, and whether we had to give up on some. */
+internal data class FetchOutcome<T>(val items: List<T>, val partial: Boolean)
+
+/**
+ * Resilient package listing — the fix for a silent total scan failure on cheap phones with many apps.
+ *
+ * The fast path is one bulk call ([bulk]) that loads every app with heavy data (permissions,
+ * signatures, activities). On a budget phone with hundreds of apps that single Binder reply can
+ * exceed the 1 MB limit and fail in TWO ways: it throws (AOSP), OR some OEM ROMs (MIUI/ColorOS)
+ * SILENTLY truncate the list and return fewer apps with no error — the worst case for a security
+ * scanner, because it looks like success.
+ *
+ * So we take a cheap [names] count first (flags=0 → tiny per-app payload, fits the limit), then try
+ * [bulk]. We trust the bulk result only if it didn't throw AND returned at least [trustRatio] of the
+ * names. Otherwise we fall back to fetching each app individually via [perName] (one bounded Binder
+ * call each), skipping any that fail and reporting `partial = true`.
+ *
+ * Pure and Android-free (generic over T) so every branch is unit-tested on the JVM without a device.
+ */
+internal fun <T> resilientPackageFetch(
+    names: () -> List<String>,
+    bulk: () -> List<T>,
+    perName: (String) -> T?,
+    trustRatio: Double = 0.95
+): FetchOutcome<T> {
+    val keys = try {
+        names()
+    } catch (e: Exception) {
+        // Even the cheap listing failed; we can't see the apps. Report nothing, but flag it.
+        return FetchOutcome(emptyList(), partial = true)
+    }
+    val bulkItems = try {
+        bulk()
+    } catch (e: Exception) {
+        null
+    }
+    if (bulkItems != null && bulkItems.size >= keys.size * trustRatio) {
+        return FetchOutcome(bulkItems, partial = false)
+    }
+    val recovered = keys.mapNotNull { perName(it) }
+    return FetchOutcome(recovered, partial = recovered.size < keys.size)
+}
+
 /**
  * Reads the real facts about installed apps using Android's public APIs (no root needed) and runs
  * each through [RiskEngine]. This is the only place that talks to Android's package system.
@@ -62,7 +105,20 @@ class AppScanner(private val context: Context) {
         }
         val myPackage = context.packageName
 
-        val assessed = installedPackages()
+        // Resilient fetch: one fast bulk call, but degrade to a per-package fetch (and mark the scan
+        // partial) if that call fails or is silently truncated on a budget phone with many apps.
+        val packages = resilientPackageFetch(
+            names = { lightweightPackageNames() },
+            bulk = { bulkInstalledPackages() },
+            perName = { name ->
+                try {
+                    packageInfo(name)
+                } catch (e: Exception) {
+                    null
+                }
+            }
+        )
+        val assessed = packages.items
             .mapNotNull { info ->
                 try {
                     assessInfo(info, accessibilityPackages, adminPackages, notificationListenerPackages, myPackage)
@@ -82,8 +138,8 @@ class AppScanner(private val context: Context) {
             .sortedByDescending { it.assessment.level.ordinal }
             .distinctBy { it.app.packageName }
 
-        // Mark as partial if visibility is restricted (Play policy, OEM restrictions, etc.)
-        val isPartial = !canQueryAllPackages()
+        // Partial if visibility is restricted (Play policy / OEM) OR the fetch had to skip apps.
+        val isPartial = !canQueryAllPackages() || packages.partial
         ScanResult(apps = sorted, partial = isPartial)
     }
 
@@ -160,8 +216,9 @@ class AppScanner(private val context: Context) {
         return permission == PackageManager.PERMISSION_GRANTED
     }
 
+    /** The fast path: one bulk call loading every app with the heavy data the brain needs. */
     @Suppress("DEPRECATION")
-    private fun installedPackages(): List<PackageInfo> {
+    private fun bulkInstalledPackages(): List<PackageInfo> {
         val flags = PackageManager.GET_PERMISSIONS or PackageManager.GET_SIGNATURES or PackageManager.GET_ACTIVITIES
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             pm.getInstalledPackages(
@@ -172,6 +229,21 @@ class AppScanner(private val context: Context) {
         } else {
             pm.getInstalledPackages(flags)
         }
+    }
+
+    /**
+     * The cheap pass: just package names, no heavy data, so the reply stays well under the Binder
+     * limit even on a phone with hundreds of apps. Gives us an authoritative count (to spot a
+     * silently-truncated bulk call) and the names to fetch one-by-one on the fallback path.
+     */
+    @Suppress("DEPRECATION")
+    private fun lightweightPackageNames(): List<String> {
+        val list = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            pm.getInstalledPackages(PackageManager.PackageInfoFlags.of(0L))
+        } else {
+            pm.getInstalledPackages(0)
+        }
+        return list.map { it.packageName }
     }
 
     @Suppress("DEPRECATION")

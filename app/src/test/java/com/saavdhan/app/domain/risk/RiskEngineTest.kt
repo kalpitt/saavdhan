@@ -321,6 +321,29 @@ class RiskEngineTest {
     }
 
     @Test
+    fun `every signal has a weight, and the decisive clues outrank the circumstantial ones`() {
+        // The map that drives the score must cover every signal — a missing one would crash the
+        // UI ranking (weightOf uses getValue). This guards against adding a signal without a weight.
+        RiskSignal.values().forEach { signal ->
+            assertTrue("missing weight for $signal", RiskEngine.weightOf(signal) > 0)
+        }
+        // Impersonation (the loudest lie) must outrank a single power, which must outrank mere
+        // timing — so the detail screen always leads with the most damning evidence.
+        assertTrue(RiskEngine.weightOf(RiskSignal.IMPERSONATION) > RiskEngine.weightOf(RiskSignal.ACCESSIBILITY))
+        assertTrue(RiskEngine.weightOf(RiskSignal.ACCESSIBILITY) > RiskEngine.weightOf(RiskSignal.NEW_INSTALL))
+    }
+
+    @Test
+    fun `the score equals the sum of its signal weights`() {
+        // Locks the scoring refactor: the points the user could tally from the reasons shown must
+        // add up to the score the engine assigned.
+        val result = RiskEngine.assess(
+            app(installSource = InstallSource.SIDELOADED, accessibility = true, deviceAdmin = true, smsGranted = true)
+        )
+        assertEquals(result.signals.sumOf { RiskEngine.weightOf(it) }, result.score)
+    }
+
+    @Test
     fun `Play-installed app with a trusted prefix and Accessibility is still allowed`() {
         // Play-verified installs of trusted-prefix packages stay trusted even with powers.
         val result = RiskEngine.assess(
