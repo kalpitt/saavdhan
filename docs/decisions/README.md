@@ -26,6 +26,7 @@ An ADR is a short note capturing **one** important decision and **why** we made 
 | [0010](0010-sdk-levels.md) | minSdk 24, target/compile SDK 35 | Accepted |
 | [0011](0011-no-di-framework-yet.md) | No dependency-injection framework yet | Accepted |
 | [0012](0012-explanation-ranked-by-engine-weight.md) | Detail-screen explanation ranked by the engine's own weights | Accepted |
+| [0013](0013-resilient-package-fetch.md) | Resilient package fetch (survive the Binder limit on cheap phones) | Accepted |
 
 ## Statuses
 **Proposed** → under discussion · **Accepted** → in effect · **Superseded** → replaced by a newer ADR.
