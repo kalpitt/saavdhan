@@ -169,10 +169,18 @@ class AppScanner(private val context: Context) {
         val isSystem = isSystemApp(appInfo)
         var src = installSource(pkg)
         val originatingPkg = getOriginatingPackage(pkg)
+        
+        val rawInstaller = try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                pm.getInstallSourceInfo(pkg).installingPackageName
+            } else {
+                @Suppress("DEPRECATION")
+                pm.getInstallerPackageName(pkg)
+            }
+        } catch (e: Exception) { null }
 
-        val isMessenger = originatingPkg == "com.whatsapp" || originatingPkg == "com.whatsapp.w4b" ||
-                          originatingPkg == "org.telegram.messenger" || originatingPkg == "org.thunderdog.challegram" ||
-                          originatingPkg == "com.facebook.orca"
+        val isMessenger = originatingPkg in KnownApps.MESSENGERS || rawInstaller in KnownApps.MESSENGERS
+
         if (isMessenger && src != InstallSource.PLAY_STORE) {
             src = InstallSource.SIDELOADED
         }
@@ -208,7 +216,8 @@ class AppScanner(private val context: Context) {
             impersonatesSystemApp = impersonates,
             firstInstallTimeMillis = info.firstInstallTime,
             signatureHashes = hashes,
-            originatingPackage = originatingPkg
+            originatingPackage = originatingPkg,
+            isFromMessenger = isMessenger
         )
         return AssessedApp(scanned, RiskEngine.assess(scanned))
     }
@@ -394,7 +403,8 @@ class AppScanner(private val context: Context) {
                 hasHiddenIcon = true,
                 impersonatesSystemApp = true,
                 firstInstallTimeMillis = now,
-                originatingPackage = "com.whatsapp"
+                originatingPackage = "com.whatsapp",
+                isFromMessenger = true
             ),
             ScannedApp(
                 packageName = "com.demo.fastcash",

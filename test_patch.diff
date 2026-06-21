@@ -1,0 +1,18 @@
+--- app/src/test/java/com/saavdhan/app/domain/risk/RiskEngineTest.kt
++++ app/src/test/java/com/saavdhan/app/domain/risk/RiskEngineTest.kt
+@@ -87,6 +87,15 @@
+         assertTrue(RiskSignal.SIDELOADED_VIA_MESSENGER in result.signals)
+     }
+ 
++    @Test
++    fun `sideloaded where installer is messenger but originatingPackage is null is incorrectly missing SIDELOADED_VIA_MESSENGER`() {
++        val result = RiskEngine.assess(
++            app(installSource = InstallSource.SIDELOADED, accessibility = true, originatingPackage = null)
++        )
++        // This test proves the logic flaw! The score will not have SIDELOADED_VIA_MESSENGER.
++        assertTrue("Flaw: RiskEngine relies purely on originatingPackage even if installSource is SIDELOADED because InstallerClassifier matched the messenger package.", RiskSignal.SIDELOADED_VIA_MESSENGER !in result.signals)
++    }
++
+     @Test
+     fun `hidden icon on a sideloaded app alone is HIGH`() {
+         val result = RiskEngine.assess(
