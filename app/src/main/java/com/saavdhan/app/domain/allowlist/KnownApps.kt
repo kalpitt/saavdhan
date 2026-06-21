@@ -55,6 +55,17 @@ object KnownApps {
     )
 
     /**
+     * Package names of popular messenger apps that are frequently used to deliver scam APKs.
+     */
+    val MESSENGERS: Set<String> = setOf(
+        "com.whatsapp",
+        "com.whatsapp.w4b",
+        "org.telegram.messenger",
+        "org.thunderdog.challegram", // Telegram X
+        "com.facebook.orca" // Messenger
+    )
+
+    /**
      * Packages we explicitly trust even though they legitimately hold powerful permissions
      * (e.g. screen readers that genuinely need Accessibility). Prevents needless alarm.
      */

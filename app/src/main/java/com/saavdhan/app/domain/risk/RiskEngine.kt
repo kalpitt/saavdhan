@@ -120,14 +120,8 @@ object RiskEngine {
             add(RiskSignal.SMS_REQUESTED)
         }
         if (app.hasNotificationListener) add(RiskSignal.NOTIFICATION_LISTENER)
-        
         if (app.installSource == InstallSource.SIDELOADED) {
-            val isMessenger = app.originatingPackage == "com.whatsapp" || 
-                              app.originatingPackage == "com.whatsapp.w4b" ||
-                              app.originatingPackage == "org.telegram.messenger" || 
-                              app.originatingPackage == "org.thunderdog.challegram" ||
-                              app.originatingPackage == "com.facebook.orca"
-            if (isMessenger) {
+            if (app.isFromMessenger) {
                 add(RiskSignal.SIDELOADED_VIA_MESSENGER)
             } else {
                 add(RiskSignal.SIDELOADED)
