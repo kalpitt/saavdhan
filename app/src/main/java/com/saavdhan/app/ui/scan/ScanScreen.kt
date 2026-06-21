@@ -67,8 +67,6 @@ import com.saavdhan.app.ui.components.RiskChip
 import com.saavdhan.app.ui.components.SecondaryButton
 import com.saavdhan.app.ui.labelRes
 import com.saavdhan.app.ui.onColor
-import com.saavdhan.app.ui.theme.RiskCritical
-import com.saavdhan.app.ui.theme.RiskLow
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
