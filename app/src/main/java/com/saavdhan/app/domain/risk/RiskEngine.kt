@@ -43,6 +43,7 @@ object RiskEngine {
      */
     private val WEIGHTS: Map<RiskSignal, Int> = mapOf(
         RiskSignal.IMPERSONATION to 50,
+        RiskSignal.SIDELOADED_VIA_MESSENGER to 40,
         RiskSignal.ACCESSIBILITY to 40,
         RiskSignal.DEVICE_ADMIN to 40,
         RiskSignal.HIDDEN_ICON to 40,
@@ -119,7 +120,13 @@ object RiskEngine {
             add(RiskSignal.SMS_REQUESTED)
         }
         if (app.hasNotificationListener) add(RiskSignal.NOTIFICATION_LISTENER)
-        if (app.installSource == InstallSource.SIDELOADED) add(RiskSignal.SIDELOADED)
+        if (app.installSource == InstallSource.SIDELOADED) {
+            if (app.isFromMessenger) {
+                add(RiskSignal.SIDELOADED_VIA_MESSENGER)
+            } else {
+                add(RiskSignal.SIDELOADED)
+            }
+        }
         // Hidden icon is only a flag for sideloaded apps (store apps may legitimately lack icons).
         if (app.installSource == InstallSource.SIDELOADED && app.hasHiddenIcon) {
             add(RiskSignal.HIDDEN_ICON)

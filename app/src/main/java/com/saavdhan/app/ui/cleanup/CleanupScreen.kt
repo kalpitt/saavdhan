@@ -41,14 +41,14 @@ import com.saavdhan.app.R
 import com.saavdhan.app.domain.cleanup.CleanupStep
 import com.saavdhan.app.domain.cleanup.CleanupStepId
 import com.saavdhan.app.domain.cleanup.StepStatus
+import com.saavdhan.app.domain.model.RiskLevel
 import com.saavdhan.app.system.deeplink.SettingsDeepLinks
 import com.saavdhan.app.system.overlay.OverlayCoach
+import com.saavdhan.app.ui.color
 import com.saavdhan.app.ui.components.InfoCard
 import com.saavdhan.app.ui.components.NumberBadge
 import com.saavdhan.app.ui.components.PrimaryButton
 import com.saavdhan.app.ui.components.SecondaryButton
-import com.saavdhan.app.ui.theme.RiskHigh
-import com.saavdhan.app.ui.theme.RiskLow
 
 /**
  * The guided-cleanup checklist. It re-reads the phone's live state every time the screen resumes
@@ -119,7 +119,7 @@ fun CleanupScreen(
                 Text(
                     stringResource(R.string.cleanup_done_title),
                     style = MaterialTheme.typography.titleLarge,
-                    color = RiskLow
+                    color = RiskLevel.LOW.color()
                 )
                 InfoCard(text = stringResource(R.string.cleanup_done_desc))
                 Spacer(Modifier.height(4.dp))
@@ -170,7 +170,7 @@ private fun StepCard(step: CleanupStep, number: Int, total: Int, onAction: (() -
     val title = stringResource(step.id.titleRes())
     when (step.status) {
         StepStatus.DONE -> StepHeader(
-            icon = { Icon(Icons.Filled.CheckCircle, contentDescription = null, tint = RiskLow) },
+            icon = { Icon(Icons.Filled.CheckCircle, contentDescription = null, tint = RiskLevel.LOW.color()) },
             title = title,
             trailing = stringResource(R.string.status_done)
         )
@@ -257,7 +257,7 @@ private fun StepHeader(
             Text(
                 trailing,
                 style = MaterialTheme.typography.labelLarge,
-                color = RiskLow,
+                color = RiskLevel.LOW.color(),
                 fontWeight = FontWeight.SemiBold
             )
         }
@@ -274,7 +274,7 @@ private fun WarningCard(
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = RiskHigh.copy(alpha = 0.10f))
+        colors = CardDefaults.cardColors(containerColor = RiskLevel.HIGH.color().copy(alpha = 0.10f))
     ) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(
@@ -284,7 +284,7 @@ private fun WarningCard(
                 Icon(
                     Icons.Filled.Warning,
                     contentDescription = null,
-                    tint = RiskHigh,
+                    tint = RiskLevel.HIGH.color(),
                     modifier = Modifier.size(20.dp)
                 )
                 Text(title, style = MaterialTheme.typography.titleLarge)

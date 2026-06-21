@@ -167,7 +167,25 @@ class AppScanner(private val context: Context) {
 
         val label = pm.getApplicationLabel(appInfo).toString()
         val isSystem = isSystemApp(appInfo)
-        val src = installSource(pkg)
+        var src = installSource(pkg)
+        val originatingPkg = getOriginatingPackage(pkg)
+
+        val rawInstaller = try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                pm.getInstallSourceInfo(pkg).installingPackageName
+            } else {
+                @Suppress("DEPRECATION")
+                pm.getInstallerPackageName(pkg)
+            }
+        } catch (e: Exception) {
+            null
+        }
+
+        val isMessenger = originatingPkg in KnownApps.MESSENGERS || rawInstaller in KnownApps.MESSENGERS
+
+        if (isMessenger && src != InstallSource.PLAY_STORE) {
+            src = InstallSource.SIDELOADED
+        }
 
         val hashes = getSignatureHashes(info)
         android.util.Log.d("SaavdhanScanner", "App: $pkg, Signature Hash: $hashes")
@@ -199,7 +217,9 @@ class AppScanner(private val context: Context) {
             hasHiddenIcon = !isSystem && pm.getLaunchIntentForPackage(pkg) == null,
             impersonatesSystemApp = impersonates,
             firstInstallTimeMillis = info.firstInstallTime,
-            signatureHashes = hashes
+            signatureHashes = hashes,
+            originatingPackage = originatingPkg,
+            isFromMessenger = isMessenger
         )
         return AssessedApp(scanned, RiskEngine.assess(scanned))
     }
@@ -319,6 +339,20 @@ class AppScanner(private val context: Context) {
         return InstallerClassifier.classify(installer)
     }
 
+    @Suppress("DEPRECATION")
+    private fun getOriginatingPackage(packageName: String): String? {
+        return try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                val info = pm.getInstallSourceInfo(packageName)
+                info.originatingPackageName ?: info.initiatingPackageName
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            null
+        }
+    }
+
     private val smsPermissions = setOf(
         android.Manifest.permission.RECEIVE_SMS,
         android.Manifest.permission.READ_SMS,
@@ -370,7 +404,9 @@ class AppScanner(private val context: Context) {
                 hasNotificationListener = true,
                 hasHiddenIcon = true,
                 impersonatesSystemApp = true,
-                firstInstallTimeMillis = now
+                firstInstallTimeMillis = now,
+                originatingPackage = "com.whatsapp",
+                isFromMessenger = true
             ),
             ScannedApp(
                 packageName = "com.demo.fastcash",
