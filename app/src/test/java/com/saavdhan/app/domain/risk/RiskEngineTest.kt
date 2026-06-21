@@ -27,7 +27,8 @@ class RiskEngineTest {
         smsGranted: Boolean = false,
         notificationListener: Boolean = false,
         hiddenIcon: Boolean = false,
-        impersonates: Boolean = false
+        impersonates: Boolean = false,
+        originatingPackage: String? = null
     ) = ScannedApp(
         packageName = packageName,
         label = label,
@@ -40,7 +41,9 @@ class RiskEngineTest {
         hasNotificationListener = notificationListener,
         hasHiddenIcon = hiddenIcon,
         impersonatesSystemApp = impersonates,
-        firstInstallTimeMillis = 0L
+        firstInstallTimeMillis = 0L,
+        originatingPackage = originatingPackage,
+        isFromMessenger = originatingPackage in com.saavdhan.app.domain.allowlist.KnownApps.MESSENGERS
     )
 
     @Test
@@ -65,6 +68,35 @@ class RiskEngineTest {
             app(installSource = InstallSource.SIDELOADED, accessibility = true)
         )
         assertEquals(RiskLevel.HIGH, result.level)
+    }
+
+    @Test
+    fun `sideloaded via messenger plus accessibility is CRITICAL`() {
+        val result = RiskEngine.assess(
+            app(installSource = InstallSource.SIDELOADED, accessibility = true, originatingPackage = "com.whatsapp")
+        )
+        assertEquals(RiskLevel.CRITICAL, result.level)
+        assertTrue(RiskSignal.SIDELOADED_VIA_MESSENGER in result.signals)
+    }
+
+    @Test
+    fun `sideloaded via WhatsApp Business plus accessibility is CRITICAL`() {
+        val result = RiskEngine.assess(
+            app(installSource = InstallSource.SIDELOADED, accessibility = true, originatingPackage = "com.whatsapp.w4b")
+        )
+        assertEquals(RiskLevel.CRITICAL, result.level)
+        assertTrue(RiskSignal.SIDELOADED_VIA_MESSENGER in result.signals)
+    }
+
+    @Test
+    fun `sideloaded where installer is messenger but originatingPackage is null is correctly caught via AppScanner`() {
+        // Here we simulate the fact that AppScanner detected the installer as messenger, so isFromMessenger is true,
+        // even though originatingPackage is null.
+        val result = RiskEngine.assess(
+            app(installSource = InstallSource.SIDELOADED, accessibility = true, originatingPackage = null).copy(isFromMessenger = true)
+        )
+        // This test proves the fix! The score MUST have SIDELOADED_VIA_MESSENGER.
+        assertTrue("Fix: RiskEngine uses isFromMessenger flag passed by AppScanner.", RiskSignal.SIDELOADED_VIA_MESSENGER in result.signals)
     }
 
     @Test

@@ -67,8 +67,6 @@ import com.saavdhan.app.ui.components.RiskChip
 import com.saavdhan.app.ui.components.SecondaryButton
 import com.saavdhan.app.ui.labelRes
 import com.saavdhan.app.ui.onColor
-import com.saavdhan.app.ui.theme.RiskCritical
-import com.saavdhan.app.ui.theme.RiskLow
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
@@ -226,7 +224,7 @@ private fun ResultsContent(
                     Icon(
                         Icons.Filled.CheckCircle,
                         contentDescription = null, // decorative — the title below says it
-                        tint = RiskLow,
+                        tint = RiskLevel.LOW.color(),
                         modifier = Modifier.size(64.dp)
                     )
                     Spacer(Modifier.height(12.dp))
@@ -256,7 +254,7 @@ private fun ResultsContent(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Icon(Icons.Filled.Warning, contentDescription = null, tint = RiskCritical)
+                        Icon(Icons.Filled.Warning, contentDescription = null, tint = RiskLevel.CRITICAL.color())
                         Text(title, style = MaterialTheme.typography.titleLarge)
                     }
                 }

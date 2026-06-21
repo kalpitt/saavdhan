@@ -15,10 +15,23 @@ import androidx.compose.ui.unit.sp
 val Teal = Color(0xFF00695C)
 val TealDark = Color(0xFF4DB6AC)
 
-val RiskCritical = Color(0xFFC62828) // deep red
-val RiskHigh = Color(0xFFEF6C00) // strong orange
-val RiskSuspicious = Color(0xFFF9A825) // amber
-val RiskLow = Color(0xFF2E7D32) // calm green
+// Light Mode Semantics (Deep colors)
+val RiskCriticalLight = Color(0xFFC62828) // deep red
+val RiskHighLight = Color(0xFFEF6C00) // strong orange
+val RiskSuspiciousLight = Color(0xFFF9A825) // amber
+val RiskLowLight = Color(0xFF2E7D32) // calm green
+
+// Dark Mode Semantics (High-luminance pastels for contrast)
+val RiskCriticalDark = Color(0xFFFF8A80) // coral red
+val RiskHighDark = Color(0xFFFFB74D) // pastel orange
+val RiskSuspiciousDark = Color(0xFFFFE082) // soft amber
+val RiskLowDark = Color(0xFF81C784) // pastel green
+
+// Backward compatibility (deprecated, prefer using RiskLevel.color() inside @Composable)
+val RiskCritical = RiskCriticalLight
+val RiskHigh = RiskHighLight
+val RiskSuspicious = RiskSuspiciousLight
+val RiskLow = RiskLowLight
 
 private val LightColors = lightColorScheme(
     primary = Teal,

@@ -49,7 +49,10 @@ enum class RiskSignal {
     IMPERSONATION,
 
     /** Was installed very recently (e.g., within the last 24 hours). */
-    NEW_INSTALL
+    NEW_INSTALL,
+
+    /** Was sideloaded directly from a common messenger (WhatsApp, Telegram). Extremely high risk for trojans. */
+    SIDELOADED_VIA_MESSENGER
 }
 
 /**

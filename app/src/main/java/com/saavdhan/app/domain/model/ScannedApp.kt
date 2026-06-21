@@ -49,7 +49,13 @@ data class ScannedApp(
     val firstInstallTimeMillis: Long,
 
     /** The SHA-256 hashes of the app's signing certificates. Used to verify trusted developers. */
-    val signatureHashes: Set<String> = emptySet()
+    val signatureHashes: Set<String> = emptySet(),
+
+    /** The package name of the app that installed this app (e.g. WhatsApp, Telegram). Null if unknown. */
+    val originatingPackage: String? = null,
+
+    /** True if this app was definitively initiated or installed by a known messenger app. */
+    val isFromMessenger: Boolean = false
 )
 
 /** How an app arrived on the phone. */

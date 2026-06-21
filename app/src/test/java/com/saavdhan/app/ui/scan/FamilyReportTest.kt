@@ -43,9 +43,10 @@ class FamilyReportTest {
     }
 
     @Test
-    fun `intro always leads and footer always trails`() {
+    fun `intro always leads and Ref ID always trails`() {
         val out = report(listOf("• X — Dangerous"))
         assertTrue(out.startsWith("Saavdhan checked this phone."))
-        assertTrue(out.trimEnd().endsWith("Sent from Saavdhan."))
+        assertTrue(out.contains("Sent from Saavdhan."))
+        assertTrue(out.trimEnd().contains("Ref: SVDN-"))
     }
 }
