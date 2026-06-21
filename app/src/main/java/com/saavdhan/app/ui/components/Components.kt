@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.saavdhan.app.ui.color
 
 /** A coloured pill showing the risk level word (e.g. "Very dangerous"). */
 @Composable
@@ -76,7 +77,7 @@ fun SecondaryButton(text: String, onClick: () -> Unit, modifier: Modifier = Modi
 fun DangerButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
     Button(
         onClick = onClick,
-        colors = ButtonDefaults.buttonColors(containerColor = com.saavdhan.app.ui.theme.RiskCritical),
+        colors = ButtonDefaults.buttonColors(containerColor = com.saavdhan.app.domain.model.RiskLevel.CRITICAL.color()),
         modifier = modifier
             .fillMaxWidth()
             .height(56.dp),

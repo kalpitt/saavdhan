@@ -27,7 +27,8 @@ class RiskEngineTest {
         smsGranted: Boolean = false,
         notificationListener: Boolean = false,
         hiddenIcon: Boolean = false,
-        impersonates: Boolean = false
+        impersonates: Boolean = false,
+        originatingPackage: String? = null
     ) = ScannedApp(
         packageName = packageName,
         label = label,
@@ -40,7 +41,8 @@ class RiskEngineTest {
         hasNotificationListener = notificationListener,
         hasHiddenIcon = hiddenIcon,
         impersonatesSystemApp = impersonates,
-        firstInstallTimeMillis = 0L
+        firstInstallTimeMillis = 0L,
+        originatingPackage = originatingPackage
     )
 
     @Test
@@ -65,6 +67,15 @@ class RiskEngineTest {
             app(installSource = InstallSource.SIDELOADED, accessibility = true)
         )
         assertEquals(RiskLevel.HIGH, result.level)
+    }
+
+    @Test
+    fun `sideloaded via messenger plus accessibility is CRITICAL`() {
+        val result = RiskEngine.assess(
+            app(installSource = InstallSource.SIDELOADED, accessibility = true, originatingPackage = "com.whatsapp")
+        )
+        assertEquals(RiskLevel.CRITICAL, result.level)
+        assertTrue(RiskSignal.SIDELOADED_VIA_MESSENGER in result.signals)
     }
 
     @Test

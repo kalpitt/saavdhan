@@ -53,6 +53,7 @@
     <string name="signal_sms_requested">Requests permission to read your text messages</string>
     <string name="signal_notification_listener">Can read all your notifications (including bank OTP messages)</string>
     <string name="signal_sideloaded">Installed from outside the Play Store</string>
+    <string name="signal_sideloaded_via_messenger">Installed directly from a messenger app (e.g., WhatsApp, Telegram)</string>
     <string name="signal_hidden_icon">Hides its icon from your app list</string>
     <string name="signal_impersonation">Pretends to be a trusted system app</string>
     <string name="signal_new_install">Installed very recently (less than 24 hours ago)</string>
