@@ -1,5 +1,6 @@
 package com.saavdhan.app.ui.scan
 
+import android.content.Intent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -35,6 +36,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
@@ -50,6 +52,7 @@ import com.saavdhan.app.ui.color
 import com.saavdhan.app.ui.components.InfoCard
 import com.saavdhan.app.ui.components.PrimaryButton
 import com.saavdhan.app.ui.components.RiskChip
+import com.saavdhan.app.ui.components.SecondaryButton
 import com.saavdhan.app.ui.labelRes
 import com.saavdhan.app.ui.onColor
 import com.saavdhan.app.ui.theme.RiskCritical
@@ -259,6 +262,38 @@ private fun ResultsContent(
         item {
             Spacer(Modifier.height(8.dp))
             PrimaryButton(text = stringResource(R.string.scan_again), onClick = onScanAgain)
+
+            // Offline "send to family": hand the worried adult child who set Saavdhan up a plain
+            // summary they can read, via the phone's own share sheet (WhatsApp/SMS). No network.
+            val context = LocalContext.current
+            val shareLabel = stringResource(R.string.action_share_result)
+            Spacer(Modifier.height(12.dp))
+            SecondaryButton(
+                text = shareLabel,
+                onClick = {
+                    val appLines = allFlagged.map { flagged ->
+                        context.getString(
+                            R.string.share_app_line,
+                            flagged.app.label,
+                            context.getString(flagged.assessment.level.labelRes())
+                        )
+                    }
+                    val report = buildFamilyReport(
+                        intro = context.getString(R.string.share_intro),
+                        appLines = appLines,
+                        safeLine = context.getString(R.string.share_safe),
+                        foundHeader = context.getString(R.string.share_found_header),
+                        advice = context.getString(R.string.share_advice),
+                        footer = context.getString(R.string.share_footer)
+                    )
+                    val send = Intent(Intent.ACTION_SEND).apply {
+                        type = "text/plain"
+                        putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.share_subject))
+                        putExtra(Intent.EXTRA_TEXT, report)
+                    }
+                    context.startActivity(Intent.createChooser(send, shareLabel))
+                }
+            )
         }
     }
 }
