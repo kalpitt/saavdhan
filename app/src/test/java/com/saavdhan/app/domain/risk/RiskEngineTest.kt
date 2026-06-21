@@ -140,9 +140,12 @@ class RiskEngineTest {
     }
 
     @Test
-    fun `SMS access alone is SUSPICIOUS`() {
+    fun `SMS access alone is LOW (a messaging app should not be flagged without other signals)`() {
+        // SMS_ACCESS weight is 10 — below the SUSPICIOUS threshold — so a store-installed
+        // messaging app that reads SMS is LOW, not SUSPICIOUS. A sideloaded SMS app adds
+        // SIDELOADED (20) for a combined 30 = SUSPICIOUS, which is the correct distinction.
         val result = RiskEngine.assess(app(requestsSms = true, smsGranted = true))
-        assertEquals(RiskLevel.SUSPICIOUS, result.level)
+        assertEquals(RiskLevel.LOW, result.level)
     }
 
     @Test

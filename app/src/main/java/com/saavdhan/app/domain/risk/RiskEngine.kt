@@ -47,7 +47,7 @@ object RiskEngine {
         RiskSignal.DEVICE_ADMIN to 40,
         RiskSignal.HIDDEN_ICON to 40,
         RiskSignal.NOTIFICATION_LISTENER to 20,
-        RiskSignal.SMS_ACCESS to 20,
+        RiskSignal.SMS_ACCESS to 10,
         RiskSignal.SIDELOADED to 20,
         RiskSignal.SMS_REQUESTED to 10,
         RiskSignal.NEW_INSTALL to 10
