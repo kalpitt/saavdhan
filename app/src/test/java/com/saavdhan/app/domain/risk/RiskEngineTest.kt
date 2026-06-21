@@ -140,9 +140,12 @@ class RiskEngineTest {
     }
 
     @Test
-    fun `SMS access alone is SUSPICIOUS`() {
+    fun `SMS access alone is LOW (a messaging app should not be flagged without other signals)`() {
+        // SMS_ACCESS weight is 10 — below the SUSPICIOUS threshold — so a store-installed
+        // messaging app that reads SMS is LOW, not SUSPICIOUS. A sideloaded SMS app adds
+        // SIDELOADED (20) for a combined 30 = SUSPICIOUS, which is the correct distinction.
         val result = RiskEngine.assess(app(requestsSms = true, smsGranted = true))
-        assertEquals(RiskLevel.SUSPICIOUS, result.level)
+        assertEquals(RiskLevel.LOW, result.level)
     }
 
     @Test
@@ -324,7 +327,7 @@ class RiskEngineTest {
     fun `every signal has a weight, and the decisive clues outrank the circumstantial ones`() {
         // The map that drives the score must cover every signal — a missing one would crash the
         // UI ranking (weightOf uses getValue). This guards against adding a signal without a weight.
-        RiskSignal.values().forEach { signal ->
+        RiskSignal.entries.forEach { signal ->
             assertTrue("missing weight for $signal", RiskEngine.weightOf(signal) > 0)
         }
         // Impersonation (the loudest lie) must outrank a single power, which must outrank mere
