@@ -79,6 +79,15 @@ class RiskEngineTest {
     }
 
     @Test
+    fun `sideloaded via WhatsApp Business plus accessibility is CRITICAL`() {
+        val result = RiskEngine.assess(
+            app(installSource = InstallSource.SIDELOADED, accessibility = true, originatingPackage = "com.whatsapp.w4b")
+        )
+        assertEquals(RiskLevel.CRITICAL, result.level)
+        assertTrue(RiskSignal.SIDELOADED_VIA_MESSENGER in result.signals)
+    }
+
+    @Test
     fun `hidden icon on a sideloaded app alone is HIGH`() {
         val result = RiskEngine.assess(
             app(installSource = InstallSource.SIDELOADED, hiddenIcon = true)

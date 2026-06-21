@@ -22,7 +22,12 @@ object InstallerClassifier {
         "com.miui.packageinstaller", // Xiaomi file manager / sideload installer
         "com.samsung.android.packageinstaller", // Samsung package manager
         "com.coloros.filemanager", // Oppo/Realme file manager
-        "com.transsion.packageinstaller" // Tecno/Infinix file manager
+        "com.transsion.packageinstaller", // Tecno/Infinix file manager
+        "com.whatsapp",
+        "com.whatsapp.w4b",
+        "org.telegram.messenger",
+        "org.thunderdog.challegram",
+        "com.facebook.orca"
         -> InstallSource.SIDELOADED
         else -> InstallSource.OTHER_STORE
     }
