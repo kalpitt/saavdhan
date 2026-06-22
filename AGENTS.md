@@ -23,6 +23,10 @@ plain English, so skim it if you're curious what your assistant is being told.
 Before you stop or run low on context, follow the **end-of-session ritual** in
 [`context/README.md`](context/README.md). That ritual is what keeps this system alive.
 
+**Claude Code shortcut:** `/orient` runs steps 1–4; `/handoff` runs the end-of-session ritual;
+`/release` the release runbook. These skills *mirror* this prose (which stays authoritative for
+other tools that can't run slash-commands). Details in §8.
+
 ---
 
 ## 1. What this project is
@@ -118,8 +122,11 @@ context/            living state: STATE / PROGRESS / PROFILE / handoffs  ← rea
 **Architecture rules (don't violate):**
 - `domain/` must stay free of Android imports so it stays unit-testable. Android-specific code
   lives in `data/`, `system/`, `ui/`. ([`docs/decisions/0004-layered-architecture.md`](docs/decisions/0004-layered-architecture.md))
+  Also enforced as a path-scoped rule: [`.claude/rules/domain-no-android.md`](.claude/rules/domain-no-android.md).
 - **Every user-facing string lives in both** `values/strings.xml` and `values-hi/strings.xml`.
-  Never hard-code user-facing text. Add the English and Hindi at the same time.
+  Never hard-code user-facing text. Add the English and Hindi at the same time. Mirrored keys are
+  enforced mechanically by `scripts/drift_check.sh` (Gate 2) and flagged at edit time by
+  [`.claude/rules/bilingual-strings.md`](.claude/rules/bilingual-strings.md).
 - The risk engine is **deterministic and explainable** — every verdict carries its reasons so
   the UI can explain in plain language. ([`docs/decisions/0009-deterministic-rule-engine.md`](docs/decisions/0009-deterministic-rule-engine.md))
 - We are honest about OS walls (detective, not enforcer). Never claim to auto-fix what Android
@@ -177,3 +184,16 @@ echo "# Phase 3 refactor (3 PRs): ..." > context/plans/2026-06-10-phase3-refacto
 rm context/plans/2026-06-10-phase3-refactor.md
 git add context/ && git commit "Session 2: Phase 3 refactor complete (all 3 PRs merged)"
 ```
+
+---
+
+## 8. The `.claude/` steering layer (Claude Code only)
+
+Claude Code reads extra files other AI tools ignore. They **accelerate** the rules above — never
+replace them (`AGENTS.md` stays the cross-tool source of truth). Keep each in sync with its mirror.
+
+- **[`CLAUDE.md`](CLAUDE.md)** imports this file (`@AGENTS.md`) so Claude Code auto-loads it.
+- **[`.claude/rules/`](.claude/rules/)** — path-scoped rules loaded only when matching files are
+  touched: `domain-no-android.md`, `bilingual-strings.md` (mirror §4).
+- **[`.claude/skills/`](.claude/skills/)** — `/orient`, `/handoff` (mirror §0) and `/release`
+  (the runbook, human-triggered).

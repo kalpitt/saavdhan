@@ -1,9 +1,14 @@
+@AGENTS.md
+
 # CLAUDE.md
 
-This project keeps its agent instructions in **[`AGENTS.md`](AGENTS.md)** (the cross-tool
-standard) so every AI tool reads the same source of truth.
+The line above (`@AGENTS.md`) **imports** our cross-tool instructions so Claude Code loads them
+automatically at the start of every session. [`AGENTS.md`](AGENTS.md) is the single source of truth
+that every AI tool reads. (Claude Code reads `CLAUDE.md`, not `AGENTS.md` — without this import it
+would only see this pointer, not the actual rules.)
 
-**👉 Read [`AGENTS.md`](AGENTS.md) now**, then follow its "30-second orientation" (it points you
-to `context/STATE.md` and the latest handoff).
+After the import loads, follow AGENTS.md's "30-second orientation" — or just run `/orient`, the
+Claude Code skill that performs it (reads `context/STATE.md`, the newest handoff, and
+`context/PROFILE.md`). See AGENTS.md §8 for the full `.claude/` steering layer.
 
-Do not duplicate guidance here — keep this file a pointer only, so the two can never drift apart.
+Keep the real guidance in AGENTS.md, not here, so the two can never drift apart.
