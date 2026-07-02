@@ -1,8 +1,7 @@
 # 10 — Roadmap
 
 A living plan. Checked = done; unchecked = planned. Order within a phase is rough priority.
-**Last synced:** 2026-07-02, after the OEM deep-link fallback chains merge (main is well ahead of
-the v0.4.0 tag — see the [changelog](../CHANGELOG.md) `[Unreleased]` section). See
+**Last synced:** 2026-07-02, after the v0.5.0 release. See
 [`context/STATE.md`](../context/STATE.md) for "now".
 
 ## Phase 1 — Scanner core ✅ Complete
@@ -107,14 +106,14 @@ the v0.4.0 tag — see the [changelog](../CHANGELOG.md) `[Unreleased]` section).
 - [x] **v0.4.0 released** (2026-06-13): detection escalation (impersonation + power → CRITICAL),
       normalized impersonation matching, redesigned public site, dependency bumps.
 
-## Phase 5 — Deep architecture, delivery-chain detection & product polish ✅ Complete (unreleased)
+## Phase 5 — Deep architecture, delivery-chain detection & product polish ✅ Complete — shipped in v0.5.0
 
 **Goal:** move the risk engine from a boolean cascade to an explainable point system, close real
 detection gaps (messenger-delivered malware, signature spoofing), and turn seven nights of an
 unattended multi-agent "world-class loop" (`claude/world-class-loop`, now fully merged) into
-shipped, tested product polish. Everything below is merged to `main` but **not yet cut into a
-signed release** — see the [changelog](../CHANGELOG.md) `[Unreleased]` section for full detail,
-and [`context/ITERATION_LOG.md`](../context/ITERATION_LOG.md) for the iteration-by-iteration diary.
+shipped, tested product polish. Everything below shipped in the **v0.5.0** signed release — see
+the [changelog](../CHANGELOG.md) `[0.5.0]` section for full detail, and
+[`context/ITERATION_LOG.md`](../context/ITERATION_LOG.md) for the iteration-by-iteration diary.
 
 - [x] Point-based `RiskEngine` (`WEIGHTS` map, CRITICAL ≥ 80 / HIGH ≥ 50 / SUSPICIOUS ≥ 20)
       replacing the old boolean cascade — see [`03-detection-rules.md`](03-detection-rules.md)
@@ -138,8 +137,8 @@ and [`context/ITERATION_LOG.md`](../context/ITERATION_LOG.md) for the iteration-
       aliasing) instead of one hardcoded component, with an honest "here's where to look instead"
       toast when only the generic fallback opens
 - [x] Claude Code steering layer (`.claude/rules`, `.claude/skills`, `spyware-researcher` subagent)
-- [ ] **Cut the next signed release** (version bump → tag → `assembleRelease` → sign → publish) —
-      human step, see the release runbook in [`context/STATE.md`](../context/STATE.md)
+- [x] **v0.5.0 released** (2026-07-02): versionCode 5, signed APK on GitHub Releases, public
+      mirror synced.
 
 ## Known limitations to revisit
 
