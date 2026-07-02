@@ -112,10 +112,10 @@ fun SettingsScreen(
                 context = context
             )
 
-            val oemIntent = SettingsDeepLinks.oemAutoStartSettings()
-            if (oemIntent != null) {
+            val oemIntents = SettingsDeepLinks.oemAutoStartSettings()
+            if (oemIntents != null) {
                 Spacer(Modifier.height(12.dp))
-                OemWarningCard(context = context, intent = oemIntent)
+                OemWarningCard(context = context, intents = oemIntents)
             }
 
             Spacer(Modifier.height(12.dp))
@@ -178,7 +178,7 @@ private fun BatteryOptimizationCard(isExempt: Boolean, lastRunMillis: Long, cont
 }
 
 @Composable
-private fun OemWarningCard(context: Context, intent: android.content.Intent) {
+private fun OemWarningCard(context: Context, intents: List<android.content.Intent>) {
     val manufacturer = android.os.Build.MANUFACTURER.uppercase()
     Column {
         Text(
@@ -192,7 +192,7 @@ private fun OemWarningCard(context: Context, intent: android.content.Intent) {
         PrimaryButton(
             text = stringResource(R.string.settings_oem_fix_button),
             onClick = {
-                SettingsDeepLinks.launch(context, intent, SettingsDeepLinks.mainSettings())
+                SettingsDeepLinks.launch(context, intents, R.string.deeplink_degraded_autostart)
             }
         )
     }

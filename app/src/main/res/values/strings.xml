@@ -155,4 +155,7 @@
     <!-- Generic -->
     <string name="back">Back</string>
     <string name="error_screen_not_found">Could not open that screen on this phone. Please open Settings and find it yourself.</string>
+    <string name="deeplink_degraded_generic">Could not open the exact screen, so Settings is open instead — please find it from there.</string>
+    <string name="deeplink_degraded_device_admin">Could not open the exact screen. In Settings, look for Security → Device admin apps.</string>
+    <string name="deeplink_degraded_autostart">Could not open the exact screen. In Settings, look for Battery or Auto-start app settings.</string>
 </resources>

@@ -154,4 +154,7 @@
     <!-- Generic -->
     <string name="back">वापस</string>
     <string name="error_screen_not_found">यह स्क्रीन इस फ़ोन पर नहीं खुल पाई। कृपया सेटिंग्स खोलकर खुद ढूँढें।</string>
+    <string name="deeplink_degraded_generic">सटीक स्क्रीन नहीं खुल पाई, इसलिए सेटिंग्स खोल दी है — कृपया वहाँ से ढूँढें।</string>
+    <string name="deeplink_degraded_device_admin">सटीक स्क्रीन नहीं खुल पाई। सेटिंग्स में सुरक्षा → डिवाइस एडमिन ऐप्स ढूँढें।</string>
+    <string name="deeplink_degraded_autostart">सटीक स्क्रीन नहीं खुल पाई। सेटिंग्स में बैटरी या ऑटो-स्टार्ट ऐप सेटिंग ढूँढें।</string>
 </resources>
