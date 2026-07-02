@@ -54,8 +54,10 @@ Fully bilingual (हिन्दी / English), chosen on first launch. More in 
 ## How it works (for the curious)
 
 It reads public, no-root signals about each installed app — whether it holds Accessibility, is a
-Device Admin, can read SMS, was sideloaded, hides its icon, or impersonates a system app — and a
-small, **deterministic, fully-tested rule engine** turns those into a risk level with reasons.
+Device Admin, can read SMS, was sideloaded (including traced straight back to a WhatsApp/Telegram
+chat), hides its icon, or impersonates a system app — and a small, **deterministic, point-based
+rule engine** turns those into a risk level with the exact reasons, ranked most-damning-first. App
+signatures are checked against a set of trusted keys so legitimate apps are never second-guessed.
 
 The full design — architecture, the detection rules and the threats behind them, the OS
 constraints, the security/privacy model, and a decision record for every important choice — lives
@@ -77,10 +79,12 @@ beginner-friendly [build guide](docs/08-build-and-run.md) explains every term.
 
 ## Project status
 
-**Early release (v0.1.0).** Phase 1 (scanner core) and Phase 2 (guided cleanup) are complete and
-tested — the full loop works: bilingual detect → explain → reactive guided cleanup, plus a
-WorkManager background watchdog for newly-installed threats. See the [roadmap](docs/10-roadmap.md)
-and the [changelog](CHANGELOG.md).
+**v0.4.0 released; substantial hardening merged on top, heading toward v0.5.0.** Phases 1–4 are
+functionally complete: bilingual detect → explain → reactive guided cleanup, a WorkManager
+background watchdog, a point-based explainable risk engine with signature verification, detection
+of scam APKs delivered straight through WhatsApp/Telegram, an offline "send result to family"
+receipt, and OEM-aware Settings deep links with graceful per-maker fallback chains. See the
+[roadmap](docs/10-roadmap.md) and the [changelog](CHANGELOG.md) for the full detail.
 
 > Tested on the Android emulator. **Help wanted:** real-device testing across phone makers.
 > Android's deep-links to system screens differ between makers (Samsung, Xiaomi, Oppo, Vivo…), so
