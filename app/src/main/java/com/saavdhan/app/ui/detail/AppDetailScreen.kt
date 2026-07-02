@@ -248,7 +248,7 @@ fun AppDetailScreen(
                             text = stringResource(R.string.action_device_admin),
                             onClick = {
                                 OverlayCoach.show(context, coachDeviceAdmin) // shows only if permission granted
-                                SettingsDeepLinks.launch(context, SettingsDeepLinks.deviceAdminSettings(), SettingsDeepLinks.mainSettings())
+                                SettingsDeepLinks.launch(context, SettingsDeepLinks.deviceAdminSettings(), R.string.deeplink_degraded_device_admin)
                             }
                         )
                     }

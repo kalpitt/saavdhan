@@ -349,7 +349,7 @@ private fun actionFor(
     CleanupStepId.REMOVE_ADMIN -> {
         {
             OverlayCoach.show(context, coachDeviceAdmin)
-            SettingsDeepLinks.launch(context, SettingsDeepLinks.deviceAdminSettings(), SettingsDeepLinks.mainSettings())
+            SettingsDeepLinks.launch(context, SettingsDeepLinks.deviceAdminSettings(), R.string.deeplink_degraded_device_admin)
         }
     }
     CleanupStepId.UNINSTALL -> {
