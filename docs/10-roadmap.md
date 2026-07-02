@@ -1,7 +1,9 @@
 # 10 — Roadmap
 
 A living plan. Checked = done; unchecked = planned. Order within a phase is rough priority.
-**Last synced:** 2026-06-13 after v0.3.0 release. See [`context/STATE.md`](../context/STATE.md) for "now".
+**Last synced:** 2026-07-02, after the OEM deep-link fallback chains merge (main is well ahead of
+the v0.4.0 tag — see the [changelog](../CHANGELOG.md) `[Unreleased]` section). See
+[`context/STATE.md`](../context/STATE.md) for "now".
 
 ## Phase 1 — Scanner core ✅ Complete
 
@@ -75,7 +77,7 @@ A living plan. Checked = done; unchecked = planned. Order within a phase is roug
 - [x] Home screen offline-promise note; honest detail-page "scan again" fallback; style cleanups
 - [x] ktlint enforced in CI
 
-### Milestone 4 — First feedback & reach (in progress)
+### Milestone 4 — First feedback & reach ✅ (shippable work complete; two items are human-only)
 - [x] First family feedback round (2026-06-13): "app looks too simple; once a threat is found,
       all the steps look the same" → visual-hierarchy redesign: severity banner, "What to do
       now" hero card, numbered do-it-yourself steps, cleanup step counters ("Step 2 of 5"),
@@ -102,10 +104,49 @@ A living plan. Checked = done; unchecked = planned. Order within a phase is roug
 - [x] Dependency bumps: AGP 8.7.3→8.9.1, Kotlin 2.0.21→2.1.0, Compose BOM 2024.12.01→2025.01.00,
       core-ktx/lifecycle/activity/navigation/work to current stable (Gradle wrapper 8.11.1 kept).
       Build + 78 unit tests + lint green; emulator smoke-tested (scan renders, no crashes)
+- [x] **v0.4.0 released** (2026-06-13): detection escalation (impersonation + power → CRITICAL),
+      normalized impersonation matching, redesigned public site, dependency bumps.
+
+## Phase 5 — Deep architecture, delivery-chain detection & product polish ✅ Complete (unreleased)
+
+**Goal:** move the risk engine from a boolean cascade to an explainable point system, close real
+detection gaps (messenger-delivered malware, signature spoofing), and turn seven nights of an
+unattended multi-agent "world-class loop" (`claude/world-class-loop`, now fully merged) into
+shipped, tested product polish. Everything below is merged to `main` but **not yet cut into a
+signed release** — see the [changelog](../CHANGELOG.md) `[Unreleased]` section for full detail,
+and [`context/ITERATION_LOG.md`](../context/ITERATION_LOG.md) for the iteration-by-iteration diary.
+
+- [x] Point-based `RiskEngine` (`WEIGHTS` map, CRITICAL ≥ 80 / HIGH ≥ 50 / SUSPICIOUS ≥ 20)
+      replacing the old boolean cascade — see [`03-detection-rules.md`](03-detection-rules.md)
+- [x] Signature verification: `TRUSTED_SIGNATURES` absolute-trust override via SHA-256 signing-key hash
+- [x] Fuzzy (Levenshtein) impersonation matching + `taskAffinity` hijacking check for sideloaded apps
+- [x] `AppScanner` Binder/PackageManager IPCs moved off the main thread
+- [x] Resilient package fetch: survives the ~1 MB Binder reply limit on cheap phones with many
+      apps instead of silently failing or trusting a truncated list ([ADR-0013](decisions/0013-resilient-package-fetch.md))
+- [x] `SIDELOADED_VIA_MESSENGER` signal: traces `originatingPackageName` (API 30+) to WhatsApp/
+      Telegram/other messengers — the real-world scam delivery chain — plus a fix for an OEM
+      installer-classifier bypass that let messenger-delivered apps dodge the signal
+- [x] Danger reasons ranked by engine weight, most-decisive-first ([ADR-0012](decisions/0012-explanation-ranked-by-engine-weight.md))
+- [x] Screen reader announces the verdict before the app name, not the package id
+- [x] Mid-scam watchdog notification rewritten to interrupt the scam script, not describe the artifact
+- [x] "Send result to family" offline share-sheet receipt, now timestamped ([ADR-0014](decisions/0014-offline-share-to-family.md))
+- [x] Phone-health severity bar, per-app launcher icons on result cards, full dark-theme polish pass
+- [x] OEM-aware Settings deep links (auto-start screens for Xiaomi/Samsung/Oppo/Vivo/Huawei) +
+      Settings warning card against OEM battery kills
+- [x] **OEM deep-link fallback chains** (2026-07-02): Device-Admin and auto-start screens now try
+      an ordered, unit-tested per-maker chain (with OnePlus/Realme/Poco/Redmi/iQOO sub-brand
+      aliasing) instead of one hardcoded component, with an honest "here's where to look instead"
+      toast when only the generic fallback opens
+- [x] Claude Code steering layer (`.claude/rules`, `.claude/skills`, `spyware-researcher` subagent)
+- [ ] **Cut the next signed release** (version bump → tag → `assembleRelease` → sign → publish) —
+      human step, see the release runbook in [`context/STATE.md`](../context/STATE.md)
 
 ## Known limitations to revisit
 
 - Accessibility/Device-Admin deep links open a *list*, not the exact row (Android limit) — the
   overlay coach is our mitigation.
-- Detection is heuristic; brand-new malware avoiding all six signals could be missed.
+- Detection is heuristic; brand-new malware avoiding all ten signals could be missed. Signature
+  verification and fuzzy impersonation matching close two real gaps, but neither is proof.
 - Impersonation list is small and updates only via app releases (we never fetch rules online).
+- OEM auto-start/device-admin screens are best-effort fallback chains built from undocumented
+  component names — only real hardware across makers can confirm they still resolve correctly.
