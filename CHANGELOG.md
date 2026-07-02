@@ -5,8 +5,10 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); the pro
 [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
-Substantial detection and architecture hardening merged since v0.4.0 — not yet cut into a signed
-release.
+
+## [0.5.0] — 2026-07-02
+Deep architecture hardening, messenger delivery-chain detection, family share receipts, and OEM
+deep-link fallback chains — the largest jump in detection depth since Phase 1.
 
 ### Added
 - **Deep architecture hardening.** The risk engine moved from a boolean cascade to a continuous,
@@ -157,7 +159,8 @@ engine.
 - Detection is heuristic (behavioural signals, not a malware database): it can raise false alarms and
   can miss brand-new threats. It guides — it never silently changes or removes anything.
 
-[Unreleased]: https://github.com/kalpitt/saavdhan/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/kalpitt/saavdhan/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/kalpitt/saavdhan/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/kalpitt/saavdhan/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/kalpitt/saavdhan/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/kalpitt/saavdhan/compare/v0.1.0...v0.2.0

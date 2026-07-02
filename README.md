@@ -79,7 +79,7 @@ beginner-friendly [build guide](docs/08-build-and-run.md) explains every term.
 
 ## Project status
 
-**v0.4.0 released; substantial hardening merged on top, heading toward v0.5.0.** Phases 1–4 are
+**v0.5.0 released.** Phases 1–4 are
 functionally complete: bilingual detect → explain → reactive guided cleanup, a WorkManager
 background watchdog, a point-based explainable risk engine with signature verification, detection
 of scam APKs delivered straight through WhatsApp/Telegram, an offline "send result to family"
