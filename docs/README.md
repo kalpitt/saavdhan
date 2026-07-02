@@ -23,7 +23,7 @@ This is an open-source project (MIT). New contributors: start with the
 | 07 | [Testing Strategy](07-testing-strategy.md) | What we test, why, and how to run it |
 | 08 | [Build & Run](08-build-and-run.md) | Set up the tools, build the app, run it on the emulator |
 | 09 | [Glossary](09-glossary.md) | Plain-language dictionary of every dev/Android term we use |
-| 10 | [Roadmap](10-roadmap.md) | Phase 1 (now), Phase 2, Phase 3 |
+| 10 | [Roadmap](10-roadmap.md) | Phase-by-phase plan and status — what's shipped, what's next |
 | — | [Decision Records](decisions/README.md) | One short file per important decision, and *why* we made it |
 
 ## The five rules that never change
