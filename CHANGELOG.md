@@ -6,6 +6,34 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); the pro
 
 ## [Unreleased]
 
+## [0.6.0] — 2026-07-04
+Detection coverage grows from 10 to 13 signals, targeting the 2026 India scam campaigns
+(wedding-invite / e-challan / bill-update / KYC APKs spread over WhatsApp/Telegram) — all
+fully offline, all sideload-gated.
+
+### Added
+- **`LURE_LABEL`** (30 pts): a sideloaded app *named* like a scam bait file — "Wedding
+  Invitation", "E-Challan", "Mahavitaran Bill Update", "India Post…", "KYC Update". A real
+  invitation, bill, or challan is a document, never an app. Matched against a curated,
+  normalized-phrase containment list (`KnownApps.LURE_LABELS`) built precision-first: near
+  misses like "wedding card", or bare words like "courier"/"kyc"/"bill" alone, are deliberately
+  excluded to avoid flagging legitimate apps.
+- **`INSTALL_PACKAGES_REQUESTED`** (25 pts): the app asks for permission to install other apps —
+  the two-stage dropper tell (the SpyMax-style wedding-invite dropper installs a hidden payload;
+  SecuriDropper-class loaders use this to dodge Android 13+ Restricted Settings).
+- **`ACCESSIBILITY_DECLARED`** (15 pts): the manifest declares an accessibility service that
+  hasn't been turned on yet — an early warning *before* the victim is walked into enabling it.
+  Yields to the existing `ACCESSIBILITY` signal once actually enabled (no double-counting).
+- A fresh wedding-invite APK sideloaded from WhatsApp, with nothing granted yet, now scores
+  **CRITICAL (110 points) at install time** — the background watchdog (which alerts on
+  HIGH/CRITICAL) can warn mid-scam, before the victim taps "Allow" on anything.
+- Scanner: `GET_SERVICES` added to the resilient package-info fetch to read declared
+  accessibility services; two new `ScannedApp` fields; a new emulator debug demo fixture
+  ("Wedding Invitation" fresh off WhatsApp) to live-test the new signals without a real APK.
+- 16 new unit tests (131 total), mirrored English/Hindi explanation strings, and
+  [`docs/03-detection-rules.md`](docs/03-detection-rules.md) rewritten for all 13 signals with
+  2026-campaign sources.
+
 ## [0.5.0] — 2026-07-02
 Deep architecture hardening, messenger delivery-chain detection, family share receipts, and OEM
 deep-link fallback chains — the largest jump in detection depth since Phase 1.
@@ -159,7 +187,8 @@ engine.
 - Detection is heuristic (behavioural signals, not a malware database): it can raise false alarms and
   can miss brand-new threats. It guides — it never silently changes or removes anything.
 
-[Unreleased]: https://github.com/kalpitt/saavdhan/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/kalpitt/saavdhan/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/kalpitt/saavdhan/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/kalpitt/saavdhan/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/kalpitt/saavdhan/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/kalpitt/saavdhan/compare/v0.2.0...v0.3.0
