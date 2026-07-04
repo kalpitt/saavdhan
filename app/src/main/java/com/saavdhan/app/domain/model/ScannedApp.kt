@@ -55,7 +55,17 @@ data class ScannedApp(
     val originatingPackage: String? = null,
 
     /** True if this app was definitively initiated or installed by a known messenger app. */
-    val isFromMessenger: Boolean = false
+    val isFromMessenger: Boolean = false,
+
+    /** True if the app asks for the power to install OTHER apps (the two-stage dropper tell). */
+    val requestsInstallPackages: Boolean = false,
+
+    /**
+     * True if the app's manifest declares an Accessibility Service — whether or not the user has
+     * switched it on yet (that live state is [hasAccessibilityEnabled]). Declaring one is the
+     * build-time evidence; enabling it is the moment the damage starts.
+     */
+    val declaresAccessibilityService: Boolean = false
 )
 
 /** How an app arrived on the phone. */

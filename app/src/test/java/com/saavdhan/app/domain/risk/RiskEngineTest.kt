@@ -28,7 +28,9 @@ class RiskEngineTest {
         notificationListener: Boolean = false,
         hiddenIcon: Boolean = false,
         impersonates: Boolean = false,
-        originatingPackage: String? = null
+        originatingPackage: String? = null,
+        requestsInstallPackages: Boolean = false,
+        declaresAccessibilityService: Boolean = false
     ) = ScannedApp(
         packageName = packageName,
         label = label,
@@ -43,7 +45,9 @@ class RiskEngineTest {
         impersonatesSystemApp = impersonates,
         firstInstallTimeMillis = 0L,
         originatingPackage = originatingPackage,
-        isFromMessenger = originatingPackage in com.saavdhan.app.domain.allowlist.KnownApps.MESSENGERS
+        isFromMessenger = originatingPackage in com.saavdhan.app.domain.allowlist.KnownApps.MESSENGERS,
+        requestsInstallPackages = requestsInstallPackages,
+        declaresAccessibilityService = declaresAccessibilityService
     )
 
     @Test
@@ -376,6 +380,118 @@ class RiskEngineTest {
             app(installSource = InstallSource.SIDELOADED, accessibility = true, deviceAdmin = true, smsGranted = true)
         )
         assertEquals(result.signals.sumOf { RiskEngine.weightOf(it) }, result.score)
+    }
+
+    // --- The 2026-campaign signals: LURE_LABEL, INSTALL_PACKAGES_REQUESTED, ACCESSIBILITY_DECLARED
+
+    @Test
+    fun `a fresh wedding-invite APK from WhatsApp is CRITICAL before ANY permission is granted`() {
+        // The flagship scenario: caught at install time by name (lure), dropper permission, and
+        // a declared-but-off Accessibility service — the watchdog can warn BEFORE the victim
+        // taps "Allow". 40 (messenger) + 30 (lure) + 25 (installer) + 15 (declared) = 110.
+        val result = RiskEngine.assess(
+            app(
+                label = "Wedding Invitation",
+                installSource = InstallSource.SIDELOADED,
+                originatingPackage = "com.whatsapp",
+                requestsInstallPackages = true,
+                declaresAccessibilityService = true
+            )
+        )
+        assertEquals(RiskLevel.CRITICAL, result.level)
+        assertTrue(RiskSignal.LURE_LABEL in result.signals)
+        assertTrue(RiskSignal.INSTALL_PACKAGES_REQUESTED in result.signals)
+        assertTrue(RiskSignal.ACCESSIBILITY_DECLARED in result.signals)
+    }
+
+    @Test
+    fun `a lure name on a Play-Store app does not fire (sideload gate)`() {
+        // A legit "Electricity Bill Check" utility from Play must stay calm.
+        val result = RiskEngine.assess(app(label = "Electricity Bill Check"))
+        assertEquals(RiskLevel.LOW, result.level)
+        assertFalse(RiskSignal.LURE_LABEL in result.signals)
+    }
+
+    @Test
+    fun `sideloaded lure name alone is HIGH`() {
+        // 30 (lure) + 20 (sideloaded) = 50. A sideloaded APK named "E-Challan" IS the scam.
+        val result = RiskEngine.assess(
+            app(label = "RTO E-Challan Update", installSource = InstallSource.SIDELOADED)
+        )
+        assertEquals(RiskLevel.HIGH, result.level)
+        assertTrue(RiskSignal.LURE_LABEL in result.signals)
+    }
+
+    @Test
+    fun `sideloaded app store asking to install apps is SUSPICIOUS not HIGH (F-Droid case)`() {
+        // 25 (installer) + 20 (sideloaded) = 45: "worth a glance", honest for a legit
+        // sideloaded store like F-Droid — the copy says it may be fine if installed on purpose.
+        val result = RiskEngine.assess(
+            app(installSource = InstallSource.SIDELOADED, requestsInstallPackages = true)
+        )
+        assertEquals(RiskLevel.SUSPICIOUS, result.level)
+        assertTrue(RiskSignal.INSTALL_PACKAGES_REQUESTED in result.signals)
+    }
+
+    @Test
+    fun `install-packages permission on a Play-Store app does not fire (sideload gate)`() {
+        val result = RiskEngine.assess(app(requestsInstallPackages = true))
+        assertEquals(RiskLevel.LOW, result.level)
+        assertFalse(RiskSignal.INSTALL_PACKAGES_REQUESTED in result.signals)
+    }
+
+    @Test
+    fun `messenger-delivered dropper is HIGH (the SecuriDropper delivery chain)`() {
+        // 40 (messenger) + 25 (installer) = 65.
+        val result = RiskEngine.assess(
+            app(
+                installSource = InstallSource.SIDELOADED,
+                originatingPackage = "org.telegram.messenger",
+                requestsInstallPackages = true
+            )
+        )
+        assertEquals(RiskLevel.HIGH, result.level)
+    }
+
+    @Test
+    fun `sideloaded declared-but-off accessibility is SUSPICIOUS (Bitwarden or Tasker case)`() {
+        // 20 (sideloaded) + 15 (declared) = 35: flagged for a glance, not an alarm.
+        val result = RiskEngine.assess(
+            app(installSource = InstallSource.SIDELOADED, declaresAccessibilityService = true)
+        )
+        assertEquals(RiskLevel.SUSPICIOUS, result.level)
+        assertTrue(RiskSignal.ACCESSIBILITY_DECLARED in result.signals)
+    }
+
+    @Test
+    fun `once accessibility is enabled the declared signal yields to ACCESSIBILITY (no double count)`() {
+        val result = RiskEngine.assess(
+            app(
+                installSource = InstallSource.SIDELOADED,
+                accessibility = true,
+                declaresAccessibilityService = true
+            )
+        )
+        assertTrue(RiskSignal.ACCESSIBILITY in result.signals)
+        assertFalse(RiskSignal.ACCESSIBILITY_DECLARED in result.signals)
+        // Identical verdict to today's sideloaded+accessibility: the new signal never worsens it.
+        assertEquals(RiskLevel.HIGH, result.level)
+    }
+
+    @Test
+    fun `declared accessibility on a Play-Store app does not fire (sideload gate)`() {
+        val result = RiskEngine.assess(app(declaresAccessibilityService = true))
+        assertEquals(RiskLevel.LOW, result.level)
+        assertFalse(RiskSignal.ACCESSIBILITY_DECLARED in result.signals)
+    }
+
+    @Test
+    fun `the lure name outranks the softer clues in the explanation order`() {
+        // ADR-0012: the UI ranks reasons by weight. The disguise (30) must lead the installer
+        // power (25), which must lead the declared-but-off service (15).
+        assertTrue(RiskEngine.weightOf(RiskSignal.LURE_LABEL) > RiskEngine.weightOf(RiskSignal.INSTALL_PACKAGES_REQUESTED))
+        assertTrue(RiskEngine.weightOf(RiskSignal.INSTALL_PACKAGES_REQUESTED) > RiskEngine.weightOf(RiskSignal.ACCESSIBILITY_DECLARED))
+        assertTrue(RiskEngine.weightOf(RiskSignal.ACCESSIBILITY) > RiskEngine.weightOf(RiskSignal.ACCESSIBILITY_DECLARED))
     }
 
     @Test

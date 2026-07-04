@@ -55,6 +55,67 @@ object KnownApps {
     )
 
     /**
+     * Scam-lure phrases the 2026 India campaigns use as app names — "Wedding Invitation",
+     * "E-Challan", "Mahavitaran Bill Update", "Emergency Courier". Real invitations, bills,
+     * challans, and parcel notices are documents, never apps, so a SIDELOADED app whose name
+     * contains one of these phrases is wearing the disguise itself.
+     *
+     * Stored in [normalize]d form and matched by containment (see [isLureLabel]), so
+     * "Wedding‑Invitation 💌" and "RTO E-Challan Update" still match. Curation rules, to keep
+     * false positives near zero: prefer multi-word phrases; a single word only when unambiguous
+     * ("challan"). Deliberately EXCLUDED: "wedding card" (legit card-maker apps), bare
+     * "courier"/"parcel"/"kyc"/"yojana"/"bill" (too broad).
+     */
+    val LURE_LABELS: Set<String> = setOf(
+        // Wedding-invitation wave (SpyMax via WhatsApp/Telegram)
+        "wedding invitation",
+        "wedding invite",
+        "marriage invitation",
+        "shadi card",
+        "shaadi card",
+        "shadi invitation",
+        "shaadi invitation",
+        // Courier / India Post lures
+        "india post",
+        "indiapost", // normalize() keeps joined words joined, so cover both spacings
+        "emergency courier",
+        "courier service",
+        "courier tracking",
+        "parcel tracking",
+        // KYC / banking lures
+        "kyc update",
+        "kyc verification",
+        "kyc online",
+        "bank kyc",
+        // Utility-bill lures ("Mahavitaran Bill Update", "Electricity Bill Notice")
+        "electricity bill",
+        "bijli bill",
+        "bill update",
+        // Traffic-challan lures (RTO campaigns)
+        "challan",
+        // Govt-scheme lures
+        "pm kisan",
+        "pm yojana",
+        "kisan yojana",
+        // Remote-support lures ("CustomerSupport.apk")
+        "customer support",
+        // Tax-refund lures
+        "income tax refund",
+        "tax refund"
+    )
+
+    /**
+     * Returns true if [label], once [normalize]d, contains any known scam-lure phrase.
+     * Containment (not equality) so "RTO E-Challan Update 2026" still matches "challan".
+     * The caller gates this on sideloaded installs — store apps never reach it.
+     */
+    fun isLureLabel(label: String): Boolean {
+        val key = normalize(label)
+        if (key.isEmpty()) return false
+        return LURE_LABELS.any { it in key }
+    }
+
+    /**
      * Package names of popular messenger apps that are frequently used to deliver scam APKs.
      */
     val MESSENGERS: Set<String> = setOf(
