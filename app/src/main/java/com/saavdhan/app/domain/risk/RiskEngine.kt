@@ -47,10 +47,13 @@ object RiskEngine {
         RiskSignal.ACCESSIBILITY to 40,
         RiskSignal.DEVICE_ADMIN to 40,
         RiskSignal.HIDDEN_ICON to 40,
+        RiskSignal.LURE_LABEL to 30,
+        RiskSignal.INSTALL_PACKAGES_REQUESTED to 25,
         RiskSignal.NOTIFICATION_LISTENER to 20,
         RiskSignal.SMS_ACCESS to 10,
         RiskSignal.SIDELOADED to 20,
         RiskSignal.SMS_REQUESTED to 10,
+        RiskSignal.ACCESSIBILITY_DECLARED to 15,
         RiskSignal.NEW_INSTALL to 10
     )
 
@@ -132,6 +135,20 @@ object RiskEngine {
             add(RiskSignal.HIDDEN_ICON)
         }
         if (app.impersonatesSystemApp) add(RiskSignal.IMPERSONATION)
+
+        // The three 2026-campaign signals below are all sideload-gated: the legit versions of
+        // these behaviours (app stores, accessibility tools, bill apps) arrive via a store.
+        if (app.installSource == InstallSource.SIDELOADED) {
+            // Named like a document ("Wedding Invitation", "E-Challan") — the disguise itself.
+            if (KnownApps.isLureLabel(app.label)) add(RiskSignal.LURE_LABEL)
+            // Asks for the power to install more apps — the two-stage dropper tell.
+            if (app.requestsInstallPackages) add(RiskSignal.INSTALL_PACKAGES_REQUESTED)
+            // Ships an Accessibility Service that isn't on yet: warn BEFORE the victim taps
+            // "Allow". Once enabled, ACCESSIBILITY (above) takes over — never both at once.
+            if (app.declaresAccessibilityService && !app.hasAccessibilityEnabled) {
+                add(RiskSignal.ACCESSIBILITY_DECLARED)
+            }
+        }
 
         // Installed within the last 24 hours
         if (app.firstInstallTimeMillis > System.currentTimeMillis() - 86400000L) {

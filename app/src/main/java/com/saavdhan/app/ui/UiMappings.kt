@@ -72,4 +72,7 @@ fun RiskSignal.labelRes(): Int = when (this) {
     RiskSignal.HIDDEN_ICON -> R.string.signal_hidden_icon
     RiskSignal.IMPERSONATION -> R.string.signal_impersonation
     RiskSignal.NEW_INSTALL -> R.string.signal_new_install
+    RiskSignal.LURE_LABEL -> R.string.signal_lure_label
+    RiskSignal.INSTALL_PACKAGES_REQUESTED -> R.string.signal_install_packages
+    RiskSignal.ACCESSIBILITY_DECLARED -> R.string.signal_accessibility_declared
 }

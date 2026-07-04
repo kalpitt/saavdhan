@@ -52,7 +52,26 @@ enum class RiskSignal {
     NEW_INSTALL,
 
     /** Was sideloaded directly from a common messenger (WhatsApp, Telegram). Extremely high risk for trojans. */
-    SIDELOADED_VIA_MESSENGER
+    SIDELOADED_VIA_MESSENGER,
+
+    /**
+     * Sideloaded app named like a scam bait file — "Wedding Invitation", "E-Challan", "Bill Update".
+     * Real invitations, bills, and parcel notices are documents, never apps; an app wearing a
+     * document's name IS the disguise (the 2026 India campaign fingerprint).
+     */
+    LURE_LABEL,
+
+    /**
+     * Sideloaded app that asks for the power to install OTHER apps (REQUEST_INSTALL_PACKAGES).
+     * The two-stage dropper tell: a harmless-looking first app sneaks in the real spyware.
+     */
+    INSTALL_PACKAGES_REQUESTED,
+
+    /**
+     * Sideloaded app whose manifest DECLARES an Accessibility Service that isn't switched on yet.
+     * The early warning before the victim taps "Allow" — once enabled, [ACCESSIBILITY] takes over.
+     */
+    ACCESSIBILITY_DECLARED
 }
 
 /**
