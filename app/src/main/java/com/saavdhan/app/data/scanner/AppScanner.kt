@@ -219,7 +219,9 @@ class AppScanner(private val context: Context) {
             firstInstallTimeMillis = info.firstInstallTime,
             signatureHashes = hashes,
             originatingPackage = originatingPkg,
-            isFromMessenger = isMessenger
+            isFromMessenger = isMessenger,
+            requestsInstallPackages = requestsInstallPackages(info),
+            declaresAccessibilityService = declaresAccessibilityService(info)
         )
         return AssessedApp(scanned, RiskEngine.assess(scanned))
     }
@@ -239,13 +241,15 @@ class AppScanner(private val context: Context) {
     /** The fast path: one bulk call loading every app with the heavy data the brain needs. */
     @Suppress("DEPRECATION")
     private fun bulkInstalledPackages(): List<PackageInfo> {
-        val flags = PackageManager.GET_PERMISSIONS or PackageManager.GET_SIGNATURES or PackageManager.GET_ACTIVITIES
+        // GET_SERVICES grows the Binder payload, but resilientPackageFetch already degrades to
+        // per-package fetches if the bulk reply fails or truncates, so no new failure mode.
+        val flags = PackageManager.GET_PERMISSIONS or PackageManager.GET_SIGNATURES or PackageManager.GET_ACTIVITIES or PackageManager.GET_SERVICES
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             pm.getInstalledPackages(
-                PackageManager.PackageInfoFlags.of(PackageManager.GET_PERMISSIONS.toLong() or PackageManager.GET_SIGNING_CERTIFICATES.toLong() or PackageManager.GET_ACTIVITIES.toLong())
+                PackageManager.PackageInfoFlags.of(PackageManager.GET_PERMISSIONS.toLong() or PackageManager.GET_SIGNING_CERTIFICATES.toLong() or PackageManager.GET_ACTIVITIES.toLong() or PackageManager.GET_SERVICES.toLong())
             )
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            pm.getInstalledPackages(PackageManager.GET_PERMISSIONS or PackageManager.GET_SIGNING_CERTIFICATES or PackageManager.GET_ACTIVITIES)
+            pm.getInstalledPackages(PackageManager.GET_PERMISSIONS or PackageManager.GET_SIGNING_CERTIFICATES or PackageManager.GET_ACTIVITIES or PackageManager.GET_SERVICES)
         } else {
             pm.getInstalledPackages(flags)
         }
@@ -268,11 +272,11 @@ class AppScanner(private val context: Context) {
 
     @Suppress("DEPRECATION")
     private fun packageInfo(packageName: String): PackageInfo? = try {
-        val flags = PackageManager.GET_PERMISSIONS or PackageManager.GET_SIGNATURES or PackageManager.GET_ACTIVITIES
+        val flags = PackageManager.GET_PERMISSIONS or PackageManager.GET_SIGNATURES or PackageManager.GET_ACTIVITIES or PackageManager.GET_SERVICES
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            pm.getPackageInfo(packageName, PackageManager.PackageInfoFlags.of(PackageManager.GET_PERMISSIONS.toLong() or PackageManager.GET_SIGNING_CERTIFICATES.toLong() or PackageManager.GET_ACTIVITIES.toLong()))
+            pm.getPackageInfo(packageName, PackageManager.PackageInfoFlags.of(PackageManager.GET_PERMISSIONS.toLong() or PackageManager.GET_SIGNING_CERTIFICATES.toLong() or PackageManager.GET_ACTIVITIES.toLong() or PackageManager.GET_SERVICES.toLong()))
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            pm.getPackageInfo(packageName, PackageManager.GET_PERMISSIONS or PackageManager.GET_SIGNING_CERTIFICATES or PackageManager.GET_ACTIVITIES)
+            pm.getPackageInfo(packageName, PackageManager.GET_PERMISSIONS or PackageManager.GET_SIGNING_CERTIFICATES or PackageManager.GET_ACTIVITIES or PackageManager.GET_SERVICES)
         } else {
             pm.getPackageInfo(packageName, flags)
         }
@@ -362,6 +366,23 @@ class AppScanner(private val context: Context) {
     private fun requestsSms(info: PackageInfo): Boolean =
         info.requestedPermissions?.any { it in smsPermissions } == true
 
+    /** The two-stage dropper tell: the app asks for the power to install OTHER apps. */
+    private fun requestsInstallPackages(info: PackageInfo): Boolean =
+        info.requestedPermissions?.any {
+            it == android.Manifest.permission.REQUEST_INSTALL_PACKAGES ||
+                it == android.Manifest.permission.INSTALL_PACKAGES // system-only, but a scam APK requesting it is still a tell
+        } == true
+
+    /**
+     * True if the manifest declares any Accessibility Service. Whether it's switched ON is a
+     * separate, live fact (enabledAccessibilityPackages); this catches the app at install time,
+     * before the victim is talked into enabling it.
+     */
+    private fun declaresAccessibilityService(info: PackageInfo): Boolean =
+        info.services?.any {
+            it.permission == android.Manifest.permission.BIND_ACCESSIBILITY_SERVICE
+        } == true
+
     private fun smsGranted(info: PackageInfo): Boolean {
         val requested = info.requestedPermissions ?: return false
         val flags = info.requestedPermissionsFlags ?: return false
@@ -420,6 +441,25 @@ class AppScanner(private val context: Context) {
                 hasHiddenIcon = false,
                 impersonatesSystemApp = false,
                 firstInstallTimeMillis = now
+            ),
+            // The 2026 flagship scenario: a wedding-invite APK fresh off WhatsApp, NOTHING
+            // granted yet — caught by name, dropper permission, and declared (off) Accessibility.
+            ScannedApp(
+                packageName = "com.demo.weddinginvite",
+                label = "Wedding Invitation",
+                installSource = InstallSource.SIDELOADED,
+                isSystemApp = false,
+                hasAccessibilityEnabled = false,
+                isDeviceAdmin = false,
+                requestsSms = true,
+                smsGranted = false,
+                hasHiddenIcon = false,
+                impersonatesSystemApp = false,
+                firstInstallTimeMillis = now,
+                originatingPackage = "com.whatsapp",
+                isFromMessenger = true,
+                requestsInstallPackages = true,
+                declaresAccessibilityService = true
             )
         )
         return demo.map { AssessedApp(it, RiskEngine.assess(it)) }

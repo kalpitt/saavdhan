@@ -57,6 +57,9 @@
     <string name="signal_hidden_icon">Hides its icon from your app list</string>
     <string name="signal_impersonation">Pretends to be a trusted system app</string>
     <string name="signal_new_install">Installed very recently (less than 24 hours ago)</string>
+    <string name="signal_lure_label">Named like a scam bait file (a real wedding invite, bill, or challan is a document, never an app)</string>
+    <string name="signal_install_packages">Asks for the power to install other apps (scam files use this to sneak in a second, hidden app)</string>
+    <string name="signal_accessibility_declared">Built to take control of your screen (Accessibility) — it just hasn\'t been switched on yet</string>
 
     <!-- App detail -->
     <string name="detail_why_title">Why this looks risky</string>
