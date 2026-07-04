@@ -79,12 +79,14 @@ beginner-friendly [build guide](docs/08-build-and-run.md) explains every term.
 
 ## Project status
 
-**v0.5.0 released.** Phases 1–4 are
+**v0.6.0 released.** Phases 1–5 are
 functionally complete: bilingual detect → explain → reactive guided cleanup, a WorkManager
 background watchdog, a point-based explainable risk engine with signature verification, detection
 of scam APKs delivered straight through WhatsApp/Telegram, an offline "send result to family"
-receipt, and OEM-aware Settings deep links with graceful per-maker fallback chains. See the
-[roadmap](docs/10-roadmap.md) and the [changelog](CHANGELOG.md) for the full detail.
+receipt, OEM-aware Settings deep links with graceful per-maker fallback chains, and 13 detection
+signals (up from 10) covering the 2026 wedding-invite / e-challan / bill-update / KYC sideload
+campaigns. See the [roadmap](docs/10-roadmap.md) and the [changelog](CHANGELOG.md) for the full
+detail.
 
 > Tested on the Android emulator. **Help wanted:** real-device testing across phone makers.
 > Android's deep-links to system screens differ between makers (Samsung, Xiaomi, Oppo, Vivo…), so
