@@ -1,7 +1,7 @@
 # 10 — Roadmap
 
 A living plan. Checked = done; unchecked = planned. Order within a phase is rough priority.
-**Last synced:** 2026-07-02, after the v0.5.0 release. See
+**Last synced:** 2026-07-04, after the v0.6.0 release. See
 [`context/STATE.md`](../context/STATE.md) for "now".
 
 ## Phase 1 — Scanner core ✅ Complete
@@ -140,12 +140,34 @@ the [changelog](../CHANGELOG.md) `[0.5.0]` section for full detail, and
 - [x] **v0.5.0 released** (2026-07-02): versionCode 5, signed APK on GitHub Releases, public
       mirror synced.
 
+## Phase 6 — Detection signals v2: 2026 sideload-lure campaigns ✅ Complete — shipped in v0.6.0
+
+**Goal:** close three specific, high-precision offline gaps observed in 2026 India scam-app
+campaigns spread over WhatsApp/Telegram (wedding-invite, e-challan, bill-update, KYC-update
+sideload lures) — see [`03-detection-rules.md`](03-detection-rules.md) for the full spec.
+
+- [x] `LURE_LABEL` (30 pts): sideloaded app named like a scam bait file, matched against a
+      curated, precision-first phrase list (`KnownApps.LURE_LABELS`)
+- [x] `INSTALL_PACKAGES_REQUESTED` (25 pts): requests permission to install other apps — the
+      two-stage dropper tell
+- [x] `ACCESSIBILITY_DECLARED` (15 pts): manifest declares an accessibility service not yet
+      enabled — early warning before the victim turns it on; yields to `ACCESSIBILITY` once on
+- [x] Scanner: `GET_SERVICES` added to the resilient fetch; new `ScannedApp` fields; new emulator
+      demo fixture ("Wedding Invitation" fresh from WhatsApp, nothing granted → CRITICAL)
+- [x] 16 new tests (131 total), mirrored EN/HI strings, detection-rules doc rewritten for 13
+      signals
+- [x] Live-tested on the `saavdhan_pixel` emulator in English and Hindi: CRITICAL verdict, all
+      three new reasons ranked correctly by weight, zero crashes
+- [x] **v0.6.0 released** (2026-07-04): versionCode 6, signed APK on GitHub Releases, public
+      mirror synced.
+
 ## Known limitations to revisit
 
 - Accessibility/Device-Admin deep links open a *list*, not the exact row (Android limit) — the
   overlay coach is our mitigation.
-- Detection is heuristic; brand-new malware avoiding all ten signals could be missed. Signature
-  verification and fuzzy impersonation matching close two real gaps, but neither is proof.
+- Detection is heuristic; brand-new malware avoiding all thirteen signals could be missed.
+  Signature verification and fuzzy impersonation matching close two real gaps, but neither is
+  proof.
 - Impersonation list is small and updates only via app releases (we never fetch rules online).
 - OEM auto-start/device-admin screens are best-effort fallback chains built from undocumented
   component names — only real hardware across makers can confirm they still resolve correctly.
