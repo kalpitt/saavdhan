@@ -19,13 +19,16 @@ echo "Drift check: verifying doc consistency..."
 # and is allowed to hold machine-specific paths such as the publish script's source dir).
 # A /Users/... path in a published file is both an information leak and a dead link.
 echo "  [1/3] Machine-local paths in published files..."
-# Build the needle dynamically and exclude this script, so the checker never matches its own
-# pattern/messages or scans itself.
-NEEDLE="$(printf '/%s/' Users)"
+# Build the needles dynamically and exclude this script, so the checker never matches its own
+# pattern/messages or scans itself. Two needles: macOS home dirs AND Linux home dirs — a
+# 2026-07-12 audit found a /home/user/... path (from a cloud container) that the /Users/-only
+# needle missed.
+NEEDLE_MAC="$(printf '/%s/' Users)"
+NEEDLE_LINUX="$(printf '/%s/' home)"
 PUBLISHED_HITS="$(git ls-files | grep -v '^context/' | grep -v '^scripts/drift_check.sh$' \
-  | xargs grep -l "$NEEDLE" 2>/dev/null || true)"
+  | xargs grep -lE "${NEEDLE_MAC}|${NEEDLE_LINUX}" 2>/dev/null || true)"
 if [ -n "$PUBLISHED_HITS" ]; then
-  echo "  FAIL: /Users/... path found in published file(s):"
+  echo "  FAIL: machine-local path (/Users/... or /home/...) found in published file(s):"
   echo "$PUBLISHED_HITS" | sed 's/^/        /'
   echo "        Move machine-specific references into context/ (private) or remove them."
   FAILED=1
