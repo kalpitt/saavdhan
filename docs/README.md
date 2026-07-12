@@ -24,6 +24,9 @@ This is an open-source project (MIT). New contributors: start with the
 | 08 | [Build & Run](08-build-and-run.md) | Set up the tools, build the app, run it on the emulator |
 | 09 | [Glossary](09-glossary.md) | Plain-language dictionary of every dev/Android term we use |
 | 10 | [Roadmap](10-roadmap.md) | Phase-by-phase plan and status — what's shipped, what's next |
+| 11 | [Play Store Prep](11-play-store-prep.md) | Listing copy, data-safety answers, policy declarations — ready to paste |
+| 12 | [Accessibility](12-accessibility.md) | TalkBack / font-scale checklist and what's already handled |
+| 13 | [F-Droid](13-fdroid.md) | The ready-to-submit fdroiddata recipe and changelog conventions |
 | — | [Decision Records](decisions/README.md) | One short file per important decision, and *why* we made it |
 
 ## The five rules that never change
