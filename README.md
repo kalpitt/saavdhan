@@ -1,116 +1,167 @@
 <div align="center">
 
-# 🛡️ Saavdhan (सावधान)
+# Saavdhan (सावधान)
 
-**A free, fully-offline Android app that helps non-technical people find and safely remove scam/spyware apps from their phone — in Hindi or English.**
+**A free, fully-offline Android app that helps families find and safely remove scam or spyware apps from a phone, in Hindi or English.**
+
+[Download latest APK](https://github.com/kalpitt/saavdhan/releases/latest/download/saavdhan.apk)
+·
+[Privacy policy](https://kalpitt.github.io/saavdhan/privacy.html)
+·
+[Open an issue](https://github.com/kalpitt/saavdhan/issues)
 
 [![CI](https://github.com/kalpitt/saavdhan/actions/workflows/ci.yml/badge.svg)](https://github.com/kalpitt/saavdhan/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Platform](https://img.shields.io/badge/platform-Android%207%2B-green.svg)](#)
-[![Built with](https://img.shields.io/badge/built%20with-Kotlin%20%2B%20Compose-7F52FF.svg)](#)
-[![Offline](https://img.shields.io/badge/network-none%20(offline)-success.svg)](#the-promises-that-never-change)
+[![Platform](https://img.shields.io/badge/platform-Android%207%2B-green.svg)](#install)
+[![Built with](https://img.shields.io/badge/built%20with-Kotlin%20%2B%20Compose-7F52FF.svg)](#build-from-source)
+[![Offline](https://img.shields.io/badge/network-none%20(offline)-success.svg)](#why-you-can-trust-it)
 
 </div>
 
 ---
 
-## Why this exists
+## What Saavdhan Does
 
-In India (and increasingly elsewhere), scam APKs spread over WhatsApp disguised as wedding
-invitations, courier updates, KYC notices, or electricity bills. Installing one sideloads
-banking spyware from the **SpyNote / SpyMax** family, which abuses **Accessibility + Device Admin
-+ SMS** access to steal OTPs and drain bank accounts — and actively resists being removed.
+Scam APKs in India often arrive through WhatsApp or Telegram as wedding invitations, courier
+updates, KYC notices, e-challans, or electricity-bill files. Once installed, they can abuse powers
+like Accessibility, Device Admin, SMS access, notification access, hidden icons, and fake system
+names to steal OTPs, spy on the phone, or make removal confusing.
 
-Cleaning an infected phone for a non-technical relative today means 30–40 minutes of panicked
-digging through Settings. **Saavdhan makes it calm and fast:** it detects the dangerous apps,
-explains the risk in plain language, and takes the user one tap to the exact screen where they can
-fix it.
+Saavdhan is built for the family member who is already stressed. It scans installed apps, explains
+why something looks risky, and opens the exact Android Settings screen where the user can remove
+dangerous powers.
 
-> ⚠️ **Disclaimer.** Saavdhan is a *defensive aid*, not a guarantee. It uses behavioural heuristics
-> (not a malware database) to flag apps that *look* dangerous; it can produce false alarms and can
-> miss brand-new threats. It guides you — it never silently changes or deletes anything. Provided
-> **as is**, with no warranty (see [LICENSE](LICENSE)). If money has already been stolen, contact
-> your bank and local cyber-crime authorities (in India, call **1930** / cybercrime.gov.in).
+It is a detective and guide, not an enforcer. Android deliberately requires the phone owner to make
+the final change, so Saavdhan never pretends to silently fix or delete another app.
 
-## What it looks like
+## See It In Action
 
-| Detect | Explain | Guide |
+| Scan | Explain | Guide |
 |---|---|---|
-| ![results](docs/screenshots/03-results.png) | ![detail](docs/screenshots/04-detail-critical.png) | ![actions](docs/screenshots/05-detail-actions.png) |
+| ![Saavdhan scan results showing risky apps ranked by severity](docs/screenshots/03-results.png) | ![Saavdhan critical risk screen explaining dangerous signals](docs/screenshots/04-detail-critical.png) | ![Saavdhan action screen with settings shortcuts](docs/screenshots/05-detail-actions.png) |
 
-Fully bilingual (हिन्दी / English), chosen on first launch. More in [docs/screenshots](docs/screenshots/README.md).
+| Hindi results | Guided cleanup | Watchdog warning |
+|---|---|---|
+| ![Saavdhan Hindi scan results](docs/screenshots/08-hindi-results.png) | ![Saavdhan guided cleanup checklist](docs/screenshots/06-guided-cleanup.png) | ![Saavdhan watchdog notification for a new threat](docs/screenshots/09-watchdog-notification.png) |
 
-## The promises that never change
+More screenshots are in [docs/screenshots](docs/screenshots/README.md).
 
-1. **Fully offline.** The app does not hold the `INTERNET` permission, so the operating system
-   makes any network call *impossible*. Your data has nowhere to go.
-2. **Detective + guide, not enforcer.** Android only lets *you* turn off another app's powers, so
-   Saavdhan takes you straight to the right screen and coaches the final tap — it never fakes an
-   "auto-fix."
-3. **Explainable, not magic.** Every verdict lists its reasons in plain words. No black-box AI.
-4. **Calm under panic.** Big buttons, simple language, one clear step at a time.
-5. **Honest about limits.** When Android blocks something, the app says so.
+## Why You Can Trust It
 
-## How it works (for the curious)
+**Fully offline.** Saavdhan does not request Android's `INTERNET` permission. That means the
+operating system blocks the app from making network calls. Your app list and scan results stay on
+the phone.
 
-It reads public, no-root signals about each installed app — whether it holds Accessibility, is a
-Device Admin, can read SMS, was sideloaded (including traced straight back to a WhatsApp/Telegram
-chat), hides its icon, or impersonates a system app — and a small, **deterministic, point-based
-rule engine** turns those into a risk level with the exact reasons, ranked most-damning-first. App
-signatures are checked against a set of trusted keys so legitimate apps are never second-guessed.
+**No account, ads, telemetry, or cloud scoring.** Detection runs on the device using rules shipped
+inside the app.
 
-The full design — architecture, the detection rules and the threats behind them, the OS
-constraints, the security/privacy model, and a decision record for every important choice — lives
-in **[docs/](docs/README.md)**.
+**Explainable verdicts.** Every risk level comes with plain-language reasons. No black-box AI and
+no remote malware lookup.
 
-## Build & run
+**Honest about Android limits.** Saavdhan guides the user to the right settings screen. It does not
+claim to auto-disable powers that Android only lets the user change.
+
+**Open source.** The code, detection rules, architecture notes, and decision records are public in
+this repository.
+
+## Install
+
+1. On the Android phone you want to protect, download the latest APK:
+   [github.com/kalpitt/saavdhan/releases/latest/download/saavdhan.apk](https://github.com/kalpitt/saavdhan/releases/latest/download/saavdhan.apk)
+2. Open the downloaded file. Android may ask you to allow installs from your browser because this
+   is a direct download outside the Play Store.
+3. Open Saavdhan, choose Hindi or English, and tap **Scan my phone**.
+
+Requirements: Android 7.0 or newer.
+
+## Current Status
+
+**v0.6.0 is released.** The app includes bilingual scan results, guided cleanup, a background
+watchdog for newly installed threats, offline family-share receipts, OEM-aware Android Settings
+deep links, trusted-signature checks, and 13 deterministic detection signals covering common
+WhatsApp/Telegram sideload-lure campaigns.
+
+The core unit test suite has 131 tests. The debug build has been tested on the Android emulator.
+Real-device testing across phone makers is the highest-value help needed now, especially Samsung,
+Xiaomi, Oppo, Vivo, Huawei, Motorola, and OnePlus.
+
+If a fix button opens the wrong Settings page on your phone, please
+[open an issue](https://github.com/kalpitt/saavdhan/issues). Android Settings screens differ by
+manufacturer, and real-device reports are extremely useful.
+
+## How Detection Works
+
+Saavdhan reads no-root, on-device facts that Android exposes about installed apps, including:
+
+- Whether an app was sideloaded or appears to have come through a messenger
+- Accessibility, Device Admin, SMS, notification-listener, and install-package powers
+- Hidden launcher icons
+- Labels that look like scam lures, such as wedding invite, KYC, bill update, courier, or e-challan
+- Attempts to impersonate system, Google, settings, security, or update apps
+- Known trusted app signatures, so legitimate apps are not second-guessed
+
+A deterministic, point-based rule engine turns those signals into a risk level and ordered reasons.
+The rules are documented in [docs/03-detection-rules.md](docs/03-detection-rules.md).
+
+## Important Disclaimer
+
+Saavdhan is a defensive aid, not a guarantee. It uses behavioural heuristics, not a complete malware
+database. It can raise false alarms and can miss brand-new threats. It never silently changes or
+deletes anything.
+
+If money has already been stolen in India, contact your bank immediately and report cyber fraud via
+**1930** or [cybercrime.gov.in](https://cybercrime.gov.in/).
+
+## Build From Source
 
 ```bash
-# Requires Android Studio (bundles the SDK). Then, from the project root:
-export JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"   # macOS
+# Requires Android Studio, which bundles the Android SDK and a suitable JDK.
+export JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"
 export ANDROID_HOME="$HOME/Library/Android/sdk"
 
-./gradlew testDebugUnitTest   # run the detection-engine tests (fast, no phone needed)
-./gradlew assembleDebug       # build the app
+./gradlew testDebugUnitTest
+./gradlew assembleDebug
 ```
 
-Or open the folder in **Android Studio** and press ▶ Run. New to Android development? The
-beginner-friendly [build guide](docs/08-build-and-run.md) explains every term.
+Or open the folder in Android Studio and press Run. If you are new to Android development, start
+with the beginner-friendly [build guide](docs/08-build-and-run.md).
 
-## Project status
+For a fuller local verification pass:
 
-**v0.6.0 released.** Phases 1–5 are
-functionally complete: bilingual detect → explain → reactive guided cleanup, a WorkManager
-background watchdog, a point-based explainable risk engine with signature verification, detection
-of scam APKs delivered straight through WhatsApp/Telegram, an offline "send result to family"
-receipt, OEM-aware Settings deep links with graceful per-maker fallback chains, and 13 detection
-signals (up from 10) covering the 2026 wedding-invite / e-challan / bill-update / KYC sideload
-campaigns. See the [roadmap](docs/10-roadmap.md) and the [changelog](CHANGELOG.md) for the full
-detail.
+```bash
+./gradlew ktlintCheck testDebugUnitTest assembleDebug :app:lintDebug
+```
 
-> Tested on the Android emulator. **Help wanted:** real-device testing across phone makers.
-> Android's deep-links to system screens differ between makers (Samsung, Xiaomi, Oppo, Vivo…), so
-> if a "fix" button lands on the wrong screen on your phone, please [open an issue](../../issues) —
-> that feedback is gold.
+## Project Map
+
+- [docs/01-vision-and-scope.md](docs/01-vision-and-scope.md): product vision and scope
+- [docs/02-architecture.md](docs/02-architecture.md): architecture overview
+- [docs/03-detection-rules.md](docs/03-detection-rules.md): risk engine signals and scoring
+- [docs/05-security-and-privacy.md](docs/05-security-and-privacy.md): privacy and security model
+- [docs/10-roadmap.md](docs/10-roadmap.md): roadmap
+- [CHANGELOG.md](CHANGELOG.md): release history
 
 ## Contributing
 
-Contributions are very welcome — especially new detection signals, translations, and real-world
-testing across phone makes. Please read **[CONTRIBUTING.md](CONTRIBUTING.md)** first; it covers the
-five non-negotiable principles above and how to build/test. Be kind: we follow a
-[Code of Conduct](CODE_OF_CONDUCT.md). To report a security concern, see [SECURITY.md](SECURITY.md).
+Contributions are welcome, especially:
 
-**Using an AI coding assistant?** Point it at **[AGENTS.md](AGENTS.md)** — it's the single,
-tool-agnostic brief that orients any agent (rules, build commands, project map). The living
-project state and session history live in **[context/](context/README.md)** so work can continue
-across chats and tools without losing the thread.
+- Real-device testing reports across Android manufacturers
+- High-confidence offline detection signals with low false-positive risk
+- Hindi/English copy improvements
+- Accessibility fixes
+- Documentation and build improvements
+
+Please read [CONTRIBUTING.md](CONTRIBUTING.md), [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md), and
+[SECURITY.md](SECURITY.md) before opening a pull request.
+
+Using an AI coding assistant? Point it at [AGENTS.md](AGENTS.md). It contains the repository rules,
+build commands, architecture boundaries, and the non-negotiable offline promise.
 
 ## Tech
 
 Native Android · Kotlin · Jetpack Compose · Material 3 · WorkManager · minSdk 24 / targetSdk 35 ·
-no network permission.
+no network permission
 
 ## License
 
-[MIT](LICENSE) © 2026 Kalpit Tiwari and the Saavdhan contributors. Use it, fork it, ship it — help
-keep people safe.
+[MIT](LICENSE) © 2026 Kalpit Tiwari and the Saavdhan contributors.
