@@ -6,11 +6,14 @@ dependency (matches this repo's toolchain). Exits non-zero on any failure.
 Run: python3 scripts/test_record_commit.py
 """
 import os
+import subprocess
 import sys
 import tempfile
 import unittest.mock as mock
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+REPO_ROOT = os.path.dirname(SCRIPT_DIR)
+sys.path.insert(0, SCRIPT_DIR)
 import record_commit as rc  # noqa: E402
 
 BASE = """# ROADMAP — Test
@@ -66,6 +69,11 @@ def check(name, new_text, message, expect_allowed):
     RESULTS.append((name, ok, allowed, expect_allowed, err))
 
 
+def record(name, ok):
+    """Record a direct (non-guard) assertion into the same results table."""
+    RESULTS.append((name, bool(ok), None, None, None if ok else "assertion failed"))
+
+
 def delete_line(text, needle):
     return "\n".join(l for l in text.splitlines() if needle not in l) + "\n"
 
@@ -83,14 +91,36 @@ def swap_now_lines(text):
     return "\n".join(lines) + "\n"
 
 
+def real_sha():
+    """A commit SHA that genuinely exists in whichever repo this runs in.
+
+    The evidence check resolves SHA-shaped tokens against real history, so this
+    test can't hardcode one — the file is byte-identical across every repo.
+    """
+    return subprocess.run(
+        ["git", "rev-parse", "--short", "HEAD"],
+        cwd=REPO_ROOT, text=True, capture_output=True,
+    ).stdout.strip()
+
+
 def main():
     # 1. delete one item from ## Now with a SHA in the message -> ALLOWED
     check(
-        "delete Now item + SHA evidence -> ALLOWED",
+        "delete Now item + PR-reference evidence -> ALLOWED",
         delete_line(BASE, "Item A"),
-        "state: reconcile ROADMAP — done in a1b2c3d",
+        "state: reconcile ROADMAP — shipped in #42",
         expect_allowed=True,
     )
+
+    # SHA evidence is resolved against REAL history, so it must be exercised
+    # against this actual repo — the guard tests above run in a temp dir with
+    # no git, where every SHA would fail for the wrong reason.
+    record("evidence: a real SHA from this repo -> credible",
+           rc.evidence_is_credible(f"state: done in {real_sha()}", REPO_ROOT) is True)
+    record("evidence: a fabricated SHA -> NOT credible",
+           rc.evidence_is_credible("state: done in deadbeef1", REPO_ROOT) is False)
+    record("evidence: no evidence at all -> NOT credible",
+           rc.evidence_is_credible("state: just tidying", REPO_ROOT) is False)
 
     # 2. delete an item with NO evidence in the message -> REJECTED
     check(
