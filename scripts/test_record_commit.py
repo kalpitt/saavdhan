@@ -36,6 +36,9 @@ Last reviewed by Kalpit: <pending first review>
 
 ## Not doing (decided against — don't re-propose)
 - Item E — never, hard rule 1
+
+## Done
+- Item G — shipped, PR #9
 """
 
 RESULTS = []
@@ -143,6 +146,15 @@ def main():
         "rewrite a Now line in place -> REJECTED",
         replace_line(BASE, "Item B", "- Item B — completely different text"),
         "state: reword — EVIDENCE: clarity",
+        expect_allowed=False,
+    )
+
+    # 8. deleting a line inside ## Done -> REJECTED (shipped history is
+    # byte-identical protected, same as ## Not doing)
+    check(
+        "delete line inside Done -> REJECTED",
+        delete_line(BASE, "Item G"),
+        "state: tidy up shipped history — EVIDENCE: cleanup",
         expect_allowed=False,
     )
 
