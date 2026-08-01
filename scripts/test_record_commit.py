@@ -158,6 +158,24 @@ def main():
         expect_allowed=False,
     )
 
+    # Rule 6b. Deleting a section heading is a pure, order-preserving deletion,
+    # so rules 2/3 allow it — but the EFFECT is to re-parent every item beneath
+    # it into the section above: a Class B promotion wearing Class A clothing.
+    # Must be rejected even WITH valid evidence, because no citation can make
+    # restructuring a fact.
+    check(
+        "delete a '## Next' heading (silently promotes its items to Now) -> REJECTED",
+        delete_line(BASE, "## Next"),
+        "state: tidy up the sections",
+        expect_allowed=False,
+    )
+    check(
+        "delete a '## Next' heading even WITH evidence -> still REJECTED",
+        delete_line(BASE, "## Next"),
+        "state: tidy sections — EVIDENCE: a1b2c3d",
+        expect_allowed=False,
+    )
+
     failed = [r for r in RESULTS if not r[1]]
     print(f"{len(RESULTS) - len(failed)}/{len(RESULTS)} passed\n")
     for name, ok, allowed, expect, err in RESULTS:
