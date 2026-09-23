@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Beta builds only: a distinct launcher name so testers can tell it apart from the stable app. -->
+<resources>
+    <string name="app_name">सावधान बीटा</string>
+</resources>

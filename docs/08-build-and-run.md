@@ -76,6 +76,46 @@ Without it, `assembleRelease` still runs but produces an unsigned APK.
   app/build/outputs/apk/release/saavdhan.apk
 ```
 
+## Beta builds (tester APKs, built in the cloud)
+
+Every merge to `main` makes GitHub build a **beta** APK and publish it as the rolling `beta`
+pre-release of the private repo ([`.github/workflows/beta.yml`](../.github/workflows/beta.yml)).
+No Mac needed. Stable releases stay manual (the section above).
+
+- **Download:** `https://github.com/kalpitt/Saavdhan---Anti-Scam-App/releases/download/beta/saavdhan-beta.apk`
+  (open it in a phone browser that's logged in to GitHub; the repo is private).
+- **Installs next to the stable app** as a separate app, "Saavdhan Beta" / "सावधान बीटा" (package
+  `com.saavdhan.app.beta`). Testing never touches the stable install.
+- **Behaves like release**, not debug: no demo apps. Version shows as e.g. `0.6.0-beta.241`
+  (the number is the CI run).
+- On a tester's phone, the stable app may list "Saavdhan Beta" as a sideloaded app. That's
+  expected: we don't hide it, because a scam app could reuse that package name to hide.
+- Local build: `./gradlew assembleBeta` → `app/build/outputs/apk/beta/saavdhan-beta.apk` (signed
+  with your debug key).
+
+**One-time setup: the beta signing key.** Without it, betas still publish, but each is signed
+with a throwaway key, so testers must uninstall the old beta before installing a new one. With
+it, each beta installs over the last. It is a **separate key from the release key** — never
+upload the release keystore to GitHub.
+
+```bash
+# On the Mac (keytool ships with Android Studio's JDK). Pick a strong password when prompted.
+"$JAVA_HOME/bin/keytool" -genkeypair -v -storetype PKCS12 \
+  -keystore ~/saavdhan-beta.keystore -alias saavdhan-beta \
+  -keyalg RSA -keysize 4096 -validity 10000 -dname "CN=Saavdhan Beta"
+
+# Copy the keystore as text to the clipboard
+base64 -i ~/saavdhan-beta.keystore | pbcopy
+```
+
+Then on GitHub: private repo → **Settings → Secrets and variables → Actions → New repository
+secret**, twice:
+1. `SAAVDHAN_BETA_KEYSTORE_BASE64` — paste the clipboard.
+2. `SAAVDHAN_BETA_PASSWORD` — the password you chose.
+
+Keep `~/saavdhan-beta.keystore` backed up outside the repo (e.g. your password manager). If it's
+lost, make a new one; testers uninstall the beta once.
+
 ## Running it on the emulator (virtual phone)
 
 The emulator is a real Android phone in a window on your Mac — no physical device needed.

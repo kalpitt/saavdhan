@@ -1,0 +1,109 @@
+name: Beta
+
+# Builds a tester APK ("Saavdhan Beta") on every merge to main and publishes it as the rolling
+# "beta" pre-release of THIS private repo. Stable releases stay manual (/release on Kalpit's Mac).
+#
+# Download (GitHub login with access to this repo required):
+#   https://github.com/kalpitt/Saavdhan---Anti-Scam-App/releases/download/beta/saavdhan-beta.apk
+#
+# Signing: with the SAAVDHAN_BETA_KEYSTORE_BASE64 + SAAVDHAN_BETA_PASSWORD secrets set, every beta
+# is signed with the same dedicated beta key and installs over the previous beta. Without them the
+# build still publishes, signed with a throwaway debug key, so each beta needs the old one
+# uninstalled first. The stable release key is never used here.
+
+on:
+  push:
+    branches: [main]
+  # PRs build the beta too (catches a broken beta build BEFORE merge) but never publish.
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+# One beta publish at a time. Never cancel mid-run: a cancel between "delete old beta" and
+# "create new beta" would leave no beta at all.
+concurrency:
+  group: beta-${{ github.event_name == 'pull_request' && github.ref || 'publish' }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write # create/replace the "beta" release
+
+jobs:
+  beta:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v4
+
+      - name: Cache Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Decode the beta signing key (if configured)
+        env:
+          KEYSTORE_B64: ${{ secrets.SAAVDHAN_BETA_KEYSTORE_BASE64 }}
+          PASSWORD: ${{ secrets.SAAVDHAN_BETA_PASSWORD }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -n "$KEYSTORE_B64" ] && [ -n "$PASSWORD" ]; then
+            echo "$KEYSTORE_B64" | base64 --decode > "$RUNNER_TEMP/beta.keystore"
+            echo "SAAVDHAN_BETA_STORE_FILE=$RUNNER_TEMP/beta.keystore" >> "$GITHUB_ENV"
+            echo "SAAVDHAN_BETA_PASSWORD=$PASSWORD" >> "$GITHUB_ENV"
+            echo "Beta key configured: builds will install over each other."
+          else
+            echo "::warning::Beta signing secrets not set — signing with a throwaway debug key. Testers must uninstall the previous beta before installing this one."
+          fi
+
+      - name: Unit tests
+        if: github.event_name != 'pull_request' # the CI workflow already runs them on PRs
+        run: ./gradlew testDebugUnitTest
+
+      - name: Assemble beta APK
+        run: ./gradlew assembleBeta
+
+      - name: Verify the offline guarantee and the Uninstall permission (beta manifest)
+        shell: bash
+        run: |
+          set -euo pipefail
+          manifest=$(find app/build/intermediates/merged_manifest* -path "*beta*" -name AndroidManifest.xml | head -1)
+          if [ -z "$manifest" ]; then
+            echo "::error::No merged beta manifest found — cannot verify the offline guarantee."
+            exit 1
+          fi
+          if grep -q "android.permission.INTERNET" "$manifest"; then
+            echo "::error::INTERNET permission found in the beta manifest — the offline rule is broken."
+            exit 1
+          fi
+          if ! grep -q "android.permission.REQUEST_DELETE_PACKAGES" "$manifest"; then
+            echo "::error::REQUEST_DELETE_PACKAGES missing from the beta manifest — Uninstall would silently do nothing."
+            exit 1
+          fi
+          echo "OK: beta manifest is offline and can open the uninstall dialog."
+
+      - name: Publish as the rolling "beta" pre-release
+        if: github.event_name != 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          apk=app/build/outputs/apk/beta/saavdhan-beta.apk
+          test -f "$apk"
+          short_sha="${GITHUB_SHA::7}"
+          # Replace last beta: drop the old release AND its tag, then recreate at this commit.
+          gh release delete beta --yes --cleanup-tag 2>/dev/null || true
+          gh release create beta "$apk" \
+            --prerelease \
+            --latest=false \
+            --target "$GITHUB_SHA" \
+            --title "Beta #${GITHUB_RUN_NUMBER} (${short_sha})" \
+            --notes "Tester build of main at ${short_sha}. Installs as a separate app, \"Saavdhan Beta\", next to the stable app. Not a stable release — test it, then ship a stable release with /release."
