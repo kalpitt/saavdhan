@@ -140,6 +140,7 @@
 
     <string name="step_uninstall_title">ऐप को हटाएँ</string>
     <string name="step_uninstall_desc">अब इस ऐप को अपने फ़ोन से हटा दें।</string>
+    <string name="step_uninstall_hint">कुछ नहीं खुला, या फ़ोन कहता है कि इसे हटाया नहीं जा सकता? इस ऐप की सेटिंग खोलें और Uninstall (या Disable) दबाएँ।</string>
 
     <string name="step_secure_title">अपने खातों को सुरक्षित करें</string>
     <string name="step_secure_desc">किसी दूसरे डिवाइस से, अपने बैंक और UPI के पासवर्ड बदलें। ऐसे किसी भी भुगतान अनुरोध या ऑटो-पे मैंडेट पर नज़र रखें जो आपने नहीं बनाया, और उन्हें रद्द करें।</string>

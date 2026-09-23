@@ -32,6 +32,9 @@ updates, which matters because detection rules only ship via app updates.
   Device-security apps are an explicitly permitted use case for this permission.
 - **SYSTEM_ALERT_WINDOW** (overlay coach) — no declaration form, but reviewers may ask; the
   in-app flow only requests it optionally, with a plain-language explanation. Fine as is.
+- **REQUEST_DELETE_PACKAGES** (Uninstall button) — normal install-time permission; it only lets
+  us open the system "Uninstall this app?" dialog, which the user confirms. Not on Play's
+  declaration-form list as far as we know — re-check the current Play policy before submitting.
 - **Anti-stalkerware / security-app policies** — Saavdhan complies: it's defensive only, makes
   no removal claims it can't keep, and surveils nothing (no data leaves the device).
 

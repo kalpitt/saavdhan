@@ -35,6 +35,7 @@ nowhere for data to go — there's no network.
 | `QUERY_ALL_PACKAGES` | See all installed apps to scan them | Permitted security use case; [ADR-0005](decisions/0005-query-all-packages.md) |
 | `SYSTEM_ALERT_WINDOW` *(Phase 1, overlay coach)* | Float step-by-step help over Settings | Requested only when first needed |
 | `POST_NOTIFICATIONS` *(Phase 1, watchdog)* | Alert on a dangerous new install | Android 13+ runtime prompt |
+| `REQUEST_DELETE_PACKAGES` | Open Android's own "Uninstall this app?" dialog from the Uninstall button | Install-time, no prompt; the user still confirms every removal. Without it Android 9+ silently ignores the button |
 
 Permissions we will **never** request: `INTERNET`, location, contacts, microphone, camera, SMS
 contents. We *read which apps hold* SMS access; we never read message contents ourselves.

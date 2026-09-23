@@ -63,3 +63,22 @@ jobs:
             exit 1
           fi
           echo "OK: no INTERNET permission in debug or release merged manifests."
+
+      - name: Verify the Uninstall button can work (REQUEST_DELETE_PACKAGES present)
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Without this permission, Android 9+ silently ignores our "Uninstall this app?" request:
+          # no error, the button just does nothing (found on a real OnePlus, Android 15).
+          for variant in debug release; do
+            manifest=$(find app/build/intermediates/merged_manifest* -path "*${variant}*" -name AndroidManifest.xml | head -1)
+            if [ -z "$manifest" ]; then
+              echo "::error::No merged ${variant} manifest found — cannot verify REQUEST_DELETE_PACKAGES."
+              exit 1
+            fi
+            if ! grep -q "android.permission.REQUEST_DELETE_PACKAGES" "$manifest"; then
+              echo "::error::REQUEST_DELETE_PACKAGES missing from the ${variant} manifest — the Uninstall button would silently do nothing."
+              exit 1
+            fi
+          done
+          echo "OK: REQUEST_DELETE_PACKAGES present in debug and release merged manifests."

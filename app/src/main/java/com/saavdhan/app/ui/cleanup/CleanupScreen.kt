@@ -131,7 +131,8 @@ fun CleanupScreen(
                     step = step,
                     number = index + 1,
                     total = plan.steps.size,
-                    onAction = actionFor(step.id, packageName, context, coachAccessibility, coachDeviceAdmin)
+                    onAction = actionFor(step.id, packageName, context, coachAccessibility, coachDeviceAdmin),
+                    onFallback = fallbackFor(step.id, packageName, context)
                 )
             }
 
@@ -166,7 +167,7 @@ fun CleanupScreen(
 
 /** One step row. DONE = compact + green check; CURRENT = expanded card with its action; PENDING = dimmed. */
 @Composable
-private fun StepCard(step: CleanupStep, number: Int, total: Int, onAction: (() -> Unit)?) {
+private fun StepCard(step: CleanupStep, number: Int, total: Int, onAction: (() -> Unit)?, onFallback: (() -> Unit)?) {
     val title = stringResource(step.id.titleRes())
     when (step.status) {
         StepStatus.DONE -> StepHeader(
@@ -227,6 +228,10 @@ private fun StepCard(step: CleanupStep, number: Int, total: Int, onAction: (() -
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
+                }
+                // Plan B when the one-tap screen doesn't open (some phones ignore it silently).
+                onFallback?.let {
+                    SecondaryButton(text = stringResource(R.string.action_app_info), onClick = it)
                 }
             }
         }
@@ -326,6 +331,7 @@ private fun CleanupStepId.actionRes(): Int? = when (this) {
 
 private fun CleanupStepId.hintRes(): Int? = when (this) {
     CleanupStepId.ISOLATE -> R.string.step_isolate_hint
+    CleanupStepId.UNINSTALL -> R.string.step_uninstall_hint
     else -> null
 }
 
@@ -357,3 +363,15 @@ private fun actionFor(
     }
     CleanupStepId.SECURE_ACCOUNTS -> null
 }
+
+/**
+ * A second, always-available route for steps whose one-tap screen can fail silently: App info
+ * exists on every phone and carries the maker's own Uninstall (or Disable) button.
+ */
+private fun fallbackFor(id: CleanupStepId, packageName: String, context: android.content.Context): (() -> Unit)? =
+    when (id) {
+        CleanupStepId.UNINSTALL -> {
+            { SettingsDeepLinks.launch(context, SettingsDeepLinks.appInfo(packageName)) }
+        }
+        else -> null
+    }
