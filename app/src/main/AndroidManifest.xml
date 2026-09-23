@@ -24,6 +24,14 @@
     <!-- Float the step-by-step "overlay coach" on top of the system Settings screen. -->
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
+    <!--
+      Lets the Uninstall button open Android's own "Uninstall this app?" dialog. The USER still
+      confirms; we can never remove an app silently. Without this, Android 9+ ignores the request
+      with no error at all (found on a OnePlus/Android 15 phone), so the button did nothing.
+      A normal install-time permission: no prompt, nothing to do with the network.
+    -->
+    <uses-permission android:name="android.permission.REQUEST_DELETE_PACKAGES" />
+
     <application
         android:allowBackup="false"
         android:icon="@drawable/ic_launcher"
