@@ -1,0 +1,5 @@
+v0.7.0
+* The Uninstall button works again on newer phones.
+* Guided cleanup now shows when the dangerous app is being removed, and confirms when it's gone.
+* If an app can't be removed, Saavdhan points you to its settings page instead.
+* Still fully offline — the app holds no INTERNET permission.
