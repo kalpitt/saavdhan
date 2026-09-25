@@ -76,12 +76,14 @@ Requirements: Android 7.0 or newer.
 
 ## Current Status
 
-**v0.6.0 is released.** The app includes bilingual scan results, guided cleanup, a background
+**v0.7.0 is released.** It fixes the Uninstall button on Android 9+ phones and shows live
+progress in guided cleanup until the dangerous app is confirmed gone. The app includes bilingual
+scan results, guided cleanup, a background
 watchdog for newly installed threats, offline family-share receipts, OEM-aware Android Settings
 deep links, trusted-signature checks, and 13 deterministic detection signals covering common
 WhatsApp/Telegram sideload-lure campaigns.
 
-The core unit test suite has 131 tests. The debug build has been tested on the Android emulator.
+The core unit test suite has 136 tests. The debug build has been tested on the Android emulator.
 Real-device testing across phone makers is the highest-value help needed now, especially Samsung,
 Xiaomi, Oppo, Vivo, Huawei, Motorola, and OnePlus.
 
