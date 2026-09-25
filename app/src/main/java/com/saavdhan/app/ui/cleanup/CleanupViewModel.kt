@@ -1,6 +1,7 @@
 package com.saavdhan.app.ui.cleanup
 
 import android.app.Application
+import android.os.SystemClock
 import android.provider.Settings
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -12,7 +13,13 @@ import com.saavdhan.app.data.scanner.AppScanner
 import com.saavdhan.app.domain.cleanup.CleanupEngine
 import com.saavdhan.app.domain.cleanup.CleanupPlan
 import com.saavdhan.app.domain.cleanup.CleanupState
+import com.saavdhan.app.domain.cleanup.CleanupStepId
+import com.saavdhan.app.domain.cleanup.StepStatus
+import com.saavdhan.app.domain.cleanup.UninstallPhase
+import com.saavdhan.app.domain.cleanup.UninstallWatch
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -32,6 +39,12 @@ class CleanupViewModel(application: Application, private val savedState: SavedSt
     var appLabel by mutableStateOf("")
         private set
 
+    /** Live feedback on the Uninstall step after the user comes back from Android's dialog. */
+    var uninstallPhase by mutableStateOf(UninstallPhase.IDLE)
+        private set
+    private var watchJob: Job? = null
+    private var holdingRemoved = false
+
     private var packageName: String = ""
 
     // What the app held when cleanup began — persisted in SavedStateHandle so the data survives
@@ -46,23 +59,106 @@ class CleanupViewModel(application: Application, private val savedState: SavedSt
         get() = savedState.get("initialized") ?: false
         set(value) = savedState.set("initialized", value)
 
+    // When the user last tapped Uninstall / App info (elapsedRealtime, survives process death).
+    private var uninstallAttemptAt: Long?
+        get() = savedState.get("uninstallAttemptAt")
+        set(value) = savedState.set("uninstallAttemptAt", value)
+
     fun start(packageName: String) {
         this.packageName = packageName
         refresh()
+    }
+
+    /** Call right before opening the uninstall dialog (or App info), so the return is watched. */
+    fun onUninstallRequested() {
+        uninstallAttemptAt = SystemClock.elapsedRealtime()
     }
 
     fun refresh() {
         if (packageName.isEmpty()) return
         // Restore the label after process death (the app may already be uninstalled by now).
         if (appLabel.isEmpty()) appLabel = savedState.get("appLabel") ?: ""
-        viewModelScope.launch {
-            val (state, label) = withContext(Dispatchers.Default) { readState() }
-            if (label.isNotEmpty()) {
-                appLabel = label
-                savedState.set("appLabel", label)
-            }
-            plan = CleanupEngine.plan(state)
+        if (holdingRemoved || watchJob?.isActive == true) return // a watch is already checking
+        if (UninstallWatch.isAttemptFresh(uninstallAttemptAt, SystemClock.elapsedRealtime())) {
+            watchUninstall()
+            return
         }
+        uninstallAttemptAt = null
+        viewModelScope.launch {
+            val state = readAndLabel()
+            if (!state.isInstalled && uninstallIsCurrent()) {
+                celebrateRemoved(state) // gone while we were away: still the user's win
+            } else {
+                // Keep a "wasn't removed" message visible until the user acts again.
+                if (uninstallPhase != UninstallPhase.NOT_REMOVED) uninstallPhase = UninstallPhase.IDLE
+                plan = CleanupEngine.plan(state)
+            }
+        }
+    }
+
+    /** The system said [removedPackage] was removed: confirm it right away, don't wait for a poll. */
+    fun onPackageRemoved(removedPackage: String) {
+        if (removedPackage != packageName || holdingRemoved) return
+        // Still behind Android's dialog: the watch that starts on return shows it where it can be seen.
+        if (UninstallWatch.isAttemptFresh(uninstallAttemptAt, SystemClock.elapsedRealtime())) return
+        watchJob?.cancel()
+        viewModelScope.launch {
+            val state = readAndLabel()
+            if (!state.isInstalled) {
+                celebrateRemoved(state)
+            } else {
+                plan = CleanupEngine.plan(state)
+            }
+        }
+    }
+
+    /**
+     * Android often finishes removing the app a moment AFTER our screen is back, so re-check every
+     * [UninstallWatch.POLL_MS] for a short while instead of trusting one read on return.
+     */
+    private fun watchUninstall() {
+        uninstallAttemptAt = null // consumed: coming back again later is a fresh look, not an attempt
+        watchJob?.cancel()
+        val returnedAt = SystemClock.elapsedRealtime()
+        uninstallPhase = UninstallPhase.CHECKING
+        watchJob = viewModelScope.launch {
+            while (true) {
+                val state = readAndLabel()
+                val phase = UninstallWatch.phase(SystemClock.elapsedRealtime() - returnedAt, state.isInstalled)
+                if (phase == UninstallPhase.REMOVED) {
+                    celebrateRemoved(state)
+                    return@launch
+                }
+                uninstallPhase = phase
+                plan = CleanupEngine.plan(state)
+                if (phase == UninstallPhase.NOT_REMOVED) return@launch
+                delay(UninstallWatch.POLL_MS)
+            }
+        }
+    }
+
+    /** Show "removed" on the Uninstall card for a moment, then let the checklist move on. */
+    private suspend fun celebrateRemoved(state: CleanupState) {
+        if (uninstallIsCurrent()) {
+            holdingRemoved = true
+            uninstallPhase = UninstallPhase.REMOVED
+            delay(UninstallWatch.REMOVED_HOLD_MS)
+            holdingRemoved = false
+        }
+        uninstallPhase = UninstallPhase.IDLE
+        plan = CleanupEngine.plan(state)
+    }
+
+    private fun uninstallIsCurrent(): Boolean =
+        plan?.steps?.any { it.id == CleanupStepId.UNINSTALL && it.status == StepStatus.CURRENT } == true
+
+    private suspend fun readAndLabel(): CleanupState {
+        val (state, label) = withContext(Dispatchers.Default) { readState() }
+        if (label.isNotEmpty()) {
+            appLabel = label
+            savedState.set("appLabel", label)
+        }
+        return state
     }
 
     private suspend fun readState(): Pair<CleanupState, String> {

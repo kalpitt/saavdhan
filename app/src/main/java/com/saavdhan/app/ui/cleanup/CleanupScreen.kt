@@ -1,5 +1,10 @@
 package com.saavdhan.app.ui.cleanup
 
+import android.content.BroadcastReceiver
+import android.content.Intent
+import android.content.IntentFilter
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,9 +19,11 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -27,13 +34,22 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -41,6 +57,7 @@ import com.saavdhan.app.R
 import com.saavdhan.app.domain.cleanup.CleanupStep
 import com.saavdhan.app.domain.cleanup.CleanupStepId
 import com.saavdhan.app.domain.cleanup.StepStatus
+import com.saavdhan.app.domain.cleanup.UninstallPhase
 import com.saavdhan.app.domain.model.RiskLevel
 import com.saavdhan.app.system.deeplink.SettingsDeepLinks
 import com.saavdhan.app.system.overlay.OverlayCoach
@@ -76,6 +93,20 @@ fun CleanupScreen(
         }
         lifecycleOwner.lifecycle.addObserver(observer)
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
+
+    // …and hear the system's "app removed" news the moment it happens (removal often finishes a
+    // second or two after we're back on screen, so ON_RESUME alone can miss it).
+    DisposableEffect(context, packageName) {
+        val receiver = object : BroadcastReceiver() {
+            override fun onReceive(c: android.content.Context, intent: Intent) {
+                if (intent.getBooleanExtra(Intent.EXTRA_REPLACING, false)) return // an update, not a removal
+                intent.data?.schemeSpecificPart?.let { viewModel.onPackageRemoved(it) }
+            }
+        }
+        val filter = IntentFilter(Intent.ACTION_PACKAGE_REMOVED).apply { addDataScheme("package") }
+        ContextCompat.registerReceiver(context, receiver, filter, ContextCompat.RECEIVER_NOT_EXPORTED)
+        onDispose { context.unregisterReceiver(receiver) }
     }
 
     val plan = viewModel.plan
@@ -131,8 +162,10 @@ fun CleanupScreen(
                     step = step,
                     number = index + 1,
                     total = plan.steps.size,
-                    onAction = actionFor(step.id, packageName, context, coachAccessibility, coachDeviceAdmin),
-                    onFallback = fallbackFor(step.id, packageName, context)
+                    onAction = actionFor(step.id, packageName, context, coachAccessibility, coachDeviceAdmin, viewModel::onUninstallRequested),
+                    onFallback = fallbackFor(step.id, packageName, context, viewModel::onUninstallRequested),
+                    uninstallPhase = if (step.id == CleanupStepId.UNINSTALL) viewModel.uninstallPhase else UninstallPhase.IDLE,
+                    appLabel = label
                 )
             }
 
@@ -167,7 +200,15 @@ fun CleanupScreen(
 
 /** One step row. DONE = compact + green check; CURRENT = expanded card with its action; PENDING = dimmed. */
 @Composable
-private fun StepCard(step: CleanupStep, number: Int, total: Int, onAction: (() -> Unit)?, onFallback: (() -> Unit)?) {
+private fun StepCard(
+    step: CleanupStep,
+    number: Int,
+    total: Int,
+    onAction: (() -> Unit)?,
+    onFallback: (() -> Unit)?,
+    uninstallPhase: UninstallPhase,
+    appLabel: String
+) {
     val title = stringResource(step.id.titleRes())
     when (step.status) {
         StepStatus.DONE -> StepHeader(
@@ -215,26 +256,117 @@ private fun StepCard(step: CleanupStep, number: Int, total: Int, onAction: (() -
                 }
                 Text(title, style = MaterialTheme.typography.titleLarge)
                 Text(stringResource(step.id.descRes()), style = MaterialTheme.typography.bodyLarge)
-                onAction?.let {
-                    val actionLabelRes = step.id.actionRes()
-                    if (actionLabelRes != null) {
-                        // The one thing to do right now — the only filled button on this screen.
-                        PrimaryButton(text = stringResource(actionLabelRes), onClick = it)
+                when (uninstallPhase) {
+                    UninstallPhase.REMOVED -> RemovedConfirmation(appLabel)
+
+                    // Waited long enough: App info becomes the main way forward, Uninstall a retry.
+                    UninstallPhase.NOT_REMOVED -> {
+                        StatusLine(
+                            text = stringResource(R.string.uninstall_not_removed),
+                            icon = { Icon(Icons.Filled.Warning, contentDescription = null, tint = RiskLevel.HIGH.color()) }
+                        )
+                        onFallback?.let { PrimaryButton(text = stringResource(R.string.action_app_info), onClick = it) }
+                        onAction?.let { SecondaryButton(text = stringResource(R.string.uninstall_try_again), onClick = it) }
                     }
-                }
-                step.id.hintRes()?.let { hint ->
-                    Text(
-                        stringResource(hint),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-                // Plan B when the one-tap screen doesn't open (some phones ignore it silently).
-                onFallback?.let {
-                    SecondaryButton(text = stringResource(R.string.action_app_info), onClick = it)
+
+                    else -> {
+                        // Buttons pause only for the short CHECKING moment, never longer.
+                        val busy = uninstallPhase == UninstallPhase.CHECKING
+                        onAction?.let {
+                            val actionLabelRes = step.id.actionRes()
+                            if (actionLabelRes != null) {
+                                // The one thing to do right now — the only filled button on this screen.
+                                PrimaryButton(text = stringResource(actionLabelRes), onClick = it, enabled = !busy)
+                            }
+                        }
+                        when (uninstallPhase) {
+                            UninstallPhase.CHECKING -> StatusLine(
+                                text = stringResource(R.string.uninstall_checking),
+                                icon = { SmallSpinner() }
+                            )
+                            UninstallPhase.NOT_YET -> {
+                                StatusLine(
+                                    text = stringResource(R.string.uninstall_not_yet),
+                                    icon = { Icon(Icons.Filled.Info, contentDescription = null, tint = MaterialTheme.colorScheme.primary) }
+                                )
+                                StatusLine(
+                                    text = stringResource(R.string.uninstall_still_checking),
+                                    icon = { SmallSpinner() },
+                                    announce = false
+                                )
+                            }
+                            else -> step.id.hintRes()?.let { hint ->
+                                Text(
+                                    stringResource(hint),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+                        // Plan B when the one-tap screen doesn't open (some phones ignore it silently).
+                        onFallback?.let {
+                            SecondaryButton(text = stringResource(R.string.action_app_info), onClick = it, enabled = !busy)
+                        }
+                    }
                 }
             }
         }
+    }
+}
+
+/** Icon + words (never colour alone), announced politely to TalkBack when it changes. */
+@Composable
+private fun StatusLine(text: String, icon: @Composable () -> Unit, announce: Boolean = true) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .then(if (announce) Modifier.semantics { liveRegion = LiveRegionMode.Polite } else Modifier),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        icon()
+        Text(text, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
+    }
+}
+
+@Composable
+private fun SmallSpinner() {
+    CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 3.dp)
+}
+
+/** The calm win: a check that grows in, one haptic tick, and a spoken confirmation. */
+@Composable
+private fun RemovedConfirmation(appLabel: String) {
+    val haptic = LocalHapticFeedback.current
+    val grow = remember { Animatable(0.6f) }
+    LaunchedEffect(Unit) {
+        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+        grow.animateTo(1f, tween(durationMillis = 250)) // Compose honours the system "remove animations" setting
+    }
+    val announce = stringResource(R.string.uninstall_removed_announce, appLabel)
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .semantics {
+                liveRegion = LiveRegionMode.Polite
+                contentDescription = announce
+            },
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        Icon(
+            Icons.Filled.CheckCircle,
+            contentDescription = null,
+            tint = RiskLevel.LOW.color(),
+            modifier = Modifier.size(32.dp).scale(grow.value)
+        )
+        Text(
+            stringResource(R.string.uninstall_removed, appLabel),
+            style = MaterialTheme.typography.titleMedium,
+            color = RiskLevel.LOW.color(),
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.weight(1f)
+        )
     }
 }
 
@@ -341,7 +473,8 @@ private fun actionFor(
     packageName: String,
     context: android.content.Context,
     coachAccessibility: String,
-    coachDeviceAdmin: String
+    coachDeviceAdmin: String,
+    onUninstallRequested: () -> Unit
 ): (() -> Unit)? = when (id) {
     CleanupStepId.ISOLATE -> {
         { SettingsDeepLinks.launch(context, SettingsDeepLinks.airplaneSettings()) }
@@ -359,7 +492,10 @@ private fun actionFor(
         }
     }
     CleanupStepId.UNINSTALL -> {
-        { SettingsDeepLinks.launch(context, SettingsDeepLinks.uninstall(packageName)) }
+        {
+            onUninstallRequested() // so the return is watched for the removal to finish
+            SettingsDeepLinks.launch(context, SettingsDeepLinks.uninstall(packageName))
+        }
     }
     CleanupStepId.SECURE_ACCOUNTS -> null
 }
@@ -368,10 +504,18 @@ private fun actionFor(
  * A second, always-available route for steps whose one-tap screen can fail silently: App info
  * exists on every phone and carries the maker's own Uninstall (or Disable) button.
  */
-private fun fallbackFor(id: CleanupStepId, packageName: String, context: android.content.Context): (() -> Unit)? =
+private fun fallbackFor(
+    id: CleanupStepId,
+    packageName: String,
+    context: android.content.Context,
+    onUninstallRequested: () -> Unit
+): (() -> Unit)? =
     when (id) {
         CleanupStepId.UNINSTALL -> {
-            { SettingsDeepLinks.launch(context, SettingsDeepLinks.appInfo(packageName)) }
+            {
+                onUninstallRequested() // uninstalling from App info is watched the same way
+                SettingsDeepLinks.launch(context, SettingsDeepLinks.appInfo(packageName))
+            }
         }
         else -> null
     }

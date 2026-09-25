@@ -142,6 +142,13 @@
     <string name="step_uninstall_title">Uninstall the app</string>
     <string name="step_uninstall_desc">Now remove the app from your phone.</string>
     <string name="step_uninstall_hint">Nothing opened, or the phone says it can\'t be removed? Open this app\'s settings page and tap Uninstall (or Disable).</string>
+    <string name="uninstall_checking">Checking if the app was removed…</string>
+    <string name="uninstall_not_yet">The app is still on your phone. If you pressed Cancel, that\'s okay. Tap Uninstall again.</string>
+    <string name="uninstall_still_checking">Still checking…</string>
+    <string name="uninstall_not_removed">It wasn\'t removed. Some apps can\'t be removed from here. Open this app\'s settings page and tap Uninstall or Disable.</string>
+    <string name="uninstall_try_again">Try again</string>
+    <string name="uninstall_removed">%1$s has been removed</string>
+    <string name="uninstall_removed_announce">%1$s has been removed from your phone. Next: secure your accounts.</string>
 
     <string name="step_secure_title">Secure your accounts</string>
     <string name="step_secure_desc">From a DIFFERENT device, change your bank and UPI passwords. Watch for any payment requests or auto-pay mandates you did not set up, and cancel them.</string>
