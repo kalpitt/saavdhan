@@ -6,6 +6,29 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); the pro
 
 ## [Unreleased]
 
+## [0.7.0] — 2026-09-25
+The Uninstall button works again, and guided cleanup now shows live progress while the
+dangerous app is being removed.
+
+### Fixed
+- **Uninstall did nothing on Android 9+.** Found on a real OnePlus (Android 15): Android silently
+  ignores an uninstall request from an app that doesn't declare `REQUEST_DELETE_PACKAGES`, with no
+  error, so the button did nothing on every modern phone. The permission is now declared. It is a
+  normal install-time permission (no prompt), and the user still confirms every removal in
+  Android's own dialog. CI now fails the build if it ever goes missing.
+- **Cleanup screen didn't notice the app was gone.** Android often finishes removing the app a
+  second or two after you return, so the single re-check missed it. The screen now keeps checking
+  for a short while and also listens for Android's "app removed" signal.
+
+### Added
+- **Live uninstall progress** on the cleanup step: "Checking…" with a spinner, then a calm "still
+  on your phone… that's okay" if you pressed Cancel, "It wasn't removed" with the app's settings
+  page as the next step if it can't be removed, and a green "has been removed" confirmation (with
+  a vibration and a TalkBack announcement) when it's gone. English and Hindi.
+- **Open this app's settings page** as a backup on the uninstall step, for built-in apps that
+  can't be removed (App info offers Disable instead).
+- Beta builds for testers (private, CI-built on every change; not part of this release).
+
 ## [0.6.0] — 2026-07-04
 Detection coverage grows from 10 to 13 signals, targeting the 2026 India scam campaigns
 (wedding-invite / e-challan / bill-update / KYC APKs spread over WhatsApp/Telegram) — all
@@ -187,7 +210,8 @@ engine.
 - Detection is heuristic (behavioural signals, not a malware database): it can raise false alarms and
   can miss brand-new threats. It guides — it never silently changes or removes anything.
 
-[Unreleased]: https://github.com/kalpitt/saavdhan/compare/v0.6.0...HEAD
+[Unreleased]: https://github.com/kalpitt/saavdhan/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/kalpitt/saavdhan/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/kalpitt/saavdhan/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/kalpitt/saavdhan/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/kalpitt/saavdhan/compare/v0.3.0...v0.4.0
