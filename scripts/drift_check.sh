@@ -21,7 +21,7 @@ echo "Drift check: verifying doc consistency..."
 echo "  [1/3] Machine-local paths in published files..."
 # Build the needles dynamically and exclude this script, so the checker never matches its own
 # pattern/messages or scans itself. Two needles: macOS home dirs AND Linux home dirs — a
-# 2026-07-12 audit found a /home/user/... path (from a cloud container) that the /Users/-only
+# 2026-07-12 audit found a Linux home-dir path (from a cloud container) that the /Users/-only
 # needle missed.
 NEEDLE_MAC="$(printf '/%s/' Users)"
 NEEDLE_LINUX="$(printf '/%s/' home)"
