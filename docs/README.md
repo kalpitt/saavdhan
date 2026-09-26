@@ -27,6 +27,7 @@ This is an open-source project (MIT). New contributors: start with the
 | 11 | [Play Store Prep](11-play-store-prep.md) | Listing copy, data-safety answers, policy declarations — ready to paste |
 | 12 | [Accessibility](12-accessibility.md) | TalkBack / font-scale checklist and what's already handled |
 | 13 | [F-Droid](13-fdroid.md) | The ready-to-submit fdroiddata recipe and changelog conventions |
+| 14 | [Project Map](14-project-map.md) | The source tree at a glance: where each package lives |
 | — | [Decision Records](decisions/README.md) | One short file per important decision, and *why* we made it |
 
 ## The five rules that never change

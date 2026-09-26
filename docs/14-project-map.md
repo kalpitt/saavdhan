@@ -21,5 +21,4 @@ app/src/main/java/com/saavdhan/app/
 app/src/test/...    unit tests (RiskEngineTest, CleanupEngineTest, KnownAppsTest, …)
 app/src/main/res/   values/strings.xml (English) + values-hi/strings.xml (Hindi) — MIRRORED
 docs/               stable reference: vision, architecture, ADRs, testing, glossary, roadmap
-context/            living state: STATE / PROGRESS / PROFILE / handoffs  ← read these each session
 ```
